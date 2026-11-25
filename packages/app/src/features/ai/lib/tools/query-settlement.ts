@@ -47,7 +47,7 @@ export const querySettlementSchema = withoutNulls(
 export type QuerySettlementArgs = z.infer<typeof querySettlementSchema>;
 
 export const QUERY_SETTLEMENT_DESCRIPTION =
-  'Household settlement between the members of the workspace: shared expenses each participant paid, their fair share (by income, equal or fixed shares), payments already made between them, the open balance and who should pay whom. Use period "open_balance" for "who owes whom now", "month" (YYYY-MM) for one month, or "range" with startDate/endDate. Read-only. Only terms every participant agreed to are settled.';
+  'Household settlement between the members of the workspace: shared expenses each participant paid, their fair share (by income, equal or fixed shares), what someone paid in another participant\'s personal categories (owed back in full), payments already made between them, the open balance and who should pay whom. Use period "open_balance" for "who owes whom now", "month" (YYYY-MM) for one month, or "range" with startDate/endDate. Read-only. Only terms every participant agreed to are settled.';
 
 type Range = { startDate: string; endDate: string } | { error: string };
 
@@ -69,10 +69,14 @@ function rangeOf(args: QuerySettlementArgs): Range {
 }
 
 function describe(report: SettlementReport, format: (amount: number) => string): string {
+  const personal = (p: SettlementReport['participants'][number]) =>
+    p.paidForOthers !== 0 || p.paidByOthers !== 0
+      ? `, paid for others' personal categories ${format(p.paidForOthers)}, others paid for theirs ${format(p.paidByOthers)}`
+      : '';
   const balances = report.participants
     .map(
       (p) =>
-        `${p.name}: paid ${format(p.sharedExpensesPaid)}, fair share ${format(p.fairShare)}, balance ${format(p.balance)}`
+        `${p.name}: paid ${format(p.sharedExpensesPaid)}, fair share ${format(p.fairShare)}${personal(p)}, balance ${format(p.balance)}`
     )
     .join('; ');
   const settle =

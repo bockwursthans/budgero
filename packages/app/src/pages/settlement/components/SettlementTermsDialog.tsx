@@ -49,6 +49,7 @@ const CLEAR_OPTION_VALUE = {
   incomeCategories: 'settlement-no-income-categories',
   expenseCategories: 'settlement-no-expense-categories',
   accounts: 'settlement-no-accounts',
+  personalCategories: 'settlement-no-personal-categories',
 } as const;
 
 type OptionGroups = MultiSelectFilterGroup<SettlementOption>[];
@@ -156,10 +157,12 @@ export function SettlementTermsDialog({
     try {
       await onSave({
         ...draft,
-        participants: draft.participants.map((participant) => ({
+        participants: draft.participants.map(({ personalCategoryIds, ...participant }) => ({
           ...participant,
           // Saved with the member's current name, shown wherever the member list isn't loaded.
           name: cleanSettlementName(nameOf.get(participant.id) ?? participant.name).trim(),
+          // Stored only when set, so terms without them sign exactly as before.
+          ...(personalCategoryIds?.length ? { personalCategoryIds } : {}),
         })),
       });
     } finally {
@@ -245,6 +248,7 @@ export function SettlementTermsDialog({
                 showShare={draft.strategy === SETTLEMENT_STRATEGY.custom}
                 canRemove={draft.participants.length > SETTLEMENT_MIN_PARTICIPANTS}
                 accountGroups={accountGroups}
+                categoryGroups={categoryGroups}
                 countLabel={countLabel}
                 onChange={(patch) => updateParticipant(participant.id, patch)}
                 onRemove={() => removeParticipant(participant.id)}
@@ -349,6 +353,7 @@ interface ParticipantRowProps {
   showShare: boolean;
   canRemove: boolean;
   accountGroups: OptionGroups;
+  categoryGroups: OptionGroups;
   countLabel: (count: number) => string;
   onChange: (patch: Partial<SettlementParticipant>) => void;
   onRemove: () => void;
@@ -360,6 +365,7 @@ function ParticipantRow({
   showShare,
   canRemove,
   accountGroups,
+  categoryGroups,
   countLabel,
   onChange,
   onRemove,
@@ -369,6 +375,7 @@ function ParticipantRow({
   // The typed text, so "12," or "" can be typed on the way to a share.
   const [shareText, setShareText] = useState(() => percentText(participant.customShareBasisPoints));
   const isMember = memberChoices.some((member) => member.id === participant.id);
+  const personalCategoryIds = participant.personalCategoryIds ?? [];
 
   return (
     <div className="grid gap-2 rounded-md border p-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
@@ -445,6 +452,26 @@ function ParticipantRow({
       >
         <Trash2 className="h-4 w-4" />
       </Button>
+      <div className="flex flex-col gap-1 sm:col-span-4">
+        <Label className="text-xs text-muted-foreground">
+          <Trans>Personal categories</Trans>
+        </Label>
+        <SettlementMultiSelect
+          groups={categoryGroups}
+          selectedIds={personalCategoryIds}
+          onChange={(ids) => onChange({ personalCategoryIds: ids })}
+          buttonLabel={countLabel(personalCategoryIds.length)}
+          searchPlaceholder={t`Search categories…`}
+          emptyText={t`No categories found.`}
+          clearOptionValue={CLEAR_OPTION_VALUE.personalCategories}
+        />
+        <p className="text-xs text-muted-foreground">
+          <Trans>
+            Spending in these categories is this person's alone. When someone else pays it, this
+            person owes them the full amount.
+          </Trans>
+        </p>
+      </div>
     </div>
   );
 }

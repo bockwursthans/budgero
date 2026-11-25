@@ -3133,6 +3133,10 @@ msgstr "A minute a day keeps your budget in step with your bank."
 msgid "A new Budgero build is ready to install. Refresh now to load the latest features and fixes."
 msgstr "A new Budgero build is ready to install. Refresh now to load the latest features and fixes."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "A personal category belongs to one person only and can't also be shared or count as income."
+msgstr "A personal category belongs to one person only and can't also be shared or count as income."
+
 #: src/features/reports/ui/notebook/viz/PivotTableView.tsx
 msgid "A pivot table needs two groupings and a metric."
 msgstr "A pivot table needs two groupings and a metric."
@@ -15367,6 +15371,18 @@ msgstr "Paid"
 msgid "Paid {0} more than set aside"
 msgstr "Paid {0} more than set aside"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid by others (owed in full)"
+msgstr "Paid by others (owed in full)"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid for each other"
+msgstr "Paid for each other"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid for others (back in full)"
+msgstr "Paid for others (back in full)"
+
 #: src/pages/accounts/components/AccountSummaryCards.tsx
 msgid "Paid off - congratulations!"
 msgstr "Paid off - congratulations!"
@@ -15679,6 +15695,10 @@ msgstr "Personal Budget Space"
 #: src/features/budget-management/model/icon-options.ts
 msgid "Personal Care"
 msgstr "Personal Care"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Personal categories"
+msgstr "Personal categories"
 
 #: src/entities/account/model/accountTypes.ts
 msgid "Personal loans, auto loans, and installment debt"
@@ -19610,6 +19630,10 @@ msgstr "Spending divided by the number of spending transactions"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Spending during the month doesn't reduce progress — only what you assign matters"
 msgstr "Spending during the month doesn't reduce progress — only what you assign matters"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Spending in these categories is this person's alone. When someone else pays it, this person owes them the full amount."
+msgstr "Spending in these categories is this person's alone. When someone else pays it, this person owes them the full amount."
 
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Spending lowers the balance, so assign again to top it back up"

@@ -26,10 +26,16 @@ export interface SettlementReportParticipant {
   fairShare: number;
   paymentsSent: number;
   paymentsReceived: number;
+  /** Paid in other participants' personal categories: owed back in full. */
+  paidForOthers: number;
+  /** Others paid in this participant's personal categories: owed to them in full. */
+  paidByOthers: number;
   /** Positive: gets money back; negative: owes; zero: settled. */
   balance: number;
   sharedExpensesByCategory: SettlementReportCategory[];
   incomeByCategory: SettlementReportCategory[];
+  paidForOthersByCategory: SettlementReportCategory[];
+  paidByOthersByCategory: SettlementReportCategory[];
 }
 
 export interface SettlementReport {
@@ -96,9 +102,13 @@ export function settlementReport(
       fairShare: amount(participant.targetContribution),
       paymentsSent: amount(participant.paymentsSent),
       paymentsReceived: amount(participant.paymentsReceived),
+      paidForOthers: amount(participant.paidForOthers),
+      paidByOthers: amount(participant.paidByOthers),
       balance: amount(participant.netSettlement),
       sharedExpensesByCategory: categories(participant.sharedExpensesByCategory, categoryNames),
       incomeByCategory: categories(participant.incomeByCategory, categoryNames),
+      paidForOthersByCategory: categories(participant.paidForOthersByCategory, categoryNames),
+      paidByOthersByCategory: categories(participant.paidByOthersByCategory, categoryNames),
     })),
     toSettleUp: result.transfers.map((transfer) => ({
       from: displayName(transfer.fromParticipantId),

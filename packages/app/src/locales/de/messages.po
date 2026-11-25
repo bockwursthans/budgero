@@ -3131,6 +3131,10 @@ msgstr "Eine Minute am Tag hält dein Budget im Einklang mit deiner Bank."
 msgid "A new Budgero build is ready to install. Refresh now to load the latest features and fixes."
 msgstr "Eine neue Budgero-Version ist bereit zur Installation. Aktualisiere jetzt, um die neuesten Funktionen und Fehlerbehebungen zu laden."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "A personal category belongs to one person only and can't also be shared or count as income."
+msgstr "Eine persönliche Kategorie gehört nur einer Person und kann nicht zugleich geteilt werden oder als Einkommen zählen."
+
 #: src/features/reports/ui/notebook/viz/PivotTableView.tsx
 msgid "A pivot table needs two groupings and a metric."
 msgstr "Eine Pivot-Tabelle braucht zwei Gruppierungen und eine Metrik."
@@ -15365,6 +15369,18 @@ msgstr "Bezahlt"
 msgid "Paid {0} more than set aside"
 msgstr "{0} mehr gezahlt als zurückgelegt"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid by others (owed in full)"
+msgstr "Von anderen bezahlt (voll geschuldet)"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid for each other"
+msgstr "Füreinander bezahlt"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid for others (back in full)"
+msgstr "Für andere bezahlt (voll zurück)"
+
 #: src/pages/accounts/components/AccountSummaryCards.tsx
 msgid "Paid off - congratulations!"
 msgstr "Abbezahlt – herzlichen Glückwunsch!"
@@ -15677,6 +15693,10 @@ msgstr "Persönlicher Budget-Bereich"
 #: src/features/budget-management/model/icon-options.ts
 msgid "Personal Care"
 msgstr "Körperpflege"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Personal categories"
+msgstr "Persönliche Kategorien"
 
 #: src/entities/account/model/accountTypes.ts
 msgid "Personal loans, auto loans, and installment debt"
@@ -19608,6 +19628,10 @@ msgstr "Ausgaben geteilt durch die Anzahl der Ausgabentransaktionen"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Spending during the month doesn't reduce progress — only what you assign matters"
 msgstr "Ausgaben während des Monats reduzieren den Fortschritt nicht — nur was du zuweist, zählt"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Spending in these categories is this person's alone. When someone else pays it, this person owes them the full amount."
+msgstr "Ausgaben in diesen Kategorien gehören nur dieser Person. Bezahlt jemand anderes sie, schuldet diese Person ihm den vollen Betrag."
 
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Spending lowers the balance, so assign again to top it back up"

@@ -27,6 +27,12 @@ export interface SettlementParticipant {
   accountIds: number[];
   /** Fixed share in basis points (10 000 = 100 %), used by the custom strategy only. */
   customShareBasisPoints: number;
+  /**
+   * Categories that are this participant's alone: spending in them is never
+   * shared. When another participant pays it from their personal accounts,
+   * this participant owes them the full amount. Absent when there are none.
+   */
+  personalCategoryIds?: number[];
 }
 
 /** The settlement rules in effect from one date on. */
@@ -92,9 +98,14 @@ export interface SettlementParticipantResult {
   paymentsSent: MilliUnits;
   /** Transfers into this participant's personal accounts from another participant's. */
   paymentsReceived: MilliUnits;
+  /** What this participant paid in other participants' personal categories. */
+  paidForOthers: MilliUnits;
+  /** What other participants paid in this participant's personal categories. */
+  paidByOthers: MilliUnits;
   /**
-   * Paid minus target, plus payments sent, minus payments received: positive
-   * means money back, negative means owed, zero means settled.
+   * Paid minus target, plus payments sent, minus payments received, plus paid
+   * for others, minus paid by others: positive means money back, negative
+   * means owed, zero means settled.
    */
   netSettlement: MilliUnits;
   /** Part of all shared expenses this participant carries (0 to 1). */
@@ -103,6 +114,10 @@ export interface SettlementParticipantResult {
   incomeByCategory: SettlementCategoryAmount[];
   /** What the shared expenses paid were spent on, largest first. */
   sharedExpensesByCategory: SettlementCategoryAmount[];
+  /** Other participants' personal categories this participant paid in, largest first. */
+  paidForOthersByCategory: SettlementCategoryAmount[];
+  /** This participant's personal categories others paid in, largest first. */
+  paidByOthersByCategory: SettlementCategoryAmount[];
 }
 
 /** A participant's net amount in one category over the range. */

@@ -30,10 +30,14 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
       targetContribution: asMilli(900_000),
       paymentsSent: asMilli(0),
       paymentsReceived: asMilli(0),
+      paidForOthers: asMilli(0),
+      paidByOthers: asMilli(0),
       netSettlement: asMilli(100_000),
       contributionShare: 0.6,
       incomeByCategory: [{ categoryId: SALARY, amount: asMilli(3_000_000) }],
       sharedExpensesByCategory: [{ categoryId: RENT, amount: asMilli(1_000_000) }],
+      paidForOthersByCategory: [],
+      paidByOthersByCategory: [],
     },
     {
       participantId: 'sam',
@@ -43,10 +47,14 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
       targetContribution: asMilli(600_000),
       paymentsSent: asMilli(0),
       paymentsReceived: asMilli(0),
+      paidForOthers: asMilli(0),
+      paidByOthers: asMilli(0),
       netSettlement: asMilli(-100_000),
       contributionShare: 0.4,
       incomeByCategory: [{ categoryId: SALARY, amount: asMilli(2_000_000) }],
       sharedExpensesByCategory: [{ categoryId: 99, amount: asMilli(500_000) }],
+      paidForOthersByCategory: [],
+      paidByOthersByCategory: [],
     },
   ],
   transfers: [{ fromParticipantId: 'sam', toParticipantId: 'alex', amount: asMilli(100_000) }],
@@ -148,6 +156,50 @@ describe('SettlementSummary', () => {
       screen.getByText('Nothing to settle until everyone taking part has agreed to the terms.')
     ).toBeInTheDocument();
     expect(screen.queryByText('Everyone has paid their share. Nothing to settle.')).toBeNull();
+  });
+
+  it('shows what was paid for each other only when someone did', async () => {
+    const user = userEvent.setup();
+    const HOBBY = 30;
+    const base = result();
+    const [alex, sam] = base.participants;
+    const { rerender } = render(
+      <SettlementSummary result={base} money={money} categoryNames={CATEGORY_NAMES} />
+    );
+    expect(screen.queryByText('Paid for each other')).toBeNull();
+
+    rerender(
+      <SettlementSummary
+        result={{
+          ...base,
+          participants: [
+            {
+              ...alex,
+              paidByOthers: asMilli(40_000),
+              paidByOthersByCategory: [{ categoryId: HOBBY, amount: asMilli(40_000) }],
+            },
+            {
+              ...sam,
+              paidForOthers: asMilli(40_000),
+              paidForOthersByCategory: [{ categoryId: HOBBY, amount: asMilli(40_000) }],
+            },
+          ],
+        }}
+        money={money}
+        categoryNames={new Map([...CATEGORY_NAMES, [HOBBY, 'Hobby (Alex)']])}
+      />
+    );
+
+    expect(screen.getByText('Paid for each other')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('row', { name: /Alex/ })).getByText('€-40.00')
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('row', { name: /Sam/ })).getByText('€40.00')
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sam' }));
+    expect(screen.getByText('Paid for others (back in full)')).toBeInTheDocument();
+    expect(screen.getByText('Hobby (Alex)')).toBeInTheDocument();
   });
 
   it('explains an equal split for lack of income', () => {

@@ -22,6 +22,7 @@ const accountGroups = [
 const categoryGroups = [
   { key: 1, heading: 'Income', items: [{ id: 10, name: 'Salary' }] },
   { key: 2, heading: 'Home', items: [{ id: 20, name: 'Rent' }] },
+  { key: 3, heading: 'Own', items: [{ id: 30, name: 'Hobby' }] },
 ];
 const twoMembers: SettlementMember[] = [
   { id: ALEX, name: 'Alex' },
@@ -68,6 +69,23 @@ function renderDialog(
 const savedTerms = (onSave: ReturnType<typeof vi.fn>): SettlementTerms =>
   onSave.mock.calls[0][0] as SettlementTerms;
 
+// The category pickers are cmdk lists, which measure themselves (jsdom has no ResizeObserver).
+beforeAll(() => {
+  class ResizeObserverStub {
+    observe() {}
+
+    unobserve() {}
+
+    disconnect() {}
+  }
+  vi.stubGlobal('ResizeObserver', ResizeObserverStub);
+  Element.prototype.scrollIntoView ??= () => {};
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
+
 describe('SettlementTermsDialog', () => {
   it('saves valid terms with the members’ current names', async () => {
     const { onSave, user } = renderDialog(terms());
@@ -80,6 +98,39 @@ describe('SettlementTermsDialog', () => {
       [SAM, 'Sam'],
     ]);
     expect(savedTerms(onSave).effectiveFrom).toBeUndefined();
+    expect(savedTerms(onSave).participants[0]).not.toHaveProperty('personalCategoryIds');
+  });
+
+  /** Each participant's personal-categories picker, in participant order (none chosen yet). */
+  const personalPickers = () => screen.getAllByRole('button', { name: 'None selected' });
+
+  it('saves a participant’s personal categories', async () => {
+    const { onSave, user } = renderDialog(terms());
+
+    await user.click(personalPickers()[0]);
+    await user.click(await screen.findByRole('option', { name: 'Hobby' }));
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    const [alex, sam] = savedTerms(onSave).participants;
+    expect(alex.personalCategoryIds).toEqual([30]);
+    expect(sam).not.toHaveProperty('personalCategoryIds');
+  });
+
+  it('refuses a personal category that is also shared', async () => {
+    const { onSave, user } = renderDialog(terms());
+
+    await user.click(personalPickers()[1]);
+    await user.click(await screen.findByRole('option', { name: 'Rent' }));
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(
+        "A personal category belongs to one person only and can't also be shared or count as income."
+      )
+    ).toBeInTheDocument();
   });
 
   it('lists what is missing instead of saving', async () => {
