@@ -2,11 +2,13 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import {
+  INITIAL_SETTLEMENT_TERMS_KEY,
   SETTLEMENT_PROFILE_FORMAT_VERSION,
   SETTLEMENT_PROFILE_KEY,
   SETTLEMENT_PROFILE_STATUS,
   SETTLEMENT_STRATEGY,
   type SettlementProfile,
+  type SettlementTerms,
 } from '@budgero/core/browser';
 import { setDemoSpaceId } from '@shared/lib/demo-space';
 import { useSettlement, useSettlementProfile } from './useSettlement';
@@ -51,8 +53,8 @@ const profile: SettlementProfile = {
     {
       strategy: SETTLEMENT_STRATEGY.equal,
       participants: [
-        { id: 'kay', name: 'Kay', accountIds: [1], customShareBasisPoints: 0 },
-        { id: 'franzi', name: 'Franzi', accountIds: [2], customShareBasisPoints: 0 },
+        { id: 'alex', name: 'Alex', accountIds: [1], customShareBasisPoints: 0 },
+        { id: 'sam', name: 'Sam', accountIds: [2], customShareBasisPoints: 0 },
       ],
       incomeCategoryIds: [],
       expenseCategoryIds: [20],
@@ -144,19 +146,35 @@ describe('useSettlementProfile', () => {
 });
 
 describe('useSettlement', () => {
-  it('settles the range with the profile', async () => {
+  const consent = { approvedTermsKeys: [INITIAL_SETTLEMENT_TERMS_KEY], ready: true };
+
+  it('settles the range with the approved terms only', async () => {
     calculate.mockReturnValue({ participants: [] });
-    const { result } = renderHook(() => useSettlement(1, profile, '2026-01-01', '2026-01-31'), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useSettlement(1, profile, '2026-01-01', '2026-01-31', consent),
+      { wrapper }
+    );
 
     await waitFor(() => expect(result.current.data).toEqual({ participants: [] }));
-    expect(calculate).toHaveBeenCalledWith(1, profile, '2026-01-01', '2026-01-31');
+    const [budgetId, usedProfile, start, end, isApproved] = calculate.mock.calls[0] as [
+      number,
+      SettlementProfile,
+      string,
+      string,
+      (terms: SettlementTerms) => boolean,
+    ];
+    expect([budgetId, usedProfile, start, end]).toEqual([1, profile, '2026-01-01', '2026-01-31']);
+    expect(isApproved(profile.terms[0])).toBe(true);
+    expect(isApproved({ ...profile.terms[0], effectiveFrom: '2026-02-01' })).toBe(false);
   });
 
-  it('stays idle without a profile or a range', () => {
-    renderHook(() => useSettlement(1, null, '2026-01-01', '2026-01-31'), { wrapper });
-    renderHook(() => useSettlement(1, profile, '', ''), { wrapper });
+  it('stays idle without a profile, a range or known consent', () => {
+    renderHook(() => useSettlement(1, null, '2026-01-01', '2026-01-31', consent), { wrapper });
+    renderHook(() => useSettlement(1, profile, '', '', consent), { wrapper });
+    renderHook(
+      () => useSettlement(1, profile, '2026-01-01', '2026-01-31', { ...consent, ready: false }),
+      { wrapper }
+    );
 
     expect(calculate).not.toHaveBeenCalled();
   });

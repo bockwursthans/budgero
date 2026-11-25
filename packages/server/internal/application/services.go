@@ -25,6 +25,8 @@ type Services struct {
 	UserPurge       driving.UserPurgeService
 	// SnapshotHistory keeps replaced workspace snapshots for restore.
 	SnapshotHistory driving.SnapshotHistoryService
+	// SettlementApproval records members' consent to settlement terms.
+	SettlementApproval driving.SettlementApprovalService
 	// Analytics is the server-side product analytics tracker. It drops
 	// everything on self-host and when POSTHOG_KEY is unset.
 	Analytics driving.AnalyticsTracker
@@ -51,6 +53,8 @@ type Repositories struct {
 	UpdatePing repository.UpdatePingRepository
 	// UserPurge permanently deletes users and every row tied to them.
 	UserPurge repository.UserPurgeRepository
+	// SettlementApproval stores members' consent to settlement terms.
+	SettlementApproval repository.SettlementApprovalRepository
 	// CurrencyProvider fetches daily exchange rates from the external
 	// dataset (or a self-hosted mirror).
 	CurrencyProvider external.CurrencyProvider
@@ -66,21 +70,23 @@ func NewServices(repos *Repositories, cfg *config.Config) *Services {
 	tracker := NewAnalyticsService(repos.AnalyticsSender, repos.User, AnalyticsOptions{Telemetry: repos.Telemetry})
 	users := NewUserService(repos.User, repos.Space, cfg)
 	users.SetAnalytics(tracker)
+	spaces := NewSpaceService(repos.Space, repos.User, cfg)
 	return &Services{
-		Analytics:       tracker,
-		User:            users,
-		Space:           NewSpaceService(repos.Space, repos.User, cfg),
-		Credential:      NewCredentialService(repos.Credential, cfg),
-		Entitlement:     NewEntitlementService(repos.Entitlement, repos.User, cfg),
-		Sync:            NewSyncService(repos.Sync),
-		Push:            NewPushService(repos.Push),
-		ExchangeRate:    NewExchangeRateService(repos.ExchangeRate, repos.CurrencyProvider),
-		Activity:        NewActivityService(repos.Activity),
-		Admin:           NewAdminService(repos.Admin, repos.Activity, repos.Space, repos.Queries, cfg),
-		DatabaseBrowser: NewDatabaseBrowserService(repos.DatabaseBrowser, repos.Queries),
-		Feedback:        NewFeedbackService(repos.Feedback),
-		UpdatePing:      NewUpdatePingService(repos.UpdatePing),
-		UserPurge:       NewUserPurgeService(repos.UserPurge),
-		SnapshotHistory: NewSnapshotHistoryService(repos.Space, cfg),
+		Analytics:          tracker,
+		User:               users,
+		Space:              spaces,
+		Credential:         NewCredentialService(repos.Credential, cfg),
+		Entitlement:        NewEntitlementService(repos.Entitlement, repos.User, cfg),
+		Sync:               NewSyncService(repos.Sync),
+		Push:               NewPushService(repos.Push),
+		ExchangeRate:       NewExchangeRateService(repos.ExchangeRate, repos.CurrencyProvider),
+		Activity:           NewActivityService(repos.Activity),
+		Admin:              NewAdminService(repos.Admin, repos.Activity, repos.Space, repos.Queries, cfg),
+		DatabaseBrowser:    NewDatabaseBrowserService(repos.DatabaseBrowser, repos.Queries),
+		Feedback:           NewFeedbackService(repos.Feedback),
+		UpdatePing:         NewUpdatePingService(repos.UpdatePing),
+		UserPurge:          NewUserPurgeService(repos.UserPurge),
+		SnapshotHistory:    NewSnapshotHistoryService(repos.Space, cfg),
+		SettlementApproval: NewSettlementApprovalService(repos.SettlementApproval, spaces),
 	}
 }

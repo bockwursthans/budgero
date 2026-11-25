@@ -209,6 +209,11 @@ msgstr "(Vereist)"
 msgid "(selected)"
 msgstr "(geselecteerd)"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgctxt "settlement-current-user"
+msgid "(you)"
+msgstr "(jij)"
+
 #. placeholder {0}: result.accountsRemoved
 #: src/pages/settings/ImportsPage.tsx
 msgid "{0, plural, one {, # account} other {, # accounts}}"
@@ -578,6 +583,11 @@ msgstr "{0}(koptekst)"
 #: src/features/import/lib/plan-file-import.ts
 msgid "{0} (new)"
 msgstr "{0} (nieuw)"
+
+#. placeholder {0}: participant.name
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "{0} (no longer in this workspace)"
+msgstr "{0} (niet meer in deze werkruimte)"
 
 #. placeholder {0}: formatAmount(sourceOutflow)
 #. placeholder {1}: sourceAccount.Currency
@@ -5278,6 +5288,10 @@ msgstr "Budgero bewaart je hoofdwachtwoord in de IndexedDB van deze browser totd
 msgid "Budgero tries to detect other format settings, but exports made with the settings above are the only ones that import losslessly."
 msgstr "Budgero probeert andere indelingsinstellingen te detecteren, maar exports die met de bovenstaande instellingen zijn gemaakt, zijn de enige die verliesvrij importeren."
 
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Budgero user"
+msgstr "Budgero-gebruiker"
+
 #: src/features/budget-management/ui/create-budget-form/YnabImportStatus.tsx
 msgid "Budgero value"
 msgstr "Budgero-waarde"
@@ -6803,6 +6817,10 @@ msgstr "Verbindingsstatus"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Consecutive months"
 msgstr "Opeenvolgende maanden"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Consent"
+msgstr "Instemming"
 
 #: src/pages/auth/AuthPage.tsx
 msgid "Contact"
@@ -8623,6 +8641,10 @@ msgstr "Elke rekening met het saldo uit de transacties."
 msgid "Each account's balance at the end of every day, week or month, for net worth over time."
 msgstr "Het saldo van elke rekening aan het einde van elke dag, week of maand, voor je vermogen door de tijd."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Each Budgero user can take part only once."
+msgstr "Elke Budgero-gebruiker kan maar één keer deelnemen."
+
 #: src/pages/settings/BudgetSettingsPage.tsx
 msgid "Each category group on the Planning page shows its share of everything assigned in the selected month, next to its allocated total."
 msgstr "Elke categoriegroep op de planningspagina toont naast het toegewezen totaal welk deel van alle toewijzingen in de geselecteerde maand erbij hoort."
@@ -9278,6 +9300,10 @@ msgid "Every month, until you change it"
 msgstr "Elke maand, tot je het wijzigt"
 
 #: src/pages/settlement/settlement-messages.ts
+msgid "Every participant must be a Budgero user in this workspace."
+msgstr "Elke deelnemer moet een Budgero-gebruiker in deze werkruimte zijn."
+
+#: src/pages/settlement/settlement-messages.ts
 msgid "Every participant needs a name."
 msgstr "Elke deelnemer heeft een naam nodig."
 
@@ -9328,6 +9354,14 @@ msgstr "Iedereen draagt hetzelfde deel van de gedeelde uitgaven."
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Everyone has paid their share. Nothing to settle."
 msgstr "Iedereen heeft zijn deel betaald. Niets te verrekenen."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Everyone in this workspace takes part. To add someone, invite them to the workspace first."
+msgstr "Iedereen in deze werkruimte doet mee. Nodig iemand eerst uit voor de werkruimte om hem toe te voegen."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Everyone taking part needs their own Budgero login in this workspace, so they can enter and manage their own transactions. Invite the others first."
+msgstr "Iedere deelnemer heeft een eigen Budgero-login in deze werkruimte nodig om zijn eigen transacties in te voeren en te beheren. Nodig de anderen eerst uit."
 
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Exact (±0.01)"
@@ -10712,6 +10746,14 @@ msgstr "Halverwege! Spaar deze maand nog {needed}"
 msgid "Halve amount"
 msgstr "Bedrag halveren"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "has agreed"
+msgstr "heeft ingestemd"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "has not agreed yet"
+msgstr "heeft nog niet ingestemd"
+
 #: src/features/goal-management/ui/GoalForm.tsx
 msgid "Have it ready every few months"
 msgstr "Om de paar maanden klaar hebben"
@@ -10965,6 +11007,10 @@ msgstr "Hoe wil je beginnen?"
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Hypermarket"
 msgstr "Hypermarkt"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "I agree to these terms"
+msgstr "Ik stem in met deze afspraken"
 
 #: src/features/transactions/ui/form/CurrencyConversionNotice.tsx
 msgid "ℹ️ Offline or unauthorized – conversions will use cached or manual rates."
@@ -13266,7 +13312,6 @@ msgstr "naam"
 #: src/pages/analytics/reports/SpendingReport.tsx
 #: src/pages/auth/AuthPage.tsx
 #: src/pages/custom-dashboards/components/DashboardSwitcher.tsx
-#: src/pages/settlement/components/SettlementTermsDialog.tsx
 #: src/pages/warranties/components/WarrantyTable.tsx
 msgid "Name"
 msgstr "Naam"
@@ -14451,6 +14496,10 @@ msgstr "Niet verwijderd"
 msgid "Not empty"
 msgstr "Niet leeg"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Not everyone has agreed to the terms for all of this period yet. Those parts are left out until everyone taking part has agreed."
+msgstr "Nog niet iedereen heeft voor deze hele periode met de afspraken ingestemd. Die delen blijven buiten beschouwing tot alle deelnemers hebben ingestemd."
+
 #: src/pages/custom-dashboards/components/WidgetCard.tsx
 msgid "Not filtered"
 msgstr "Niet gefilterd"
@@ -15339,10 +15388,6 @@ msgstr "Gedeeltelijk"
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Participant"
 msgstr "Deelnemer"
-
-#: src/pages/settlement/components/SettlementTermsDialog.tsx
-msgid "Participant {position}"
-msgstr "Deelnemer {position}"
 
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Participants"
@@ -18862,8 +18907,8 @@ msgid "Settings → Workspaces"
 msgstr "Instellingen → Werkruimtes"
 
 #: src/pages/settlement/SettlementPage.tsx
-msgid "Settlement saved"
-msgstr "Verrekening opgeslagen"
+msgid "Settlement saved. It takes effect once everyone has agreed."
+msgstr "Verrekening opgeslagen. Ze geldt zodra iedereen heeft ingestemd."
 
 #: src/pages/settlement/components/SettlementTermsList.tsx
 msgid "Settlement terms"
@@ -18896,8 +18941,8 @@ msgid "Share feedback"
 msgstr "Feedback delen"
 
 #: src/pages/settlement/SettlementPage.tsx
-msgid "Share household expenses fairly: assign each person their personal accounts, pick the shared expense categories, and see each month who owes whom."
-msgstr "Verdeel huishoudkosten eerlijk: koppel ieder aan zijn persoonlijke rekeningen, kies de categorieën van gedeelde uitgaven en zie elke maand wie wie wat verschuldigd is."
+msgid "Share household expenses fairly: pick who takes part, assign each person their personal accounts and the shared expense categories, and see each month who owes whom."
+msgstr "Verdeel huishoudkosten eerlijk: kies wie meedoet, koppel ieder aan zijn persoonlijke rekeningen en de categorieën van gedeelde uitgaven, en zie elke maand wie wie wat verschuldigd is."
 
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Share in %"
@@ -20334,6 +20379,10 @@ msgstr "Sjablonen"
 msgid "Terms of Service"
 msgstr "Servicevoorwaarden"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Terms take effect only when everyone taking part has agreed to them from their own login. Any change needs everyone's consent again."
+msgstr "Afspraken gelden pas als alle deelnemers er vanuit hun eigen login mee hebben ingestemd. Elke wijziging heeft opnieuw ieders instemming nodig."
+
 #: src/pages/settings/ai/ConnectionTestPanel.tsx
 msgid "Test"
 msgstr "Testen"
@@ -20493,6 +20542,10 @@ msgstr "De kolommen van de grafiek staan niet in dit resultaat, dus de rijen wor
 msgid "The code stays on this device: Budgero only ever sees a fingerprint of it. Next, you pick a master password that keeps the shared budget encrypted here."
 msgstr "De code blijft op dit apparaat: Budgero ziet er alleen een vingerafdruk van. Daarna kies je een hoofdwachtwoord dat het gedeelde budget hier versleuteld houdt."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The consents could not be loaded, so the settlement can't be shown right now. Check your connection."
+msgstr "De instemmingen konden niet worden geladen, dus de verrekening kan nu niet worden getoond. Controleer je verbinding."
+
 #: src/pages/settings/DataManagementPage.tsx
 msgid "the currently active workspace"
 msgstr "de momenteel actieve werkruimte"
@@ -20597,6 +20650,10 @@ msgstr "De lijst toont alleen de periode bovenaan, eerst de laatste 180 dagen. T
 #: src/features/budget-sharing/ui/WorkspaceSharingPanel.tsx
 msgid "The member no longer has access to this workspace."
 msgstr "Het lid heeft geen toegang meer tot deze werkruimte."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The members of this workspace could not be loaded, so the setup can't be changed right now. Check your connection."
+msgstr "De leden van deze werkruimte konden niet worden geladen, dus de instellingen kunnen nu niet worden gewijzigd. Controleer je verbinding."
 
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "The next occurrence not yet entered (can be overdue)."
@@ -20709,6 +20766,10 @@ msgstr "De SQL achter deze vraag"
 #: src/features/category-management/lib/delete-block.ts
 msgid "The system Income category can't be deleted."
 msgstr "De systeemcategorie Inkomsten kan niet worden verwijderd."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The terms were saved, but your consent could not be recorded. Try again below."
+msgstr "De afspraken zijn opgeslagen, maar je instemming kon niet worden vastgelegd. Probeer het hieronder opnieuw."
 
 #: src/features/goal-management/ui/GoalForm.tsx
 msgid "The total amount to allocate across the period. Monthly target is calculated automatically."
@@ -23204,6 +23265,10 @@ msgstr "Met twee groeperingen houdt de limiet de hoogste waarden van de eerste g
 msgid "With your current settings:"
 msgstr "Met je huidige instellingen:"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Withdraw my consent"
+msgstr "Mijn instemming intrekken"
+
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Within {tolerance}"
 msgstr "Binnen {tolerance}"
@@ -23824,6 +23889,14 @@ msgstr "Je budget is gewijzigd door een nieuwere versie van Budgero. Om je gegev
 #: src/pages/dashboard/HomeDashboard.tsx
 msgid "Your changes to the home page are removed and it shows the default cards again. You can undo this."
 msgstr "Je wijzigingen aan de startpagina worden verwijderd en hij toont weer de standaardkaarten. Je kunt dit ongedaan maken."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Your consent could not be recorded. Check your connection."
+msgstr "Je instemming kon niet worden vastgelegd. Controleer je verbinding."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Your consent could not be withdrawn. Check your connection."
+msgstr "Je instemming kon niet worden ingetrokken. Controleer je verbinding."
 
 #: src/pages/settings/subscription/SubscriptionStatusCard.tsx
 msgid "Your current subscription status"

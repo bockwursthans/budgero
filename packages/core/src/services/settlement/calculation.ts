@@ -221,6 +221,7 @@ export function calculateSettlement(
       effectiveFrom: segment.terms.effectiveFrom,
       strategy: segment.terms.strategy,
     })),
+    unapprovedSegments: [],
     warnings: [...warnings],
   };
 }

@@ -16,8 +16,12 @@ export const SETTLEMENT_STRATEGIES: readonly SettlementStrategy[] =
   Object.values(SETTLEMENT_STRATEGY);
 
 export interface SettlementParticipant {
-  /** Stable id, kept across terms so the results of one person add up. */
+  /**
+   * The participant's Budgero user id (a member of the workspace). Stable
+   * across terms, so the results of one person add up.
+   */
   id: string;
+  /** The member's display name when the terms were saved (shown while offline). */
   name: string;
   /** Personal accounts: what is paid from or earned into them counts for this participant. */
   accountIds: number[];
@@ -40,6 +44,11 @@ export interface SettlementTerms {
 /** A budget's settlement setup, stored as synced budget state. */
 export interface SettlementProfile {
   formatVersion: number;
+  /**
+   * HMAC key (hex) the members' approvals of the terms are fingerprinted
+   * with. Kept only in the encrypted workspace; set on the first save.
+   */
+  approvalKey?: string;
   /** Ordered by effectiveFrom; only the first terms have none. */
   terms: SettlementTerms[];
 }
@@ -106,5 +115,7 @@ export interface SettlementResult {
     effectiveFrom?: string;
     strategy: SettlementStrategy;
   }[];
+  /** Parts of the range left out because not every participant approved their terms yet. */
+  unapprovedSegments: { startDate: string; endDate: string; effectiveFrom?: string }[];
   warnings: SettlementWarning[];
 }

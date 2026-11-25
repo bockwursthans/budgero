@@ -1,15 +1,21 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SETTLEMENT_STRATEGY, type SettlementTerms } from '@budgero/core/browser';
+import type { SettlementMember } from '../useSettlementMembers';
 import { SettlementTermsDialog } from './SettlementTermsDialog';
+
+const ALEX = 'user-alex';
+const SAM = 'user-sam';
+const FLATMATE = 'user-flatmate';
 
 const accountGroups = [
   {
     key: 'budget',
     heading: 'Budget accounts',
     items: [
-      { id: 1, name: 'Kay Checking' },
-      { id: 2, name: 'Franzi Checking' },
+      { id: 1, name: 'Alex Checking' },
+      { id: 2, name: 'Sam Checking' },
+      { id: 3, name: 'Flatmate Checking' },
     ],
   },
 ];
@@ -17,12 +23,16 @@ const categoryGroups = [
   { key: 1, heading: 'Income', items: [{ id: 10, name: 'Salary' }] },
   { key: 2, heading: 'Home', items: [{ id: 20, name: 'Rent' }] },
 ];
+const twoMembers: SettlementMember[] = [
+  { id: ALEX, name: 'Alex' },
+  { id: SAM, name: 'Sam' },
+];
 
 const terms = (overrides: Partial<SettlementTerms> = {}): SettlementTerms => ({
   strategy: SETTLEMENT_STRATEGY.incomeWeighted,
   participants: [
-    { id: 'kay', name: '  Kay ', accountIds: [1], customShareBasisPoints: 5_000 },
-    { id: 'franzi', name: 'Franzi', accountIds: [2], customShareBasisPoints: 5_000 },
+    { id: ALEX, name: 'Old name', accountIds: [1], customShareBasisPoints: 5_000 },
+    { id: SAM, name: 'Sam', accountIds: [2], customShareBasisPoints: 5_000 },
   ],
   incomeCategoryIds: [10],
   expenseCategoryIds: [20],
@@ -31,8 +41,11 @@ const terms = (overrides: Partial<SettlementTerms> = {}): SettlementTerms => ({
 
 function renderDialog(
   initialTerms: SettlementTerms,
-  dated = false,
-  takenEffectiveDates: string[] = []
+  {
+    dated = false,
+    takenEffectiveDates = [] as string[],
+    members = twoMembers,
+  }: { dated?: boolean; takenEffectiveDates?: string[]; members?: SettlementMember[] } = {}
 ) {
   const onSave = vi.fn().mockResolvedValue(undefined);
   render(
@@ -43,6 +56,7 @@ function renderDialog(
       initialTerms={initialTerms}
       dated={dated}
       takenEffectiveDates={takenEffectiveDates}
+      members={members}
       accountGroups={accountGroups}
       categoryGroups={categoryGroups}
       onSave={onSave}
@@ -51,15 +65,21 @@ function renderDialog(
   return { onSave, user: userEvent.setup() };
 }
 
+const savedTerms = (onSave: ReturnType<typeof vi.fn>): SettlementTerms =>
+  onSave.mock.calls[0][0] as SettlementTerms;
+
 describe('SettlementTermsDialog', () => {
-  it('saves valid terms with trimmed names', async () => {
+  it('saves valid terms with the members’ current names', async () => {
     const { onSave, user } = renderDialog(terms());
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(onSave).toHaveBeenCalledTimes(1);
-    expect(onSave.mock.calls[0][0].participants[0].name).toBe('Kay');
-    expect(onSave.mock.calls[0][0].effectiveFrom).toBeUndefined();
+    expect(savedTerms(onSave).participants.map((p) => [p.id, p.name])).toEqual([
+      [ALEX, 'Alex'],
+      [SAM, 'Sam'],
+    ]);
+    expect(savedTerms(onSave).effectiveFrom).toBeUndefined();
   });
 
   it('lists what is missing instead of saving', async () => {
@@ -82,44 +102,52 @@ describe('SettlementTermsDialog', () => {
     expect(screen.getByText('Choose the categories of shared expenses.')).toBeInTheDocument();
   });
 
-  it('asks for fixed shares that add up to 100 %', async () => {
+  it('refuses someone who is no longer in the workspace', async () => {
+    const { onSave, user } = renderDialog(terms(), { members: [twoMembers[0]] });
+
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(onSave).not.toHaveBeenCalled();
+    expect(
+      screen.getByText('Every participant must be a Budgero user in this workspace.')
+    ).toBeInTheDocument();
+  });
+
+  it('asks for fixed shares that add up to 100 %, decimal comma included', async () => {
     const { onSave, user } = renderDialog(terms());
 
     await user.click(screen.getByRole('radio', { name: /Fixed shares/ }));
-    const [kayShare] = screen.getAllByLabelText('Share in %');
-    await user.clear(kayShare);
-    await user.type(kayShare, '60');
+    const [alexShare, samShare] = screen.getAllByLabelText('Share in %');
+    await user.clear(alexShare);
+    await user.type(alexShare, '62,5');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(onSave).not.toHaveBeenCalled();
     expect(screen.getByText('The fixed shares must add up to 100 %.')).toBeInTheDocument();
 
-    const [, franziShare] = screen.getAllByLabelText('Share in %');
-    await user.clear(franziShare);
-    await user.type(franziShare, '40');
+    await user.clear(samShare);
+    await user.type(samShare, '37,5');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(onSave).toHaveBeenCalledTimes(1);
-    expect(
-      onSave.mock.calls[0][0].participants.map(
-        (participant: { customShareBasisPoints: number }) => participant.customShareBasisPoints
-      )
-    ).toEqual([6_000, 4_000]);
+    expect(savedTerms(onSave).participants.map((p) => p.customShareBasisPoints)).toEqual([
+      6_250, 3_750,
+    ]);
   });
 
   it('saves a dated change from the first day of the picked month', async () => {
-    const { onSave, user } = renderDialog(terms({ effectiveFrom: '2026-03-01' }), true);
+    const { onSave, user } = renderDialog(terms({ effectiveFrom: '2026-03-01' }), { dated: true });
 
     expect(screen.getByText('Applies from')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(onSave.mock.calls[0][0].effectiveFrom).toBe('2026-03-01');
+    expect(savedTerms(onSave).effectiveFrom).toBe('2026-03-01');
   });
 
   it('refuses a month another change already starts in', async () => {
-    const { onSave, user } = renderDialog(terms({ effectiveFrom: '2026-03-01' }), true, [
-      '2026-03-01',
-    ]);
+    const { onSave, user } = renderDialog(terms({ effectiveFrom: '2026-03-01' }), {
+      dated: true,
+      takenEffectiveDates: ['2026-03-01'],
+    });
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
@@ -129,53 +157,19 @@ describe('SettlementTermsDialog', () => {
     ).toBeInTheDocument();
   });
 
-  it('removes hidden characters from names before saving', async () => {
-    const { onSave, user } = renderDialog(terms());
-
-    const [kayName] = screen.getAllByPlaceholderText(/Participant \d/);
-    await user.clear(kayName);
-    await user.type(kayName, 'Ka\u200By');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-
-    expect(onSave.mock.calls[0][0].participants[0].name).toBe('Kay');
-  });
-
-  it('accepts a decimal comma in shares', async () => {
-    const { onSave, user } = renderDialog(terms({ strategy: SETTLEMENT_STRATEGY.custom }));
-
-    const [kayShare, franziShare] = screen.getAllByLabelText('Share in %');
-    await user.clear(kayShare);
-    await user.type(kayShare, '62,5');
-    await user.clear(franziShare);
-    await user.type(franziShare, '37,5');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-
-    expect(
-      onSave.mock.calls[0][0].participants.map(
-        (participant: { customShareBasisPoints: number }) => participant.customShareBasisPoints
-      )
-    ).toEqual([6_250, 3_750]);
-  });
-
-  it('removes a participant beyond the second', async () => {
-    const { onSave, user } = renderDialog(terms());
-
-    await user.click(screen.getByRole('button', { name: 'Add participant' }));
-    const removeButtons = screen.getAllByRole('button', { name: 'Remove participant' });
-    await user.click(removeButtons[2]);
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-
-    expect(onSave.mock.calls[0][0].participants).toHaveLength(2);
-  });
-
-  it('adds participants and keeps at least two', async () => {
-    const { user } = renderDialog(terms());
+  it('adds only members who are not taking part yet, and keeps at least two', async () => {
+    const { user } = renderDialog(terms(), {
+      members: [...twoMembers, { id: FLATMATE, name: 'Flatmate' }],
+    });
     const removeButtons = () => screen.getAllByRole('button', { name: 'Remove participant' });
+    const addButton = () => screen.getByRole('button', { name: 'Add participant' });
 
     expect(removeButtons().every((button) => button.hasAttribute('disabled'))).toBe(true);
-    await user.click(screen.getByRole('button', { name: 'Add participant' }));
+    await user.click(addButton());
 
-    expect(screen.getAllByPlaceholderText(/Participant \d/)).toHaveLength(3);
+    expect(removeButtons()).toHaveLength(3);
+    expect(addButton()).toBeDisabled();
+    expect(screen.getByText(/Everyone in this workspace takes part/)).toBeInTheDocument();
     expect(removeButtons().some((button) => !button.hasAttribute('disabled'))).toBe(true);
   });
 });

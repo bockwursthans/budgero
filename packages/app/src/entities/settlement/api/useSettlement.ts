@@ -3,12 +3,14 @@ import {
   readSettlementProfile,
   SETTLEMENT_PROFILE_KEY,
   SETTLEMENT_PROFILE_STATUS,
+  settlementTermsKey,
   type SettlementProfile,
   type SettlementProfileStatus,
   type SettlementResult,
 } from '@budgero/core/browser';
 import { useSpaceQuery } from '@shared/api/useSpaceQuery';
 import { budgetScope, useSyncedState } from '@shared/lib/synced-state';
+import type { SettlementConsentState } from './useSettlementConsent';
 
 /**
  * Keyed under 'allTransactionsAnalytics', which every transaction, split and
@@ -16,6 +18,7 @@ import { budgetScope, useSyncedState } from '@shared/lib/synced-state';
  */
 const SETTLEMENT_QUERY_ROOT = 'allTransactionsAnalytics';
 const SETTLEMENT_QUERY_PART = 'householdSettlement';
+const APPROVED_KEYS_SEPARATOR = ',';
 
 /** Statuses this build may write over: nothing stored yet, or read completely. */
 const WRITABLE_STATUSES: readonly SettlementProfileStatus[] = [
@@ -52,13 +55,18 @@ export function useSettlementProfile(budgetId: number): SettlementProfileState {
   };
 }
 
-/** The settlement of an inclusive date range; idle without a profile or range. */
+/**
+ * The settlement of an inclusive date range; idle without a profile, a range
+ * or before consent is known. Only terms in `approvedTermsKeys` are settled.
+ */
 export function useSettlement(
   budgetId: number,
   profile: SettlementProfile | null,
   startDate: string,
-  endDate: string
+  endDate: string,
+  consent: Pick<SettlementConsentState, 'approvedTermsKeys' | 'ready'>
 ) {
+  const approved = consent.approvedTermsKeys;
   return useSpaceQuery<SettlementResult | null>({
     key: [
       SETTLEMENT_QUERY_ROOT,
@@ -67,9 +75,15 @@ export function useSettlement(
       startDate,
       endDate,
       JSON.stringify(profile),
+      approved.join(APPROVED_KEYS_SEPARATOR),
     ],
-    enabled: budgetId > 0 && profile !== null && startDate !== '' && startDate <= endDate,
+    enabled:
+      consent.ready && budgetId > 0 && profile !== null && startDate !== '' && startDate <= endDate,
     queryFn: (services) =>
-      profile ? services.settlement.calculate(budgetId, profile, startDate, endDate) : null,
+      profile
+        ? services.settlement.calculate(budgetId, profile, startDate, endDate, (terms) =>
+            approved.includes(settlementTermsKey(terms))
+          )
+        : null,
   });
 }

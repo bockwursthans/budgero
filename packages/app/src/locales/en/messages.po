@@ -211,6 +211,11 @@ msgstr "(Required)"
 msgid "(selected)"
 msgstr "(selected)"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgctxt "settlement-current-user"
+msgid "(you)"
+msgstr "(you)"
+
 #. placeholder {0}: result.accountsRemoved
 #: src/pages/settings/ImportsPage.tsx
 msgid "{0, plural, one {, # account} other {, # accounts}}"
@@ -580,6 +585,11 @@ msgstr "{0} (header)"
 #: src/features/import/lib/plan-file-import.ts
 msgid "{0} (new)"
 msgstr "{0} (new)"
+
+#. placeholder {0}: participant.name
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "{0} (no longer in this workspace)"
+msgstr "{0} (no longer in this workspace)"
 
 #. placeholder {0}: formatAmount(sourceOutflow)
 #. placeholder {1}: sourceAccount.Currency
@@ -5280,6 +5290,10 @@ msgstr "Budgero stores your master password in this browser's IndexedDB until it
 msgid "Budgero tries to detect other format settings, but exports made with the settings above are the only ones that import losslessly."
 msgstr "Budgero tries to detect other format settings, but exports made with the settings above are the only ones that import losslessly."
 
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Budgero user"
+msgstr "Budgero user"
+
 #: src/features/budget-management/ui/create-budget-form/YnabImportStatus.tsx
 msgid "Budgero value"
 msgstr "Budgero value"
@@ -6805,6 +6819,10 @@ msgstr "Connectivity status"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Consecutive months"
 msgstr "Consecutive months"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Consent"
+msgstr "Consent"
 
 #: src/pages/auth/AuthPage.tsx
 msgid "Contact"
@@ -8625,6 +8643,10 @@ msgstr "Each account with its balance from transactions."
 msgid "Each account's balance at the end of every day, week or month, for net worth over time."
 msgstr "Each account's balance at the end of every day, week or month, for net worth over time."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Each Budgero user can take part only once."
+msgstr "Each Budgero user can take part only once."
+
 #: src/pages/settings/BudgetSettingsPage.tsx
 msgid "Each category group on the Planning page shows its share of everything assigned in the selected month, next to its allocated total."
 msgstr "Each category group on the Planning page shows its share of everything assigned in the selected month, next to its allocated total."
@@ -9280,6 +9302,10 @@ msgid "Every month, until you change it"
 msgstr "Every month, until you change it"
 
 #: src/pages/settlement/settlement-messages.ts
+msgid "Every participant must be a Budgero user in this workspace."
+msgstr "Every participant must be a Budgero user in this workspace."
+
+#: src/pages/settlement/settlement-messages.ts
 msgid "Every participant needs a name."
 msgstr "Every participant needs a name."
 
@@ -9330,6 +9356,14 @@ msgstr "Everyone carries the same part of the shared expenses."
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Everyone has paid their share. Nothing to settle."
 msgstr "Everyone has paid their share. Nothing to settle."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Everyone in this workspace takes part. To add someone, invite them to the workspace first."
+msgstr "Everyone in this workspace takes part. To add someone, invite them to the workspace first."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Everyone taking part needs their own Budgero login in this workspace, so they can enter and manage their own transactions. Invite the others first."
+msgstr "Everyone taking part needs their own Budgero login in this workspace, so they can enter and manage their own transactions. Invite the others first."
 
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Exact (±0.01)"
@@ -10714,6 +10748,14 @@ msgstr "Halfway there! Save {needed} more this month"
 msgid "Halve amount"
 msgstr "Halve amount"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "has agreed"
+msgstr "has agreed"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "has not agreed yet"
+msgstr "has not agreed yet"
+
 #: src/features/goal-management/ui/GoalForm.tsx
 msgid "Have it ready every few months"
 msgstr "Have it ready every few months"
@@ -10967,6 +11009,10 @@ msgstr "How would you like to get started?"
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Hypermarket"
 msgstr "Hypermarket"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "I agree to these terms"
+msgstr "I agree to these terms"
 
 #: src/features/transactions/ui/form/CurrencyConversionNotice.tsx
 msgid "ℹ️ Offline or unauthorized – conversions will use cached or manual rates."
@@ -13268,7 +13314,6 @@ msgstr "name"
 #: src/pages/analytics/reports/SpendingReport.tsx
 #: src/pages/auth/AuthPage.tsx
 #: src/pages/custom-dashboards/components/DashboardSwitcher.tsx
-#: src/pages/settlement/components/SettlementTermsDialog.tsx
 #: src/pages/warranties/components/WarrantyTable.tsx
 msgid "Name"
 msgstr "Name"
@@ -14453,6 +14498,10 @@ msgstr "Not deleted"
 msgid "Not empty"
 msgstr "Not empty"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Not everyone has agreed to the terms for all of this period yet. Those parts are left out until everyone taking part has agreed."
+msgstr "Not everyone has agreed to the terms for all of this period yet. Those parts are left out until everyone taking part has agreed."
+
 #: src/pages/custom-dashboards/components/WidgetCard.tsx
 msgid "Not filtered"
 msgstr "Not filtered"
@@ -15341,10 +15390,6 @@ msgstr "Partial"
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Participant"
 msgstr "Participant"
-
-#: src/pages/settlement/components/SettlementTermsDialog.tsx
-msgid "Participant {position}"
-msgstr "Participant {position}"
 
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Participants"
@@ -18864,8 +18909,8 @@ msgid "Settings → Workspaces"
 msgstr "Settings → Workspaces"
 
 #: src/pages/settlement/SettlementPage.tsx
-msgid "Settlement saved"
-msgstr "Settlement saved"
+msgid "Settlement saved. It takes effect once everyone has agreed."
+msgstr "Settlement saved. It takes effect once everyone has agreed."
 
 #: src/pages/settlement/components/SettlementTermsList.tsx
 msgid "Settlement terms"
@@ -18898,8 +18943,8 @@ msgid "Share feedback"
 msgstr "Share feedback"
 
 #: src/pages/settlement/SettlementPage.tsx
-msgid "Share household expenses fairly: assign each person their personal accounts, pick the shared expense categories, and see each month who owes whom."
-msgstr "Share household expenses fairly: assign each person their personal accounts, pick the shared expense categories, and see each month who owes whom."
+msgid "Share household expenses fairly: pick who takes part, assign each person their personal accounts and the shared expense categories, and see each month who owes whom."
+msgstr "Share household expenses fairly: pick who takes part, assign each person their personal accounts and the shared expense categories, and see each month who owes whom."
 
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Share in %"
@@ -20336,6 +20381,10 @@ msgstr "Templates"
 msgid "Terms of Service"
 msgstr "Terms of Service"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Terms take effect only when everyone taking part has agreed to them from their own login. Any change needs everyone's consent again."
+msgstr "Terms take effect only when everyone taking part has agreed to them from their own login. Any change needs everyone's consent again."
+
 #: src/pages/settings/ai/ConnectionTestPanel.tsx
 msgid "Test"
 msgstr "Test"
@@ -20495,6 +20544,10 @@ msgstr "The chart’s columns aren’t in this result, so its rows are shown ins
 msgid "The code stays on this device: Budgero only ever sees a fingerprint of it. Next, you pick a master password that keeps the shared budget encrypted here."
 msgstr "The code stays on this device: Budgero only ever sees a fingerprint of it. Next, you pick a master password that keeps the shared budget encrypted here."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The consents could not be loaded, so the settlement can't be shown right now. Check your connection."
+msgstr "The consents could not be loaded, so the settlement can't be shown right now. Check your connection."
+
 #: src/pages/settings/DataManagementPage.tsx
 msgid "the currently active workspace"
 msgstr "the currently active workspace"
@@ -20599,6 +20652,10 @@ msgstr "The list only shows the date range at the top, the last 180 days to star
 #: src/features/budget-sharing/ui/WorkspaceSharingPanel.tsx
 msgid "The member no longer has access to this workspace."
 msgstr "The member no longer has access to this workspace."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The members of this workspace could not be loaded, so the setup can't be changed right now. Check your connection."
+msgstr "The members of this workspace could not be loaded, so the setup can't be changed right now. Check your connection."
 
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "The next occurrence not yet entered (can be overdue)."
@@ -20711,6 +20768,10 @@ msgstr "The SQL behind this question"
 #: src/features/category-management/lib/delete-block.ts
 msgid "The system Income category can't be deleted."
 msgstr "The system Income category can't be deleted."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The terms were saved, but your consent could not be recorded. Try again below."
+msgstr "The terms were saved, but your consent could not be recorded. Try again below."
 
 #: src/features/goal-management/ui/GoalForm.tsx
 msgid "The total amount to allocate across the period. Monthly target is calculated automatically."
@@ -23206,6 +23267,10 @@ msgstr "With two groupings, the limit keeps the top values of the first non-date
 msgid "With your current settings:"
 msgstr "With your current settings:"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Withdraw my consent"
+msgstr "Withdraw my consent"
+
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Within {tolerance}"
 msgstr "Within {tolerance}"
@@ -23826,6 +23891,14 @@ msgstr "Your budget was modified by a newer version of Budgero. To keep your dat
 #: src/pages/dashboard/HomeDashboard.tsx
 msgid "Your changes to the home page are removed and it shows the default cards again. You can undo this."
 msgstr "Your changes to the home page are removed and it shows the default cards again. You can undo this."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Your consent could not be recorded. Check your connection."
+msgstr "Your consent could not be recorded. Check your connection."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Your consent could not be withdrawn. Check your connection."
+msgstr "Your consent could not be withdrawn. Check your connection."
 
 #: src/pages/settings/subscription/SubscriptionStatusCard.tsx
 msgid "Your current subscription status"

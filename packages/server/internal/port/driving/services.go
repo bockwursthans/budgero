@@ -493,3 +493,17 @@ type AnalyticsTracker interface {
 	// SetOptOut updates the cached opt-out flag after the user changes it.
 	SetOptOut(userID string, disabled bool)
 }
+
+// SettlementApprovalService records members' consent to household settlement
+// terms. Only accepted members of a space may list, approve or revoke, and a
+// member can only ever approve or revoke for themselves.
+type SettlementApprovalService interface {
+	// List returns every approval in the space.
+	List(ctx context.Context, userID, spaceID string) ([]domain.SettlementApproval, error)
+
+	// Approve records the caller's approval of a fingerprint (idempotent).
+	Approve(ctx context.Context, userID, spaceID, fingerprint string) (*domain.SettlementApproval, error)
+
+	// Revoke removes the caller's approval of a fingerprint (idempotent).
+	Revoke(ctx context.Context, userID, spaceID, fingerprint string) error
+}

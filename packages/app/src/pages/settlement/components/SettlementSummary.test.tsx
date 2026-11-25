@@ -16,8 +16,8 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
   totalEligibleIncome: asMilli(5_000_000),
   participants: [
     {
-      participantId: 'kay',
-      name: 'Kay',
+      participantId: 'alex',
+      name: 'Alex',
       eligibleIncome: asMilli(3_000_000),
       sharedExpensesPaid: asMilli(1_000_000),
       targetContribution: asMilli(900_000),
@@ -25,8 +25,8 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
       contributionShare: 0.6,
     },
     {
-      participantId: 'franzi',
-      name: 'Franzi',
+      participantId: 'sam',
+      name: 'Sam',
       eligibleIncome: asMilli(2_000_000),
       sharedExpensesPaid: asMilli(500_000),
       targetContribution: asMilli(600_000),
@@ -34,7 +34,7 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
       contributionShare: 0.4,
     },
   ],
-  transfers: [{ fromParticipantId: 'franzi', toParticipantId: 'kay', amount: asMilli(100_000) }],
+  transfers: [{ fromParticipantId: 'sam', toParticipantId: 'alex', amount: asMilli(100_000) }],
   segments: [
     {
       startDate: '2026-01-01',
@@ -42,6 +42,7 @@ const result = (overrides: Partial<SettlementResult> = {}): SettlementResult => 
       strategy: SETTLEMENT_STRATEGY.incomeWeighted,
     },
   ],
+  unapprovedSegments: [],
   warnings: [],
   ...overrides,
 });
@@ -50,24 +51,31 @@ describe('SettlementSummary', () => {
   it('shows each participant with share, paid, fair share and balance', () => {
     render(<SettlementSummary result={result()} money={money} />);
 
-    const kay = screen.getByRole('row', { name: /Kay/ });
-    expect(within(kay).getByText('€3000.00')).toBeInTheDocument();
-    expect(within(kay).getByText('60.0%')).toBeInTheDocument();
-    expect(within(kay).getByText('€900.00')).toBeInTheDocument();
-    expect(within(kay).getByText('€100.00')).toBeInTheDocument();
+    const alex = screen.getByRole('row', { name: /Alex/ });
+    expect(within(alex).getByText('€3000.00')).toBeInTheDocument();
+    expect(within(alex).getByText('60.0%')).toBeInTheDocument();
+    expect(within(alex).getByText('€900.00')).toBeInTheDocument();
+    expect(within(alex).getByText('€100.00')).toBeInTheDocument();
     expect(
-      within(screen.getByRole('row', { name: /Franzi/ })).getByText('€-100.00')
+      within(screen.getByRole('row', { name: /Sam/ })).getByText('€-100.00')
     ).toBeInTheDocument();
     expect(screen.getByText('€1500.00')).toBeInTheDocument();
+  });
+
+  it('marks the signed-in member', () => {
+    render(<SettlementSummary result={result()} money={money} currentUserId="sam" />);
+
+    expect(within(screen.getByRole('row', { name: /Sam/ })).getByText('(you)')).toBeInTheDocument();
+    expect(within(screen.getByRole('row', { name: /Alex/ })).queryByText('(you)')).toBeNull();
   });
 
   it('says who pays whom', () => {
     render(<SettlementSummary result={result()} money={money} />);
 
     const transfer = screen.getByRole('listitem');
-    expect(transfer).toHaveTextContent('Franzi');
+    expect(transfer).toHaveTextContent('Sam');
     expect(transfer).toHaveTextContent('pays');
-    expect(transfer).toHaveTextContent('Kay');
+    expect(transfer).toHaveTextContent('Alex');
     expect(transfer).toHaveTextContent('€100.00');
   });
 

@@ -161,6 +161,10 @@ func SetupRoutes(e *echo.Echo, h *handler.Handlers, services *application.Servic
 	protected.PUT("/budget-spaces/:spaceID/invites/:inviteID/bundle", h.AttachInviteBundle)
 	protected.PUT("/budget-spaces/:spaceID/members/me/encrypted-key", h.UpdateMyEncryptedSpaceKey)
 	protected.PUT("/budget-spaces/members/me/encrypted-keys", h.UpdateMyEncryptedSpaceKeys)
+	// Household settlement consent: each member approves terms for themselves only.
+	protected.GET("/budget-spaces/:spaceID/settlement-approvals", h.ListSettlementApprovals)
+	protected.POST("/budget-spaces/:spaceID/settlement-approvals", h.ApproveSettlement)
+	protected.DELETE("/budget-spaces/:spaceID/settlement-approvals/:fingerprint", h.RevokeSettlementApproval)
 	// NOTE: encryption-key-version is now handled via WebSocket for proper sender exclusion
 
 	// Bank sync relay tickets (a paid feature, like the rest of sync)

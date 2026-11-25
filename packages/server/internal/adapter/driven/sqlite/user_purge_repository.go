@@ -33,8 +33,8 @@ var _ repository.UserPurgeRepository = (*UserPurgeRepository)(nil)
 //   - their rows in other people's shared spaces' mutation log are kept (the
 //     space needs them) but anonymized;
 //   - heartbeats, sent-email records, beta invites they created, pending
-//     invites addressed to their email, memberships, credentials,
-//     preferences, feedback and push data.
+//     invites addressed to their email, memberships, settlement approvals,
+//     credentials, preferences, feedback and push data.
 func (r *UserPurgeRepository) Purge(ctx context.Context, userID string) (_ *domain.UserPurgeReport, files []string, err error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -115,6 +115,9 @@ func (r *UserPurgeRepository) Purge(ctx context.Context, userID string) (_ *doma
 			`UPDATE budget_space_invites SET redeemed_by = NULL WHERE redeemed_by = ?`, []any{userID}},
 		{nil, "budget_space_members",
 			`DELETE FROM budget_space_members WHERE user_id = ? OR space_id IN ` + ownedSpaces,
+			[]any{userID, userID}},
+		{nil, "settlement_approvals",
+			`DELETE FROM settlement_approvals WHERE user_id = ? OR space_id IN ` + ownedSpaces,
 			[]any{userID, userID}},
 		{nil, "space_blob_history", `DELETE FROM space_blob_history WHERE space_id IN ` + ownedSpaces, []any{userID}},
 		{nil, "budget_space_blobs", `DELETE FROM budget_space_blobs WHERE space_id IN ` + ownedSpaces, []any{userID}},

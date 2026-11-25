@@ -1,8 +1,9 @@
 /**
- * The settlement profile of a budget: who takes part, which of their accounts
- * are personal, which categories count as income and as shared expenses, and
- * how the expenses are divided. Kept as synced budget state (one JSON value
- * per budget), so every member and device sees the same setup.
+ * The settlement profile of a budget: which workspace members take part,
+ * which of their accounts are personal, which categories count as income and
+ * as shared expenses, and how the expenses are divided. Kept as synced budget
+ * state (one JSON value per budget), so every member sees and can manage the
+ * same setup from their own login.
  *
  * Changes apply from the first day of a month: the profile holds a list of
  * terms, each in effect from its `effectiveFrom` until the next one starts.
@@ -18,6 +19,7 @@
  */
 
 import { getUTCDateString, isCalendarDate } from '../../utils/date.js';
+import { createSettlementApprovalKey, isSettlementApprovalKey } from './consent.js';
 import {
   SETTLEMENT_STRATEGIES,
   SETTLEMENT_STRATEGY,
@@ -84,6 +86,8 @@ export const SETTLEMENT_TERMS_ISSUE = {
   categoryCountedTwice: 'category-counted-twice',
   invalidEffectiveDate: 'invalid-effective-date',
   effectiveDateTaken: 'effective-date-taken',
+  participantNotAMember: 'participant-not-a-member',
+  memberChosenTwice: 'member-chosen-twice',
 } as const;
 
 export type SettlementTermsIssueCode =
@@ -242,10 +246,20 @@ export function readSettlementProfile(raw: unknown): SettlementProfileReading {
     .map((entry) => reader.terms(entry))
     .filter((terms): terms is SettlementTerms => terms !== null);
   const terms = normalizeSettlementTerms(read);
-  const complete = !reader.lossy && terms.length === raw.terms.length && terms.length > 0;
+  const { approvalKey } = raw;
+  const keyReadable = approvalKey === undefined || isSettlementApprovalKey(approvalKey);
+  const complete =
+    !reader.lossy && keyReadable && terms.length === raw.terms.length && terms.length > 0;
   return {
     status: complete ? SETTLEMENT_PROFILE_STATUS.ready : SETTLEMENT_PROFILE_STATUS.unreadable,
-    profile: terms.length > 0 ? { formatVersion: SETTLEMENT_PROFILE_FORMAT_VERSION, terms } : null,
+    profile:
+      terms.length > 0
+        ? {
+            formatVersion: SETTLEMENT_PROFILE_FORMAT_VERSION,
+            ...(isSettlementApprovalKey(approvalKey) ? { approvalKey } : {}),
+            terms,
+          }
+        : null,
   };
 }
 
@@ -320,6 +334,8 @@ export function upsertSettlementTerms(
   );
   return {
     formatVersion: SETTLEMENT_PROFILE_FORMAT_VERSION,
+    // A profile gets its approval key with its first terms and keeps it.
+    approvalKey: profile?.approvalKey ?? createSettlementApprovalKey(),
     terms: normalizeSettlementTerms([...kept, terms]),
   };
 }
@@ -335,7 +351,10 @@ export function removeSettlementTerms(
   };
 }
 
-function participantIssues(participants: readonly SettlementParticipant[]): SettlementTermsIssue[] {
+function participantIssues(
+  participants: readonly SettlementParticipant[],
+  memberIds: ReadonlySet<string> | undefined
+): SettlementTermsIssue[] {
   const issues: SettlementTermsIssue[] = [];
   if (participants.length < SETTLEMENT_MIN_PARTICIPANTS) {
     issues.push({ code: SETTLEMENT_TERMS_ISSUE.tooFewParticipants });
@@ -344,7 +363,21 @@ function participantIssues(participants: readonly SettlementParticipant[]): Sett
     issues.push({ code: SETTLEMENT_TERMS_ISSUE.tooManyParticipants });
   }
   const accountOwners = new Map<number, string>();
+  const seenIds = new Set<string>();
   for (const participant of participants) {
+    if (seenIds.has(participant.id)) {
+      issues.push({
+        code: SETTLEMENT_TERMS_ISSUE.memberChosenTwice,
+        participantId: participant.id,
+      });
+    }
+    seenIds.add(participant.id);
+    if (memberIds && !memberIds.has(participant.id)) {
+      issues.push({
+        code: SETTLEMENT_TERMS_ISSUE.participantNotAMember,
+        participantId: participant.id,
+      });
+    }
     if (participant.name.trim() === '') {
       issues.push({
         code: SETTLEMENT_TERMS_ISSUE.missingParticipantName,
@@ -371,15 +404,19 @@ function participantIssues(participants: readonly SettlementParticipant[]): Sett
   return issues;
 }
 
-/**
- * Problems that keep terms from being saved; empty when they are fine.
- * `otherEffectiveDates` are the dates other terms of the profile start on.
- */
+export interface SettlementTermsValidationContext {
+  /** Dates other terms of the profile start on. */
+  otherEffectiveDates?: readonly string[];
+  /** Budgero user ids of the workspace members; participants must be among them. */
+  memberIds?: ReadonlySet<string>;
+}
+
+/** Problems that keep terms from being saved; empty when they are fine. */
 export function validateSettlementTerms(
   terms: SettlementTerms,
-  otherEffectiveDates: readonly string[] = []
+  { otherEffectiveDates = [], memberIds }: SettlementTermsValidationContext = {}
 ): SettlementTermsIssue[] {
-  const issues = participantIssues(terms.participants);
+  const issues = participantIssues(terms.participants, memberIds);
   if (terms.strategy === SETTLEMENT_STRATEGY.custom) {
     const total = terms.participants.reduce((sum, p) => sum + p.customShareBasisPoints, 0);
     if (total !== SETTLEMENT_FULL_SHARE_BASIS_POINTS) {

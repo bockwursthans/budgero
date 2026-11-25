@@ -34,6 +34,8 @@ export const TERMS_ISSUE_MESSAGES: Record<SettlementTermsIssueCode, MessageDescr
   [SETTLEMENT_TERMS_ISSUE.categoryCountedTwice]: msg`A category can't count as income and as a shared expense.`,
   [SETTLEMENT_TERMS_ISSUE.invalidEffectiveDate]: msg`Choose the month the change applies from.`,
   [SETTLEMENT_TERMS_ISSUE.effectiveDateTaken]: msg`Another change already starts in this month. Edit that one instead.`,
+  [SETTLEMENT_TERMS_ISSUE.participantNotAMember]: msg`Every participant must be a Budgero user in this workspace.`,
+  [SETTLEMENT_TERMS_ISSUE.memberChosenTwice]: msg`Each Budgero user can take part only once.`,
 };
 
 export const WARNING_MESSAGES: Record<SettlementWarning, MessageDescriptor> = {

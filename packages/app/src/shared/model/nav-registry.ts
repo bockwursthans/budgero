@@ -64,9 +64,16 @@ export const NAV_SETTINGS_ACCOUNT: NavRouteItem[] = [
   { to: '/settings/security', icon: Shield, label: msg`Security & Privacy` },
 ];
 
+/** Settings → Workspaces: members and invites. */
+export const NAV_WORKSPACES: NavRouteItem = {
+  to: '/settings/workspaces',
+  icon: Users,
+  label: msg`Workspaces`,
+};
+
 /** Settings → Budgets & Data links. */
 export const NAV_SETTINGS_DATA: NavRouteItem[] = [
-  { to: '/settings/workspaces', icon: Users, label: msg`Workspaces` },
+  NAV_WORKSPACES,
   { to: '/settings/imports', icon: Inbox, label: msg`Imports` },
   { to: '/settings/payees', icon: User, label: msg`Payees` },
   { to: '/settings/labels', icon: Tag, label: msg`Labels` },

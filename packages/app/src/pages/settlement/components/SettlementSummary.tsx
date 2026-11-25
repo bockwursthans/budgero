@@ -11,6 +11,8 @@ import { WARNING_MESSAGES } from '../settlement-messages';
 interface SettlementSummaryProps {
   result: SettlementResult;
   money: (milli: number) => string;
+  /** The signed-in user's id: their row is marked. */
+  currentUserId?: string | null;
 }
 
 const PERCENT_POINTS = 100;
@@ -20,7 +22,7 @@ const headClass = 'h-8 text-xs font-medium uppercase tracking-wide text-muted-fo
 const moneyCell = 'text-right font-mono text-sm tabular-nums';
 
 /** Per participant: income, share, paid, target and net; then who pays whom. */
-export function SettlementSummary({ result, money }: SettlementSummaryProps) {
+export function SettlementSummary({ result, money, currentUserId }: SettlementSummaryProps) {
   const { t } = useLingui();
   const nameOf = new Map(result.participants.map((p) => [p.participantId, p.name]));
 
@@ -78,7 +80,14 @@ export function SettlementSummary({ result, money }: SettlementSummaryProps) {
           <TableBody>
             {result.participants.map((participant) => (
               <TableRow key={participant.participantId}>
-                <TableCell className="font-medium">{participant.name}</TableCell>
+                <TableCell className="font-medium">
+                  {participant.name}
+                  {participant.participantId === currentUserId ? (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                      <Trans context="settlement-current-user">(you)</Trans>
+                    </span>
+                  ) : null}
+                </TableCell>
                 <TableCell className={moneyCell}>{money(participant.eligibleIncome)}</TableCell>
                 <TableCell className={moneyCell}>
                   {formatPercent(participant.contributionShare * PERCENT_POINTS, SHARE_DECIMALS)}

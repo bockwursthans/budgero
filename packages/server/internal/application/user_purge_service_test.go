@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -81,6 +82,15 @@ func testUserPurge(t *testing.T, foreignKeys bool) {
 	exec(t, db, `INSERT INTO beta_invites (code, created_by, expires_at) VALUES ('made', ?, ?)`, gone, time.Now())
 	exec(t, db, `INSERT INTO beta_invites (code, created_by, used_by, expires_at) VALUES ('used', ?, ?, ?)`,
 		stays, gone, time.Now())
+	approveSettlement := func(spaceID, userID, fingerprintChar string) {
+		_, err := services.SettlementApproval.Approve(ctx, userID, spaceID, strings.Repeat(fingerprintChar, 64))
+		if err != nil {
+			t.Fatalf("approve settlement: %v", err)
+		}
+	}
+	approveSettlement(own, stays, "a")
+	approveSettlement(theirs, gone, "b")
+	approveSettlement(theirs, stays, "b")
 
 	report, err := services.UserPurge.Purge(ctx, gone)
 	if err != nil {
@@ -119,6 +129,9 @@ func testUserPurge(t *testing.T, foreignKeys bool) {
 		{"other user", `SELECT COUNT(*) FROM users WHERE id = ?`, []any{stays}, 1},
 		{"other user's space", `SELECT COUNT(*) FROM budget_spaces WHERE space_id = ?`, []any{theirs}, 1},
 		{"dangling primary space", `SELECT COUNT(*) FROM users WHERE primary_space_id = ?`, []any{own}, 0},
+		{"settlement approvals of the user", `SELECT COUNT(*) FROM settlement_approvals WHERE user_id = ?`, []any{gone}, 0},
+		{"settlement approvals in the owned space", `SELECT COUNT(*) FROM settlement_approvals WHERE space_id = ?`, []any{own}, 0},
+		{"other user's settlement approvals", `SELECT COUNT(*) FROM settlement_approvals WHERE space_id = ?`, []any{theirs}, 1},
 	}
 	for _, c := range checks {
 		if got := count(t, db, c.query, c.args...); got != c.want {

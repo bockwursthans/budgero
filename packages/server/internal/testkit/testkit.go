@@ -106,20 +106,21 @@ func NewTestServices(t *testing.T, selfHost bool) (*sql.DB, *sqlc.Queries, *appl
 
 	// Create repositories and services
 	repos := &application.Repositories{
-		User:            sqlite.NewUserRepository(queries),
-		Space:           sqlite.NewSpaceRepository(queries),
-		Credential:      sqlite.NewCredentialRepository(queries),
-		Entitlement:     sqlite.NewEntitlementRepository(queries),
-		Sync:            sqlite.NewSyncRepository(queries),
-		Push:            sqlite.NewPushRepository(queries),
-		ExchangeRate:    sqlite.NewExchangeRateRepository(queries),
-		Activity:        sqlite.NewActivityRepository(sqlDB, queries),
-		Admin:           sqlite.NewAdminRepository(queries),
-		DatabaseBrowser: sqlite.NewDatabaseBrowserRepository(sqlDB),
-		Feedback:        sqlite.NewFeedbackRepository(sqlDB),
-		UpdatePing:      sqlite.NewUpdatePingRepository(sqlDB),
-		UserPurge:       sqlite.NewUserPurgeRepository(sqlDB),
-		Queries:         queries,
+		User:               sqlite.NewUserRepository(queries),
+		Space:              sqlite.NewSpaceRepository(queries),
+		Credential:         sqlite.NewCredentialRepository(queries),
+		Entitlement:        sqlite.NewEntitlementRepository(queries),
+		Sync:               sqlite.NewSyncRepository(queries),
+		Push:               sqlite.NewPushRepository(queries),
+		ExchangeRate:       sqlite.NewExchangeRateRepository(queries),
+		Activity:           sqlite.NewActivityRepository(sqlDB, queries),
+		Admin:              sqlite.NewAdminRepository(queries),
+		DatabaseBrowser:    sqlite.NewDatabaseBrowserRepository(sqlDB),
+		Feedback:           sqlite.NewFeedbackRepository(sqlDB),
+		UpdatePing:         sqlite.NewUpdatePingRepository(sqlDB),
+		UserPurge:          sqlite.NewUserPurgeRepository(sqlDB),
+		SettlementApproval: sqlite.NewSettlementApprovalRepository(queries),
+		Queries:            queries,
 		// No CurrencyProvider: service-level tests exercise the cache path;
 		// provider behavior is covered by fakes in dedicated tests.
 	}

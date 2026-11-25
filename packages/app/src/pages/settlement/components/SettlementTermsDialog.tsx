@@ -4,6 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import {
   cleanSettlementName,
   SETTLEMENT_FULL_SHARE_BASIS_POINTS,
+  SETTLEMENT_MAX_PARTICIPANTS,
   SETTLEMENT_MIN_PARTICIPANTS,
   SETTLEMENT_STRATEGIES,
   SETTLEMENT_STRATEGY,
@@ -14,10 +15,9 @@ import {
 } from '@budgero/core/browser';
 import type { MultiSelectFilterGroup } from '@pages/analytics/components/MultiSelectFilterControl';
 import { formatPercent } from '@pages/analytics/format-percent';
+import { getTodayISO } from '@shared/lib/date-utils';
 import { Alert, AlertDescription } from '@shared/ui/alert';
 import { Button } from '@shared/ui/button';
-import MonthPickerPopover from '@shared/ui/MonthPickerPopover';
-import { getTodayISO } from '@shared/lib/date-utils';
 import {
   Dialog,
   DialogContent,
@@ -28,14 +28,16 @@ import {
 } from '@shared/ui/dialog';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import MonthPickerPopover from '@shared/ui/MonthPickerPopover';
 import { RadioGroup, RadioGroupItem } from '@shared/ui/radio-group';
-import { newSettlementParticipantId } from '../settlement-ids';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@shared/ui/select';
 import { defaultChangeDate, monthKeyOf, monthStart } from '../settlement-period';
 import {
   STRATEGY_DESCRIPTIONS,
   STRATEGY_LABELS,
   TERMS_ISSUE_MESSAGES,
 } from '../settlement-messages';
+import type { SettlementMember } from '../useSettlementMembers';
 import { SettlementMultiSelect, type SettlementOption } from './SettlementMultiSelect';
 
 const BASIS_POINTS_PER_PERCENT = 100;
@@ -61,6 +63,8 @@ interface SettlementTermsDialogProps {
   dated: boolean;
   /** Months other dated terms already start on (YYYY-MM-01). */
   takenEffectiveDates: readonly string[];
+  /** Workspace members: the Budgero users that can take part. */
+  members: readonly SettlementMember[];
   accountGroups: OptionGroups;
   categoryGroups: OptionGroups;
   onSave: (terms: SettlementTerms) => Promise<void>;
@@ -77,6 +81,13 @@ function basisPointsFrom(text: string): number | null {
   return Math.round(percent * BASIS_POINTS_PER_PERCENT);
 }
 
+const asParticipant = (member: SettlementMember): SettlementParticipant => ({
+  id: member.id,
+  name: member.name,
+  accountIds: [],
+  customShareBasisPoints: 0,
+});
+
 /** Editor for one set of settlement terms: participants, categories, strategy, start date. */
 export function SettlementTermsDialog({
   open,
@@ -85,6 +96,7 @@ export function SettlementTermsDialog({
   initialTerms,
   dated,
   takenEffectiveDates,
+  members,
   accountGroups,
   categoryGroups,
   onSave,
@@ -100,15 +112,20 @@ export function SettlementTermsDialog({
   const [showIssues, setShowIssues] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const memberIds = useMemo(() => new Set(members.map((member) => member.id)), [members]);
   const issues = useMemo(
-    () => validateSettlementTerms(draft, takenEffectiveDates),
-    [draft, takenEffectiveDates]
+    () => validateSettlementTerms(draft, { otherEffectiveDates: takenEffectiveDates, memberIds }),
+    [draft, takenEffectiveDates, memberIds]
   );
   const issueMessages = [...new Set(issues.map((issue) => t(TERMS_ISSUE_MESSAGES[issue.code])))];
   const customShareTotal = draft.participants.reduce(
     (sum, participant) => sum + participant.customShareBasisPoints,
     0
   );
+  const chosenIds = new Set(draft.participants.map((participant) => participant.id));
+  const unchosenMembers = members.filter((member) => !chosenIds.has(member.id));
+  const canAdd =
+    unchosenMembers.length > 0 && draft.participants.length < SETTLEMENT_MAX_PARTICIPANTS;
 
   const update = (patch: Partial<SettlementTerms>) => setDraft((prev) => ({ ...prev, ...patch }));
   const updateParticipant = (id: string, patch: Partial<SettlementParticipant>) =>
@@ -118,14 +135,11 @@ export function SettlementTermsDialog({
         participant.id === id ? { ...participant, ...patch } : participant
       ),
     }));
-  const addParticipant = () =>
-    setDraft((prev) => ({
-      ...prev,
-      participants: [
-        ...prev.participants,
-        { id: newSettlementParticipantId(), name: '', accountIds: [], customShareBasisPoints: 0 },
-      ],
-    }));
+  const addParticipant = () => {
+    const [next] = unchosenMembers;
+    if (!next) return;
+    setDraft((prev) => ({ ...prev, participants: [...prev.participants, asParticipant(next)] }));
+  };
   const removeParticipant = (id: string) =>
     setDraft((prev) => ({
       ...prev,
@@ -137,13 +151,15 @@ export function SettlementTermsDialog({
       setShowIssues(true);
       return;
     }
+    const nameOf = new Map(members.map((member) => [member.id, member.name]));
     setSaving(true);
     try {
       await onSave({
         ...draft,
         participants: draft.participants.map((participant) => ({
           ...participant,
-          name: cleanSettlementName(participant.name).trim(),
+          // Saved with the member's current name, shown wherever the member list isn't loaded.
+          name: cleanSettlementName(nameOf.get(participant.id) ?? participant.name).trim(),
         })),
       });
     } finally {
@@ -218,11 +234,14 @@ export function SettlementTermsDialog({
             <legend className="mb-2 text-sm font-medium">
               <Trans>Participants</Trans>
             </legend>
-            {draft.participants.map((participant, index) => (
+            {draft.participants.map((participant) => (
               <ParticipantRow
                 key={participant.id}
                 participant={participant}
-                position={index + 1}
+                memberChoices={[
+                  ...members.filter((member) => member.id === participant.id),
+                  ...unchosenMembers,
+                ]}
                 showShare={draft.strategy === SETTLEMENT_STRATEGY.custom}
                 canRemove={draft.participants.length > SETTLEMENT_MIN_PARTICIPANTS}
                 accountGroups={accountGroups}
@@ -231,8 +250,14 @@ export function SettlementTermsDialog({
                 onRemove={() => removeParticipant(participant.id)}
               />
             ))}
-            <div className="flex items-center justify-between gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={addParticipant}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addParticipant}
+                disabled={!canAdd}
+              >
                 <Plus className="mr-1 h-4 w-4" />
                 <Trans>Add participant</Trans>
               </Button>
@@ -244,6 +269,14 @@ export function SettlementTermsDialog({
                 </span>
               ) : null}
             </div>
+            {unchosenMembers.length === 0 ? (
+              <p className="text-xs text-muted-foreground">
+                <Trans>
+                  Everyone in this workspace takes part. To add someone, invite them to the
+                  workspace first.
+                </Trans>
+              </p>
+            ) : null}
           </fieldset>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -311,7 +344,8 @@ export function SettlementTermsDialog({
 
 interface ParticipantRowProps {
   participant: SettlementParticipant;
-  position: number;
+  /** This participant's member (if still one) and the members nobody has chosen yet. */
+  memberChoices: readonly SettlementMember[];
   showShare: boolean;
   canRemove: boolean;
   accountGroups: OptionGroups;
@@ -322,7 +356,7 @@ interface ParticipantRowProps {
 
 function ParticipantRow({
   participant,
-  position,
+  memberChoices,
   showShare,
   canRemove,
   accountGroups,
@@ -334,19 +368,37 @@ function ParticipantRow({
   const fieldId = useId();
   // The typed text, so "12," or "" can be typed on the way to a share.
   const [shareText, setShareText] = useState(() => percentText(participant.customShareBasisPoints));
+  const isMember = memberChoices.some((member) => member.id === participant.id);
 
   return (
     <div className="grid gap-2 rounded-md border p-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
       <div className="flex flex-col gap-1">
-        <Label htmlFor={`${fieldId}-name`} className="text-xs text-muted-foreground">
-          <Trans>Name</Trans>
+        <Label htmlFor={`${fieldId}-member`} className="text-xs text-muted-foreground">
+          <Trans>Budgero user</Trans>
         </Label>
-        <Input
-          id={`${fieldId}-name`}
-          value={participant.name}
-          onChange={(event) => onChange({ name: event.target.value })}
-          placeholder={t`Participant ${position}`}
-        />
+        <Select
+          value={participant.id}
+          onValueChange={(id) => {
+            const member = memberChoices.find((choice) => choice.id === id);
+            if (member) onChange({ id: member.id, name: member.name });
+          }}
+        >
+          <SelectTrigger id={`${fieldId}-member`} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {isMember ? null : (
+              <SelectItem value={participant.id} disabled>
+                {t`${participant.name} (no longer in this workspace)`}
+              </SelectItem>
+            )}
+            {memberChoices.map((member) => (
+              <SelectItem key={member.id} value={member.id}>
+                {member.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex flex-col gap-1">
         <Label className="text-xs text-muted-foreground">
