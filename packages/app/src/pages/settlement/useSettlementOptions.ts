@@ -13,6 +13,8 @@ export interface SettlementOptions {
   categoryGroups: MultiSelectFilterGroup<SettlementOption>[];
   /** Categories of the budget's Income group: the default income categories. */
   incomeCategoryIds: number[];
+  /** Every category's name by id (for the settlement details). */
+  categoryNames: ReadonlyMap<number, string>;
   isLoading: boolean;
 }
 
@@ -67,6 +69,7 @@ export function useSettlementOptions(budgetId: number): SettlementOptions {
         tracking: t`Tracking accounts`,
       }),
       categoryGroups: categoryGroupsOf(groups, categories),
+      categoryNames: new Map(categories.map((category) => [category.ID, category.Name])),
       incomeCategoryIds: categories
         .filter((category) => category.CategoryGroupID === incomeGroup?.ID)
         .map((category) => category.ID),

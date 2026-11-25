@@ -8210,6 +8210,10 @@ msgstr "Delete workspace"
 msgid "Deleted \"{name}\""
 msgstr "Deleted \"{name}\""
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Deleted category"
+msgstr "Deleted category"
+
 #: src/features/rules/ui/RuleHistoryDrawer.tsx
 #: src/features/rules/ui/RuleSummary.tsx
 msgid "Deleted label"
@@ -14550,6 +14554,10 @@ msgstr "Note"
 msgid "Notes"
 msgstr "Notes"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing in this period."
+msgstr "Nothing in this period."
+
 #: src/features/bank-sync/ui/BankReviewDialog.tsx
 msgid "Nothing left to review."
 msgstr "Nothing left to review."
@@ -18969,6 +18977,10 @@ msgstr "Shared expense categories"
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Shared expenses"
 msgstr "Shared expenses"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Shared expenses paid"
+msgstr "Shared expenses paid"
 
 #: src/features/reports/ui/notebook/viz/ChartSettings.tsx
 msgid "Shared with the bars"

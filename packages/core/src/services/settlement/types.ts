@@ -83,6 +83,16 @@ export interface SettlementParticipantResult {
   netSettlement: MilliUnits;
   /** Part of all shared expenses this participant carries (0 to 1). */
   contributionShare: number;
+  /** Where the eligible income came from, largest first. */
+  incomeByCategory: SettlementCategoryAmount[];
+  /** What the shared expenses paid were spent on, largest first. */
+  sharedExpensesByCategory: SettlementCategoryAmount[];
+}
+
+/** A participant's net amount in one category over the range. */
+export interface SettlementCategoryAmount {
+  categoryId: number;
+  amount: MilliUnits;
 }
 
 /** A suggested payment that settles the period. */

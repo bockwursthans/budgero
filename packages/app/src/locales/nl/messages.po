@@ -8208,6 +8208,10 @@ msgstr "Werkruimte verwijderen"
 msgid "Deleted \"{name}\""
 msgstr "\"{name}\" verwijderd"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Deleted category"
+msgstr "Verwijderde categorie"
+
 #: src/features/rules/ui/RuleHistoryDrawer.tsx
 #: src/features/rules/ui/RuleSummary.tsx
 msgid "Deleted label"
@@ -14548,6 +14552,10 @@ msgstr "Notitie"
 msgid "Notes"
 msgstr "Notities"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing in this period."
+msgstr "Niets in deze periode."
+
 #: src/features/bank-sync/ui/BankReviewDialog.tsx
 msgid "Nothing left to review."
 msgstr "Niets meer na te kijken."
@@ -18967,6 +18975,10 @@ msgstr "Categorieën gedeelde uitgaven"
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Shared expenses"
 msgstr "Gedeelde uitgaven"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Shared expenses paid"
+msgstr "Betaalde gedeelde uitgaven"
 
 #: src/features/reports/ui/notebook/viz/ChartSettings.tsx
 msgid "Shared with the bars"

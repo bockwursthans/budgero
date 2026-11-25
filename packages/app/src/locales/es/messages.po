@@ -8208,6 +8208,10 @@ msgstr "Eliminar espacio de trabajo"
 msgid "Deleted \"{name}\""
 msgstr "Eliminado \"{name}\""
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Deleted category"
+msgstr "Categoría eliminada"
+
 #: src/features/rules/ui/RuleHistoryDrawer.tsx
 #: src/features/rules/ui/RuleSummary.tsx
 msgid "Deleted label"
@@ -14548,6 +14552,10 @@ msgstr "Nota"
 msgid "Notes"
 msgstr "Notas"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing in this period."
+msgstr "Nada en este periodo."
+
 #: src/features/bank-sync/ui/BankReviewDialog.tsx
 msgid "Nothing left to review."
 msgstr "No queda nada por revisar."
@@ -18967,6 +18975,10 @@ msgstr "Categorías de gastos compartidos"
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Shared expenses"
 msgstr "Gastos compartidos"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Shared expenses paid"
+msgstr "Gastos compartidos pagados"
 
 #: src/features/reports/ui/notebook/viz/ChartSettings.tsx
 msgid "Shared with the bars"

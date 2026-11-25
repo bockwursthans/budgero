@@ -146,6 +146,36 @@ describe('calculateSettlement', () => {
     expect(result.warnings).toEqual([]);
   });
 
+  it('shows per category what was earned and paid, summed over the range', () => {
+    const later = terms({ effectiveFrom: '2026-02-01' });
+    const result = calculateSettlement(
+      [
+        {
+          segment: { terms: terms(), startDate: '2026-01-01', endDate: '2026-01-31' },
+          lines: [
+            line(ALEX_ACCOUNT, SALARY, 1_000_000, 0),
+            line(ALEX_ACCOUNT, RENT, 0, 800_000),
+            line(ALEX_ACCOUNT, GROCERIES, 50_000, 250_000),
+          ],
+        },
+        {
+          segment: { terms: later, startDate: '2026-02-01', endDate: '2026-02-28' },
+          lines: [line(ALEX_ACCOUNT, RENT, 0, 800_000), line(ALEX_ACCOUNT, GROCERIES, 200_000, 0)],
+        },
+      ],
+      '2026-01-01',
+      '2026-02-28'
+    );
+
+    expect(byId(result, ALEX).sharedExpensesByCategory).toEqual([
+      { categoryId: RENT, amount: 1_600_000 },
+    ]);
+    expect(byId(result, ALEX).incomeByCategory).toEqual([
+      { categoryId: SALARY, amount: 1_000_000 },
+    ]);
+    expect(byId(result, SAM).sharedExpensesByCategory).toEqual([]);
+  });
+
   it('ignores categories and accounts outside the terms', () => {
     const result = settleOne(terms(), [
       line(ALEX_ACCOUNT, SALARY, 1_000_000, 0),

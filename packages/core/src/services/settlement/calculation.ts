@@ -20,6 +20,7 @@ import { asMilli, roundToCents } from '../../money/index.js';
 import {
   SETTLEMENT_STRATEGY,
   SETTLEMENT_WARNING,
+  type SettlementCategoryAmount,
   type SettlementLineTotal,
   type SettlementParticipantResult,
   type SettlementResult,
@@ -34,6 +35,22 @@ interface ParticipantTotals {
   eligibleIncome: number;
   sharedExpensesPaid: number;
   targetContribution: number;
+  incomeByCategory: Map<number, number>;
+  paidByCategory: Map<number, number>;
+}
+
+const addTo = (amounts: Map<number, number>, categoryId: number, amount: number) =>
+  amounts.set(categoryId, (amounts.get(categoryId) ?? 0) + amount);
+
+const sumOf = (amounts: ReadonlyMap<number, number>) =>
+  [...amounts.values()].reduce((sum, amount) => sum + amount, 0);
+
+/** Category amounts, largest first (category id on a tie), without zeros. */
+function byCategory(amounts: ReadonlyMap<number, number>): SettlementCategoryAmount[] {
+  return [...amounts]
+    .filter(([, amount]) => amount !== 0)
+    .sort(([idA, a], [idB, b]) => b - a || idA - idB)
+    .map(([categoryId, amount]) => ({ categoryId, amount: asMilli(amount) }));
 }
 
 /**
@@ -71,23 +88,34 @@ function participantTotalsOf(terms: SettlementTerms, lines: readonly SettlementL
   }
   const incomeCategories = new Set(terms.incomeCategoryIds);
   const expenseCategories = new Set(terms.expenseCategoryIds);
-  const income = new Map<string, number>();
-  const paid = new Map<string, number>();
+  const income = new Map<string, Map<number, number>>();
+  const paid = new Map<string, Map<number, number>>();
+  const amountsOf = (byOwner: Map<string, Map<number, number>>, owner: string) => {
+    let amounts = byOwner.get(owner);
+    if (!amounts) byOwner.set(owner, (amounts = new Map()));
+    return amounts;
+  };
   for (const line of lines) {
     const owner = ownerOf.get(line.accountId);
     if (owner === undefined) continue;
     if (incomeCategories.has(line.categoryId)) {
-      income.set(owner, (income.get(owner) ?? 0) + line.inflow - line.outflow);
+      addTo(amountsOf(income, owner), line.categoryId, line.inflow - line.outflow);
     }
     if (expenseCategories.has(line.categoryId)) {
-      paid.set(owner, (paid.get(owner) ?? 0) + line.outflow - line.inflow);
+      addTo(amountsOf(paid, owner), line.categoryId, line.outflow - line.inflow);
     }
   }
-  return terms.participants.map((participant) => ({
-    participant,
-    income: income.get(participant.id) ?? 0,
-    paid: paid.get(participant.id) ?? 0,
-  }));
+  return terms.participants.map((participant) => {
+    const incomeByCategory = income.get(participant.id) ?? new Map<number, number>();
+    const paidByCategory = paid.get(participant.id) ?? new Map<number, number>();
+    return {
+      participant,
+      incomeByCategory,
+      paidByCategory,
+      income: sumOf(incomeByCategory),
+      paid: sumOf(paidByCategory),
+    };
+  });
 }
 
 function weightsFor(
@@ -173,18 +201,26 @@ export function calculateSettlement(
     );
     if (warning && sharedTotal !== 0) warnings.add(warning);
     const targets = apportion(sharedTotal, weights);
-    rows.forEach(({ participant, income, paid }, index) => {
+    rows.forEach(({ participant, income, paid, incomeByCategory, paidByCategory }, index) => {
       const entry = totals.get(participant.id) ?? {
         name: participant.name,
         eligibleIncome: 0,
         sharedExpensesPaid: 0,
         targetContribution: 0,
+        incomeByCategory: new Map<number, number>(),
+        paidByCategory: new Map<number, number>(),
       };
       // Parts come in date order: the latest name wins.
       entry.name = participant.name;
       entry.eligibleIncome += income;
       entry.sharedExpensesPaid += paid;
       entry.targetContribution += targets[index];
+      for (const [categoryId, amount] of incomeByCategory) {
+        addTo(entry.incomeByCategory, categoryId, amount);
+      }
+      for (const [categoryId, amount] of paidByCategory) {
+        addTo(entry.paidByCategory, categoryId, amount);
+      }
       totals.set(participant.id, entry);
     });
   }
@@ -206,6 +242,8 @@ export function calculateSettlement(
     netSettlement: asMilli(entry.sharedExpensesPaid - entry.targetContribution),
     contributionShare:
       totalSharedExpenses === 0 ? 0 : entry.targetContribution / totalSharedExpenses,
+    incomeByCategory: byCategory(entry.incomeByCategory),
+    sharedExpensesByCategory: byCategory(entry.paidByCategory),
   }));
 
   return {

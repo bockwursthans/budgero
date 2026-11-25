@@ -214,7 +214,12 @@ export default function SettlementPage() {
   const renderSettlement = () => {
     if (result) {
       return (
-        <SettlementSummary result={result} money={money} currentUserId={membership.currentUserId} />
+        <SettlementSummary
+          result={result}
+          money={money}
+          currentUserId={membership.currentUserId}
+          categoryNames={options.categoryNames}
+        />
       );
     }
     if (settlement.isError) {
