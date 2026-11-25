@@ -1117,6 +1117,10 @@ msgstr "{count, plural, one {Wekelijks} other {Elke # weken}}"
 msgid "{count, plural, one {Yearly} other {Every # years}}"
 msgstr "{count, plural, one {Jaarlijks} other {Elke # jaar}}"
 
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "{count} selected"
+msgstr "{count} geselecteerd"
+
 #: src/features/page-guides/ui/guide-visuals.tsx
 msgid "{count} transactions"
 msgstr "{count} transacties"
@@ -3037,6 +3041,10 @@ msgstr "Een bank gaf geen rekeningen terug. Koppel die rekeningen in het <0>cont
 msgid "A brief description helps us understand the issue."
 msgstr "Een korte beschrijving helpt ons het probleem te begrijpen."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "A category can't count as income and as a shared expense."
+msgstr "Een categorie kan niet tegelijk als inkomen en als gedeelde uitgave tellen."
+
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "A closing parenthesis ) is missing."
 msgstr "Er ontbreekt een sluithaakje )."
@@ -3148,6 +3156,10 @@ msgstr "Een resultaatfilter kon niet worden gelezen en is weggelaten."
 #: src/features/page-guides/ui/guide-content.tsx
 msgid "A rule checks a transaction against conditions on memo, payee, amount or account, joined with AND or OR, then runs its actions, such as Set category or Set payee. Choose New rule to make one; when several rules match, the lower run order goes first."
 msgstr "Een regel toetst een transactie aan voorwaarden op memo, begunstigde, bedrag of rekening, verbonden met EN of OF, en voert dan zijn acties uit, zoals ‘Categorie instellen’ of ‘Begunstigde instellen’. Kies ‘Nieuwe regel’ om er een te maken; als meerdere regels passen, gaat de laagste uitvoervolgorde voor."
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "A settlement can have at most {SETTLEMENT_MAX_PARTICIPANTS} participants."
+msgstr "Een verrekening kan hoogstens {SETTLEMENT_MAX_PARTICIPANTS} deelnemers hebben."
 
 #: src/shared/mutations/op-code-registry/domains/transactions.ts
 msgid "A split line can have a category or a transfer account, not both."
@@ -3535,6 +3547,10 @@ msgstr "Kaart toevoegen"
 msgid "Add a category first, then give it a goal."
 msgstr "Voeg eerst een categorie toe en geef die dan een doel."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Add a change"
+msgstr "Wijziging toevoegen"
+
 #: src/pages/settings/CurrencySettingsPage.tsx
 msgid "Add a custom rate to override automatically fetched exchange rates for specific date ranges."
 msgstr "Voeg een aangepaste koers toe om automatisch opgehaalde wisselkoersen te overschrijven voor specifieke periodes."
@@ -3612,6 +3628,10 @@ msgstr "Voeg ten minste één actie toe die Budgero moet uitvoeren."
 msgid "Add at least one condition to control when the rule runs."
 msgstr "Voeg ten minste één voorwaarde toe om te bepalen wanneer de regel wordt uitgevoerd."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Add at least two participants."
+msgstr "Voeg minstens twee deelnemers toe."
+
 #: src/features/bank-sync/ui/EnableBankingBanksCard.tsx
 msgid "Add bank"
 msgstr "Bank toevoegen"
@@ -3632,6 +3652,10 @@ msgstr "Categorie toevoegen"
 #: src/features/category-management/ui/AddCategoryGroupDialog.tsx
 msgid "Add Category Group"
 msgstr "Categoriegroep toevoegen"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Add change"
+msgstr "Wijziging toevoegen"
 
 #: src/features/reports/ui/SaveReportDialog.tsx
 msgid "Add charts to visualize your query results"
@@ -3681,6 +3705,10 @@ msgstr "Voeg nieuwe begunstigden toe, hernoem bestaande, of verwijder ze uit je 
 #: src/features/transactions/ui/add-transaction/TransactionFormHeader.tsx
 msgid "Add New Transaction"
 msgstr "Nieuwe transactie toevoegen"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Add participant"
+msgstr "Deelnemer toevoegen"
 
 #: src/features/account-management/ui/InterestRateScheduleEditor.tsx
 msgid "Add rate change"
@@ -3936,6 +3964,10 @@ msgstr "Helemaal bij"
 msgid "All fields are required"
 msgstr "Alle velden zijn verplicht"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "All fixed shares are zero for part of this period, so the shared expenses there are split equally."
+msgstr "Voor een deel van deze periode zijn alle vaste aandelen nul, dus worden de gedeelde uitgaven daar gelijk verdeeld."
+
 #: src/features/budget-planning/ui/assign-dropdown/useAssignDropdownState.tsx
 msgid "All goals are fully funded!"
 msgstr "Alle doelen zijn volledig gefinancierd!"
@@ -4154,6 +4186,10 @@ msgstr "Bedrag om de maand mee te beginnen"
 msgid "Amount:"
 msgstr "Bedrag:"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "An account can belong to one participant only."
+msgstr "Een rekening kan maar bij één deelnemer horen."
+
 #: src/features/import/lib/plan-file-import.ts
 msgid "An account named \"{newName}\" already exists. In Configuration, choose it for \"{accountName}\" or give the new account another name."
 msgstr "Er bestaat al een rekening met de naam \"{newName}\". Kies die in Configuratie voor \"{accountName}\" of geef de nieuwe rekening een andere naam."
@@ -4219,6 +4255,10 @@ msgstr "Jaarlijks percentage, bijv. 5 voor 5%."
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Annual service"
 msgstr "Jaarlijkse onderhoudsbeurt"
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Another change already starts in this month. Edit that one instead."
+msgstr "Er begint deze maand al een andere wijziging. Bewerk die in plaats daarvan."
 
 #: src/features/account-management/ui/InterestRateScheduleEditor.tsx
 msgid "Another rate already starts on this date."
@@ -4300,6 +4340,7 @@ msgid "Applies"
 msgstr "Geldt"
 
 #: src/features/goal-management/ui/GoalTimeframeFields.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Applies from"
 msgstr "Geldt vanaf"
 
@@ -4811,6 +4852,7 @@ msgstr "Bakker"
 #: src/pages/accounts/AccountPage.tsx
 #: src/pages/accounts/components/AccountSummaryCards.tsx
 #: src/pages/analytics/reports/ScenarioReport.tsx
+#: src/pages/settlement/components/SettlementSummary.tsx
 #: src/widgets/dashboard/BalanceAreaChart.tsx
 msgid "Balance"
 msgstr "Saldo"
@@ -5283,6 +5325,7 @@ msgid "Budget Account"
 msgstr "Budgetrekening"
 
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/useSettlementOptions.ts
 msgid "Budget accounts"
 msgstr "Budgetrekeningen"
 
@@ -5480,6 +5523,10 @@ msgstr "Voor een datum, zoals een vakantie of een jaarlijkse rekening."
 msgid "By amount"
 msgstr "Op bedrag"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "By income"
+msgstr "Naar inkomen"
+
 #: src/features/reports/ui/notebook/GroupingPicker.tsx
 msgid "By part of the date"
 msgstr "Op deel van de datum"
@@ -5577,6 +5624,7 @@ msgstr "Canadese dollar"
 #: src/pages/settings/SecurityPage.tsx
 #: src/pages/settings/subscription/PlanChangeDialog.tsx
 #: src/pages/settings/WorkspaceSettingsPage.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 #: src/pages/warranties/components/WarrantyFormDialog.tsx
 msgid "Cancel"
 msgstr "Annuleren"
@@ -5919,6 +5967,10 @@ msgstr "Wijzigingen zijn toegepast op de database."
 msgid "Changes saved successfully."
 msgstr "Wijzigingen succesvol opgeslagen."
 
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Changes start with a month. Earlier months keep being settled with the terms before."
+msgstr "Wijzigingen beginnen met een maand. Eerdere maanden worden verder verrekend met de afspraken van daarvoor."
+
 #: src/pages/settings/SecurityPage.tsx
 msgid "Changing..."
 msgstr "Wijzigen..."
@@ -6173,6 +6225,10 @@ msgstr "Kies ‘Nieuwe terugkerende transactie’, of zet ‘Terugkerend maken�
 msgid "Choose Select File under New Import, or drop the file anywhere in Budgero on a computer. No export to hand? The upload step links a spreadsheet and a CSV template."
 msgstr "Kies ‘Bestand selecteren’ onder ‘Nieuwe import’, of sleep het bestand op een computer ergens in Budgero. Geen export bij de hand? De uploadstap linkt naar een spreadsheet- en een CSV-sjabloon."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Choose the categories of shared expenses."
+msgstr "Kies de categorieën van de gedeelde uitgaven."
+
 #: src/pages/onboarding/onboarding-data.ts
 msgid "Choose the currency for your budget. You can change the display language in Settings → Appearance."
 msgstr "Kies de valuta voor je budget. Je kunt de weergavetaal wijzigen via Instellingen → Weergave."
@@ -6185,6 +6241,10 @@ msgstr "Kies de database die je als Budgero-back-up hebt geëxporteerd. We impor
 msgid "Choose the first day of the week for calendars, weekly reports, and “this week” and “last week” searches in this workspace."
 msgstr "Kies de eerste dag van de week voor kalenders, weekrapporten en zoekopdrachten naar ‘deze week’ en ‘vorige week’ in deze werkruimte."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Choose the income categories that count."
+msgstr "Kies de inkomenscategorieën die meetellen."
+
 #: src/features/bank-sync/ui/EnableBankingSetupCard.tsx
 msgid "Choose the key file"
 msgstr "Kies het sleutelbestand"
@@ -6192,6 +6252,10 @@ msgstr "Kies het sleutelbestand"
 #: src/pages/settings/AppearancePage.tsx
 msgid "Choose the language Budgero uses on this device"
 msgstr "Kies de taal die Budgero op dit apparaat gebruikt"
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Choose the month the change applies from."
+msgstr "Kies de maand vanaf wanneer de wijziging geldt."
 
 #: src/features/budget-management/ui/create-budget-form/YnabCreditPaymentMatching.tsx
 msgid "Choose the payment category belonging to each card so its reserved money and future payments stay together."
@@ -7604,6 +7668,7 @@ msgstr "Eigen metriek…"
 
 #: src/pages/analytics/analytics-state.ts
 #: src/pages/custom-dashboards/components/DashboardFilterBar.tsx
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
 msgid "Custom range"
 msgstr "Aangepast bereik"
 
@@ -8733,9 +8798,17 @@ msgstr "Terugkerende transactie bewerken"
 msgid "Edit result filter: {label}"
 msgstr "Resultaatfilter bewerken: {label}"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Edit settlement terms"
+msgstr "Verrekenafspraken bewerken"
+
 #: src/features/transactions/ui/desktop-table/SplitDetailsDialog.tsx
 msgid "Edit splits"
 msgstr "Splits bewerken"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Edit terms"
+msgstr "Afspraken bewerken"
 
 #: src/features/transactions/ui/desktop-table/TransactionRow.tsx
 msgid "Edit time"
@@ -8760,6 +8833,10 @@ msgstr "Onderwijs"
 #: src/features/budget-management/model/icon-options.ts
 msgid "Electricity"
 msgstr "Elektriciteit"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Eligible income"
+msgstr "Meetellend inkomen"
 
 #: src/pages/settings/subscription/SubscriptionPage.tsx
 msgid "Email:"
@@ -9100,6 +9177,10 @@ msgstr "Omgeving"
 msgid "Equal completion percentage"
 msgstr "Gelijk voltooiingspercentage"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Equal split"
+msgstr "Gelijk verdeeld"
+
 #: src/features/subscription/api/useSubscription.ts
 #: src/pages/admin/admin-users/useAdminUsersState.ts
 #: src/shared/ui/calculator-cell/CalculatorInput.tsx
@@ -9196,6 +9277,14 @@ msgstr "Elke maand, zoals huur of boodschappen."
 msgid "Every month, until you change it"
 msgstr "Elke maand, tot je het wijzigt"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Every participant needs a name."
+msgstr "Elke deelnemer heeft een naam nodig."
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Every participant needs at least one personal account."
+msgstr "Elke deelnemer heeft minstens één persoonlijke rekening nodig."
+
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "Every scheduled occurrence that hasn't been entered yet, by due date."
 msgstr "Elke geplande keer die nog niet is ingevoerd, op vervaldatum."
@@ -9223,6 +9312,22 @@ msgstr "Dagelijks"
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Everyday checking"
 msgstr "Betaalrekening"
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Everyone carries a fixed percentage of the shared expenses."
+msgstr "Iedereen draagt een vast percentage van de gedeelde uitgaven."
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Everyone carries the part of the shared expenses that matches their part of the income in the period."
+msgstr "Iedereen draagt het deel van de gedeelde uitgaven dat past bij zijn deel van het inkomen in de periode."
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Everyone carries the same part of the shared expenses."
+msgstr "Iedereen draagt hetzelfde deel van de gedeelde uitgaven."
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Everyone has paid their share. Nothing to settle."
+msgstr "Iedereen heeft zijn deel betaald. Niets te verrekenen."
 
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Exact (±0.01)"
@@ -9338,6 +9443,10 @@ msgstr "Zijbalk uitklappen"
 #: src/features/transactions/ui/form/TransactionTypeSelector.tsx
 msgid "Expense"
 msgstr "Uitgave"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Expenses in the shared categories paid from a participant's personal accounts count as paid by them. Income is what reaches their personal accounts in the income categories."
+msgstr "Uitgaven in de gedeelde categorieën die van de persoonlijke rekeningen van een deelnemer betaald zijn, tellen als door hem betaald. Inkomen is wat in de inkomenscategorieën op zijn persoonlijke rekeningen binnenkomt."
 
 #: src/features/bank-sync/ui/EnableBankingBanksCard.tsx
 #: src/pages/warranties/components/StatusBadge.tsx
@@ -9840,6 +9949,10 @@ msgstr "Plan bijwerken mislukt. Probeer het opnieuw."
 msgid "Failed to write to clipboard. Please try again."
 msgstr "Naar klembord kopiëren mislukt. Probeer het opnieuw."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Fair share"
+msgstr "Eerlijk deel"
+
 #: src/features/budget-management/model/icon-options.ts
 msgid "Family"
 msgstr "Familie"
@@ -10006,6 +10119,10 @@ msgstr "Fitness & Sportschool"
 msgid "Five levels (default)"
 msgstr "Vijf niveaus (standaard)"
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "Fixed shares"
+msgstr "Vaste aandelen"
+
 #: src/features/rules/ui/rule-editor/RuleActionRow.tsx
 msgid "Flags"
 msgstr "Flags"
@@ -10161,6 +10278,11 @@ msgstr "Vriend of collega"
 msgid "From"
 msgstr "Van"
 
+#. placeholder {0}: formatShortDate(date)
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "From {0}"
+msgstr "Vanaf {0}"
+
 #. placeholder {0}: goalMonthLabel(currentMonth)
 #. placeholder {0}: goalMonthLabel(viewedMonth)
 #: src/features/goal-management/ui/GoalSection.tsx
@@ -10198,6 +10320,10 @@ msgstr "Uit spaargeld"
 #: src/pages/onboarding/onboarding-data.ts
 msgid "From the person who invited you"
 msgstr "Van de persoon die je heeft uitgenodigd"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "From the start"
+msgstr "Vanaf het begin"
 
 #: src/features/transactions/ui/add-transaction/TransactionDetailsSection.tsx
 msgid "From your last transaction for \"{name}\""
@@ -10732,6 +10858,15 @@ msgstr "Horizon"
 msgid "Household"
 msgstr "Huishouden"
 
+#: src/pages/settlement/SettlementPage.tsx
+#: src/shared/model/nav-registry.ts
+msgid "Household settlement"
+msgstr "Huishoudverrekening"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "How are shared expenses split?"
+msgstr "Hoe worden gedeelde uitgaven verdeeld?"
+
 #: src/pages/onboarding/onboarding-data.ts
 msgid "How are you starting?"
 msgstr "Hoe begin je?"
@@ -11137,6 +11272,7 @@ msgstr "Inclusief al geboekte of overgeslagen herhalingen."
 #: src/pages/analytics/reports/FlowReport.tsx
 #: src/pages/analytics/reports/ScenarioReport.tsx
 #: src/pages/settings/recurring/components/RecurringKindBadge.tsx
+#: src/pages/settlement/components/SettlementSummary.tsx
 #: src/widgets/dashboard/CashflowTrendCard.tsx
 msgid "Income"
 msgstr "Inkomen"
@@ -11152,6 +11288,10 @@ msgstr "Inkomsten tegenover uitgaven, maand per maand."
 #: src/features/budgeting/ui/ReadyToAssignHelpPopover.tsx
 msgid "Income and assignments accumulate across all time, so this figure is the same in every month."
 msgstr "Inkomsten en toewijzingen hopen zich op over alle tijd, dus dit bedrag is in elke maand hetzelfde."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Income categories"
+msgstr "Inkomenscategorieën"
 
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "Income category"
@@ -12830,6 +12970,7 @@ msgstr "Monochrome budgetteringswerkruimte met perkamenten canvas en rood/groene
 #: src/pages/analytics/reports/InOutReport.tsx
 #: src/pages/analytics/reports/ScenarioReport.tsx
 #: src/pages/analytics/reports/WealthReport.tsx
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
 msgid "Month"
 msgstr "Maand"
 
@@ -13125,6 +13266,7 @@ msgstr "naam"
 #: src/pages/analytics/reports/SpendingReport.tsx
 #: src/pages/auth/AuthPage.tsx
 #: src/pages/custom-dashboards/components/DashboardSwitcher.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 #: src/pages/warranties/components/WarrantyTable.tsx
 msgid "Name"
 msgstr "Naam"
@@ -13517,6 +13659,7 @@ msgid "Next date"
 msgstr "Volgende datum"
 
 #: src/pages/budgeting/BudgetingPage.desktop.tsx
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
 msgid "Next month"
 msgstr "Volgende maand"
 
@@ -13561,6 +13704,7 @@ msgstr "Geen rekeningen gevonden"
 
 #: src/features/analytics/ui/IncomeExpenseByGroupChart.tsx
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "No accounts found."
 msgstr "Geen rekeningen gevonden."
 
@@ -13704,6 +13848,7 @@ msgid "No categories found!"
 msgstr "Geen categorieën gevonden!"
 
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "No categories found."
 msgstr "Geen categorieën gevonden."
 
@@ -13817,6 +13962,10 @@ msgstr "Geen eerdere periode om mee te vergelijken."
 #: src/features/snapshot-history/ui/SnapshotHistoryList.tsx
 msgid "No earlier versions yet. One is kept each time this workspace syncs."
 msgstr "Nog geen eerdere versies. Elke keer dat deze werkruimte synchroniseert, wordt er een bewaard."
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "No eligible income was found for part of this period, so the shared expenses there are split equally."
+msgstr "Voor een deel van deze periode is geen meetellend inkomen gevonden, dus worden de gedeelde uitgaven daar gelijk verdeeld."
 
 #: src/pages/settings/CurrencySettingsPage.tsx
 msgid "No end date"
@@ -14256,9 +14405,14 @@ msgstr "Nog geen werkruimtes. Gebruik de knop hierboven om je eerste werkruimte 
 #: src/features/reports/ui/notebook/viz/ChartSettings.tsx
 #: src/features/reports/ui/SaveReportDialog.tsx
 #: src/features/sync-diagnostics/ui/SyncOverviewCards.tsx
+#: src/pages/settlement/components/SettlementMultiSelect.tsx
 #: src/pages/warranties/components/WarrantyFormDialog.tsx
 msgid "None"
 msgstr "Geen"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "None selected"
+msgstr "Niets geselecteerd"
 
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Noodle bar"
@@ -14686,6 +14840,10 @@ msgstr "Alleen de meest recente wijziging kan ongedaan worden gemaakt. Maak eers
 #: src/pages/settings/DataManagementPage.tsx
 msgid "Only the workspace owner can restore a Budgero Core backup into this workspace."
 msgstr "Alleen de werkruimte-eigenaar kan een Budgero Core-back-up herstellen in deze werkruimte."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Only these expenses are shared; everything else stays personal."
+msgstr "Alleen deze uitgaven worden gedeeld; al het andere blijft persoonlijk."
 
 #: src/features/budget-sharing/ui/WorkspaceSharingPanel.tsx
 msgid "Only workspace owners can create new invites. Ask an owner to share access with teammates."
@@ -15133,6 +15291,10 @@ msgstr "Pagina {0}/{1}"
 msgid "Pages"
 msgstr "Pagina's"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Paid"
+msgstr "Betaald"
+
 #. placeholder {0}: formatAmount(Math.abs(item.available))
 #: src/features/budget-planning/ui/AvailableInfoPopover.tsx
 msgid "Paid {0} more than set aside"
@@ -15173,6 +15335,22 @@ msgstr "Een deel van deze vraag kon niet worden geopend"
 #: src/widgets/sync-status/ConnectivityStatus.tsx
 msgid "Partial"
 msgstr "Gedeeltelijk"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Participant"
+msgstr "Deelnemer"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Participant {position}"
+msgstr "Deelnemer {position}"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Participants"
+msgstr "Deelnemers"
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Parts of this settlement could not be read, so it can't be changed here. Update Budgero on all devices."
+msgstr "Delen van deze verrekening konden niet worden gelezen, dus kan ze hier niet worden gewijzigd. Werk Budgero bij op alle apparaten."
 
 #: src/pages/admin/SelfHostAdminUsers.tsx
 #: src/pages/auth/AuthPage.tsx
@@ -15364,6 +15542,11 @@ msgstr "Aflossingsdatum"
 msgid "Payoff plan"
 msgstr "Afbetaalplan"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgctxt "settlement-transfer"
+msgid "pays"
+msgstr "betaalt aan"
+
 #: src/pages/settings/push-api/QueueStatsPanel.tsx
 msgid "Pending"
 msgstr "In behandeling"
@@ -15395,6 +15578,10 @@ msgstr "Per maand historisch"
 msgid "Percent"
 msgstr "Procent"
 
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
+msgid "Period"
+msgstr "Periode"
+
 #: src/features/page-guides/ui/guide-visuals.tsx
 msgid "Periodic"
 msgstr "Periodiek"
@@ -15417,6 +15604,10 @@ msgstr "{0} permanent verwijderen. Dit verwijdert hun lidmaatschappen en ruimtes
 #: src/pages/onboarding/steps/YnabImportStep.tsx
 msgid "Personal access tokens are only available in the YNAB web app, not the phone app. No token? Use EXPORT ZIP instead."
 msgstr "Persoonlijke toegangstokens zijn alleen beschikbaar in de YNAB-webapp, niet in de telefoon-app. Geen token? Gebruik dan ZIP EXPORTEREN."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Personal accounts"
+msgstr "Persoonlijke rekeningen"
 
 #: src/app/startup/screens.tsx
 msgid "Personal Budget Space"
@@ -15501,6 +15692,10 @@ msgstr "Kies een metriek"
 msgid "Pick a metric…"
 msgstr "Kies een metriek…"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Pick a period to see the settlement."
+msgstr "Kies een periode om de verrekening te zien."
+
 #: src/pages/analytics/reports/ScenarioReport.tsx
 msgid "Pick a period with some history to project from."
 msgstr "Kies een periode met wat geschiedenis om vanuit te projecteren."
@@ -15526,6 +15721,7 @@ msgid "Pick an account"
 msgstr "Kies een rekening"
 
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
 msgid "Pick range"
 msgstr "Kies bereik"
 
@@ -15946,6 +16142,7 @@ msgid "Previous"
 msgstr "Vorige"
 
 #: src/pages/budgeting/BudgetingPage.desktop.tsx
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
 msgid "Previous month"
 msgstr "Vorige maand"
 
@@ -16842,6 +17039,7 @@ msgstr "Externe wijziging (gesynchroniseerd vanaf een ander apparaat)"
 #: src/features/bank-sync/ui/EnableBankingBanksCard.tsx
 #: src/features/settings/directory-manager/DirectoryManagerPage.tsx
 #: src/features/transactions/ui/mobile-transaction-card/TransactionCardDetails.tsx
+#: src/pages/settlement/SettlementPage.tsx
 msgid "Remove"
 msgstr "Verwijderen"
 
@@ -16886,6 +17084,10 @@ msgstr "Actie verwijderen"
 msgid "Remove all filters"
 msgstr "Alle filters verwijderen"
 
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Remove change"
+msgstr "Wijziging verwijderen"
+
 #: src/features/rules/ui/rule-editor/RuleConditionRow.tsx
 msgid "Remove condition"
 msgstr "Voorwaarde verwijderen"
@@ -16919,6 +17121,10 @@ msgstr "Metriek verwijderen: {label}"
 #: src/pages/analytics/reports/ScenarioReport.tsx
 msgid "Remove one-off"
 msgstr "Eenmalige verwijderen"
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Remove participant"
+msgstr "Deelnemer verwijderen"
 
 #: src/features/rules/ui/rule-editor/RuleActionRow.tsx
 #: src/features/rules/ui/RuleSummary.tsx
@@ -16961,6 +17167,10 @@ msgstr "Limiet verwijderen"
 #: src/features/reports/ui/notebook/NotebookEditor.tsx
 msgid "Remove the summary"
 msgstr "Samenvatting verwijderen"
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Remove this change?"
+msgstr "Deze wijziging verwijderen?"
 
 #: src/pages/settings/LabelsPage.tsx
 msgid "Remove this label?"
@@ -17641,6 +17851,7 @@ msgstr "Zelfde periode vorig jaar"
 #: src/pages/reports/question/NotebookQuestionView.tsx
 #: src/pages/settings/components/WorkspaceRow.tsx
 #: src/pages/settings/DataManagementPage.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Save"
 msgstr "Opslaan"
 
@@ -17945,6 +18156,7 @@ msgstr "Rekeningen zoeken..."
 #: src/features/transactions/ui/form/AccountSelect.tsx
 #: src/pages/accounts/AccountsPage.tsx
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Search accounts…"
 msgstr "Rekeningen zoeken…"
 
@@ -17981,6 +18193,7 @@ msgid "Search categories..."
 msgstr "Categorieën zoeken..."
 
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Search categories…"
 msgstr "Categorieën zoeken…"
 
@@ -18604,6 +18817,10 @@ msgstr "Op nul zetten"
 msgid "Set up a new budget to track your finances"
 msgstr "Stel een nieuw budget in om je financiën bij te houden"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Set up household settlement"
+msgstr "Huishoudverrekening instellen"
+
 #: src/pages/onboarding/OnboardingFlow.tsx
 msgid "Set up my budget →"
 msgstr "Mijn budget opzetten →"
@@ -18612,9 +18829,17 @@ msgstr "Mijn budget opzetten →"
 msgid "Set up recurring paycheques, bills, or transfers and Budgero will remind you when they are due."
 msgstr "Stel terugkerende salarissen, facturen of overboekingen in en Budgero herinnert je eraan wanneer ze vervallen."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Set up settlement"
+msgstr "Verrekening instellen"
+
 #: src/pages/settings/RecurringTransactionsPage.tsx
 msgid "Set up transactions that repeat on a schedule. Nothing is posted until you mark it ready or post it."
 msgstr "Stel transacties in die zich volgens een schema herhalen. Er wordt niets geboekt tot je het klaar markeert of boekt."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Sets each participant's share when splitting by income."
+msgstr "Bepaalt het aandeel van elke deelnemer bij verdeling naar inkomen."
 
 #: src/pages/onboarding/OnboardingFlow.tsx
 msgid "Setting up the demo budget…"
@@ -18636,6 +18861,14 @@ msgstr "Opties"
 msgid "Settings → Workspaces"
 msgstr "Instellingen → Werkruimtes"
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Settlement saved"
+msgstr "Verrekening opgeslagen"
+
+#: src/pages/settlement/components/SettlementTermsList.tsx
+msgid "Settlement terms"
+msgstr "Verrekenafspraken"
+
 #: src/pages/onboarding/apply-onboarding.ts
 #: src/pages/onboarding/steps/DoneStep.tsx
 msgid "Setup failed"
@@ -18654,12 +18887,21 @@ msgid "Several categories"
 msgstr "Meerdere categorieën"
 
 #: src/pages/analytics/components/LedgerTable.tsx
+#: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Share"
 msgstr "Aandeel"
 
 #: src/pages/settings/AboutPage.tsx
 msgid "Share feedback"
 msgstr "Feedback delen"
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "Share household expenses fairly: assign each person their personal accounts, pick the shared expense categories, and see each month who owes whom."
+msgstr "Verdeel huishoudkosten eerlijk: koppel ieder aan zijn persoonlijke rekeningen, kies de categorieën van gedeelde uitgaven en zie elke maand wie wie wat verschuldigd is."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Share in %"
+msgstr "Aandeel in %"
 
 #: src/features/budget-planning/ui/GroupShareBadge.tsx
 msgid "Share of everything assigned this month"
@@ -18672,6 +18914,14 @@ msgstr "Gedeelde medewerkers kunnen de werkruimtes bekijken waarvoor ze zijn uit
 #: src/pages/settings/DataManagementPage.tsx
 msgid "Shared collaborators can’t export workspace data. Ask the workspace owner to download it for you."
 msgstr "Gedeelde medewerkers kunnen geen werkruimtegegevens exporteren. Vraag de eigenaar van de werkruimte om het voor je te downloaden."
+
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
+msgid "Shared expense categories"
+msgstr "Categorieën gedeelde uitgaven"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Shared expenses"
+msgstr "Gedeelde uitgaven"
 
 #: src/features/reports/ui/notebook/viz/ChartSettings.tsx
 msgid "Shared with the bars"
@@ -20286,6 +20536,10 @@ msgstr "De expressie stopt te vroeg."
 msgid "The first three come in two kinds. Available: have the amount ready. Allocation: put a set amount aside."
 msgstr "De eerste drie zijn er in twee soorten. Beschikbaarheid: het bedrag klaar hebben. Toewijzing: een vast bedrag opzijzetten."
 
+#: src/pages/settlement/settlement-messages.ts
+msgid "The fixed shares must add up to 100 %."
+msgstr "De vaste aandelen moeten samen 100 % zijn."
+
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "The goal counts as met (or on track) this month."
 msgstr "Het doel telt deze maand als gehaald (of op schema)."
@@ -20376,6 +20630,10 @@ msgstr "De eigenaar maakt uitnodigingen, hernoemt of verwijdert de werkruimte en
 msgid "The paired transfer transaction could not be loaded."
 msgstr "De gekoppelde overboekingstransactie kon niet worden geladen."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The period it covered is then settled with the terms before it. Transactions are not touched."
+msgstr "De periode wordt dan verrekend met de afspraken ervoor. Transacties blijven ongewijzigd."
+
 #: src/features/page-guides/ui/guide-content.tsx
 msgid "The prebuilt reports answer common questions, such as where your money goes. Questions you save show up here too, and Dashboards put several of them side by side."
 msgstr "De kant-en-klare rapporten beantwoorden veelgestelde vragen, zoals waar je geld naartoe gaat. Vragen die je opslaat, staan hier ook, en dashboards zetten er meerdere naast elkaar."
@@ -20423,6 +20681,14 @@ msgstr "De server heeft alle wijzigingen van dit apparaat bevestigd."
 #: src/features/snapshot-history/ui/SnapshotHistoryList.tsx
 msgid "The server keeps the last few copies of this workspace, and one a day for the past week. You can go back to a copy and discard everything changed after it, or restore it and re-apply the later changes. Use it when a workspace looks empty or broken after syncing, or to undo a batch of changes."
 msgstr "De server bewaart de laatste kopieën van deze werkruimte en één per dag voor de afgelopen week. Je kunt teruggaan naar een kopie en alles verwijderen wat daarna is gewijzigd, of hem herstellen en de latere wijzigingen opnieuw toepassen. Gebruik dit als een werkruimte na het synchroniseren leeg of kapot lijkt, of om een reeks wijzigingen ongedaan te maken."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The settlement could not be calculated. Try again or pick another period."
+msgstr "De verrekening kon niet worden berekend. Probeer het opnieuw of kies een andere periode."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The settlement could not be saved here."
+msgstr "De verrekening kon hier niet worden opgeslagen."
 
 #: src/pages/onboarding/steps/PasswordStep.tsx
 msgid "The shared budget is kept on this device, encrypted with a master password only you know. It’s yours alone — not the password of the person who invited you. Pick something memorable — we can’t reset it for you."
@@ -20875,6 +21141,10 @@ msgstr "Deze regel en de geschiedenis ervan worden verwijderd. Recente uitvoerin
 msgid "This run has been undone. Transactions were restored to their prior values."
 msgstr "Deze uitvoering is ongedaan gemaakt. Transacties zijn hersteld naar hun eerdere waarden."
 
+#: src/pages/settlement/SettlementPage.tsx
+msgid "This settlement was set up with a newer version of Budgero. Update the app to see or change it."
+msgstr "Deze verrekening is ingesteld met een nieuwere versie van Budgero. Werk de app bij om haar te bekijken of te wijzigen."
+
 #: src/features/bank-sync/lib/simplefin-client.ts
 msgid "This setup token was already used or revoked. Create a new one in SimpleFIN Bridge."
 msgstr "Deze setup-token is al gebruikt of ingetrokken. Maak een nieuwe aan in SimpleFIN Bridge."
@@ -21081,6 +21351,10 @@ msgstr "Om met je afschrift overeen te komen, kun je de koers van één transact
 msgid "To reach target available"
 msgstr "Om het doelbedrag beschikbaar te krijgen"
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "To settle up"
+msgstr "Om te verrekenen"
+
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "To stay on pace"
 msgstr "Om op schema te blijven"
@@ -21285,7 +21559,9 @@ msgstr "Totaal aantal gebruikers"
 
 #. placeholder {0}: formatMilli(globalLocalizer, asMilli(allowance - remaining))
 #. placeholder {0}: formatMilli(globalLocalizer, asMilli(readyToAssign - remaining))
+#. placeholder {0}: formatPercent(customShareTotal / BASIS_POINTS_PER_PERCENT, 2)
 #: src/features/budget-planning/ui/assign-dropdown/useAssignDropdownState.tsx
+#: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Total: {0}"
 msgstr "Totaal: {0}"
 
@@ -21303,6 +21579,7 @@ msgid "Toy store"
 msgstr "Speelgoedwinkel"
 
 #: src/pages/analytics/components/AnalyticsFilterBar.tsx
+#: src/pages/settlement/useSettlementOptions.ts
 msgid "Tracking accounts"
 msgstr "Tracking-rekeningen"
 

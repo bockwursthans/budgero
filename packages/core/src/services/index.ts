@@ -24,4 +24,5 @@ export * from './custom-dashboards/index.js';
 export * from './warranties/index.js';
 export * from './page-guides/index.js';
 export * from './synced-state/index.js';
+export * from './settlement/index.js';
 export * from './legacy-replay/index.js';

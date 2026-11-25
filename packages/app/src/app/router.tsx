@@ -46,6 +46,7 @@ import AdminDashboard from '@pages/admin/AdminDashboard';
 import { AdminUsers } from '@pages/admin/admin-users';
 import AdminSqlExplorer from '@pages/admin/sql-explorer';
 import WarrantiesPage from '@pages/warranties/WarrantiesPage';
+import SettlementPage from '@pages/settlement/SettlementPage';
 import { hideStartupPreload } from '@/app/startup/preload';
 import { trackPageView } from '@shared/lib/analytics/analytics';
 import { addBreadcrumb } from '@shared/lib/analytics/error-capture';
@@ -123,6 +124,7 @@ function AppRouter() {
             <Route path="/reports/explorer" element={<LegacyExplorerRedirect />} />
             <Route path="/reports/dashboards" element={<CustomDashboardsPage />} />
             <Route path="/reports/dashboards/:dashboardId" element={<CustomDashboardsPage />} />
+            <Route path="/reports/settlement" element={<SettlementPage />} />
             <Route path="/settings" element={<Navigate to="/settings/appearance" replace />} />
             <Route path="/automations" element={<Navigate to="/settings/recurring" replace />} />
             <Route path="/settings/appearance" element={<AppearancePage />} />
