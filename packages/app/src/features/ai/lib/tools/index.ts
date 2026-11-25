@@ -20,6 +20,11 @@ import { queryTransactionsSchema, executeQueryTransactions } from './query-trans
 import { querySqlSchema, executeQuerySql, buildSqlToolDescription } from './query-sql';
 import { renderChartSchema, executeRenderChart, buildChartToolDescription } from './query-chart';
 import { searchDocsSchema, executeSearchDocs } from './query-docs';
+import {
+  executeQuerySettlement,
+  QUERY_SETTLEMENT_DESCRIPTION,
+  querySettlementSchema,
+} from './query-settlement';
 import { isToolEnabled } from './tool-registry';
 
 export type {
@@ -90,6 +95,15 @@ export function buildChatTools(context: ToolContext) {
       inputSchema: searchDocsSchema,
       execute: async (args) => {
         const result = await executeSearchDocs(args);
+        return result.message;
+      },
+    }),
+
+    query_settlement: tool({
+      description: QUERY_SETTLEMENT_DESCRIPTION,
+      inputSchema: querySettlementSchema,
+      execute: async (args) => {
+        const result = await executeQuerySettlement(args, context);
         return result.message;
       },
     }),

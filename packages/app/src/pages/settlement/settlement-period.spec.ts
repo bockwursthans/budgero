@@ -1,3 +1,4 @@
+import { SETTLEMENT_EARLIEST_DATE } from '@budgero/core/browser';
 import {
   defaultChangeDate,
   initialSettlementPeriod,
@@ -8,19 +9,23 @@ import {
   shiftSettlementMonth,
 } from './settlement-period';
 
+const TODAY = '2026-11-25';
+
 describe('settlement period', () => {
-  it('opens on the month of today', () => {
-    expect(initialSettlementPeriod('2026-11-25')).toEqual({
-      mode: SETTLEMENT_PERIOD_MODE.month,
-      month: '2026-11',
-      customStart: '',
-      customEnd: '',
+  it('opens on the open balance: every month up to today', () => {
+    const period = initialSettlementPeriod(TODAY);
+
+    expect(period.mode).toBe(SETTLEMENT_PERIOD_MODE.sinceStart);
+    expect(resolveSettlementRange(period)).toEqual({
+      startDate: SETTLEMENT_EARLIEST_DATE,
+      endDate: TODAY,
     });
   });
 
-  it('covers the whole month, leap days included', () => {
-    const period = { ...initialSettlementPeriod('2028-02-10') };
-    expect(resolveSettlementRange(period)).toEqual({
+  it('covers a whole month, leap days included, starting from the current one', () => {
+    const month = { ...initialSettlementPeriod('2028-02-10'), mode: SETTLEMENT_PERIOD_MODE.month };
+
+    expect(resolveSettlementRange(month)).toEqual({
       startDate: '2028-02-01',
       endDate: '2028-02-29',
     });
@@ -34,7 +39,7 @@ describe('settlement period', () => {
 
   it('uses the picked custom range, a single day while only the start is picked', () => {
     const custom = {
-      ...initialSettlementPeriod('2026-11-25'),
+      ...initialSettlementPeriod(TODAY),
       mode: SETTLEMENT_PERIOD_MODE.custom,
       customStart: '2026-03-15',
       customEnd: '',
@@ -50,10 +55,7 @@ describe('settlement period', () => {
   });
 
   it('has no range until a custom start is picked', () => {
-    const custom = {
-      ...initialSettlementPeriod('2026-11-25'),
-      mode: SETTLEMENT_PERIOD_MODE.custom,
-    };
+    const custom = { ...initialSettlementPeriod(TODAY), mode: SETTLEMENT_PERIOD_MODE.custom };
     expect(resolveSettlementRange(custom)).toEqual({ startDate: '', endDate: '' });
   });
 });
@@ -65,7 +67,7 @@ describe('settlement change dates', () => {
   });
 
   it('proposes next month for a new change, across the year end', () => {
-    expect(defaultChangeDate('2026-11-25')).toBe('2026-12-01');
+    expect(defaultChangeDate(TODAY)).toBe('2026-12-01');
     expect(defaultChangeDate('2026-12-31')).toBe('2027-01-01');
   });
 });

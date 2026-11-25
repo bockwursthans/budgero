@@ -7,7 +7,12 @@
  *
  *   share_i  = weight_i / sum(weights)       weight: income, 1, or fixed share
  *   target_i = totalSharedExpenses * share_i
- *   net_i    = paid_i - target_i             > 0: money back, < 0: owes
+ *   net_i    = paid_i - target_i + sent_i - received_i
+ *                                            > 0: money back, < 0: owes, 0: even
+ *
+ * Transfers between the personal accounts of two participants are settlement
+ * payments (sent_i, received_i), so over all months the nets come back to
+ * zero once everyone has paid what the settlement suggested.
  *
  * Targets are apportioned exactly in milliunits (largest remainder), so they
  * always add up to the total and the nets to zero. The parts are then summed
@@ -23,6 +28,7 @@ import {
   type SettlementCategoryAmount,
   type SettlementLineTotal,
   type SettlementParticipantResult,
+  type SettlementPaymentTotal,
   type SettlementResult,
   type SettlementSegmentTotals,
   type SettlementTerms,
@@ -35,6 +41,8 @@ interface ParticipantTotals {
   eligibleIncome: number;
   sharedExpensesPaid: number;
   targetContribution: number;
+  paymentsSent: number;
+  paymentsReceived: number;
   incomeByCategory: Map<number, number>;
   paidByCategory: Map<number, number>;
 }
@@ -79,13 +87,37 @@ export function apportion(total: number, weights: readonly bigint[]): number[] {
   return parts.map((part) => Number(part * sign));
 }
 
-function participantTotalsOf(terms: SettlementTerms, lines: readonly SettlementLineTotal[]) {
+/** Which participant each personal account belongs to (the first one listed, if two claim it). */
+function accountOwners(terms: SettlementTerms): Map<number, string> {
   const ownerOf = new Map<number, string>();
   for (const participant of terms.participants) {
     for (const accountId of participant.accountIds) {
       if (!ownerOf.has(accountId)) ownerOf.set(accountId, participant.id);
     }
   }
+  return ownerOf;
+}
+
+/**
+ * Money participants transferred to each other, by participant. A transfer
+ * between two accounts of the same participant is no settlement payment.
+ */
+function paymentTotalsOf(terms: SettlementTerms, payments: readonly SettlementPaymentTotal[]) {
+  const ownerOf = accountOwners(terms);
+  const sent = new Map<string, number>();
+  const received = new Map<string, number>();
+  for (const payment of payments) {
+    const from = ownerOf.get(payment.fromAccountId);
+    const to = ownerOf.get(payment.toAccountId);
+    if (from === undefined || to === undefined || from === to) continue;
+    sent.set(from, (sent.get(from) ?? 0) + payment.amount);
+    received.set(to, (received.get(to) ?? 0) + payment.amount);
+  }
+  return { sent, received };
+}
+
+function participantTotalsOf(terms: SettlementTerms, lines: readonly SettlementLineTotal[]) {
+  const ownerOf = accountOwners(terms);
   const incomeCategories = new Set(terms.incomeCategoryIds);
   const expenseCategories = new Set(terms.expenseCategoryIds);
   const income = new Map<string, Map<number, number>>();
@@ -192,8 +224,9 @@ export function calculateSettlement(
   const totals = new Map<string, ParticipantTotals>();
   const warnings = new Set<SettlementWarning>();
 
-  for (const { segment, lines } of parts) {
+  for (const { segment, lines, payments } of parts) {
     const rows = participantTotalsOf(segment.terms, lines);
+    const { sent, received } = paymentTotalsOf(segment.terms, payments);
     const sharedTotal = rows.reduce((sum, row) => sum + row.paid, 0);
     const { weights, warning } = weightsFor(
       segment.terms,
@@ -207,6 +240,8 @@ export function calculateSettlement(
         eligibleIncome: 0,
         sharedExpensesPaid: 0,
         targetContribution: 0,
+        paymentsSent: 0,
+        paymentsReceived: 0,
         incomeByCategory: new Map<number, number>(),
         paidByCategory: new Map<number, number>(),
       };
@@ -215,6 +250,8 @@ export function calculateSettlement(
       entry.eligibleIncome += income;
       entry.sharedExpensesPaid += paid;
       entry.targetContribution += targets[index];
+      entry.paymentsSent += sent.get(participant.id) ?? 0;
+      entry.paymentsReceived += received.get(participant.id) ?? 0;
       for (const [categoryId, amount] of incomeByCategory) {
         addTo(entry.incomeByCategory, categoryId, amount);
       }
@@ -239,7 +276,14 @@ export function calculateSettlement(
     eligibleIncome: asMilli(entry.eligibleIncome),
     sharedExpensesPaid: asMilli(entry.sharedExpensesPaid),
     targetContribution: asMilli(entry.targetContribution),
-    netSettlement: asMilli(entry.sharedExpensesPaid - entry.targetContribution),
+    paymentsSent: asMilli(entry.paymentsSent),
+    paymentsReceived: asMilli(entry.paymentsReceived),
+    netSettlement: asMilli(
+      entry.sharedExpensesPaid -
+        entry.targetContribution +
+        entry.paymentsSent -
+        entry.paymentsReceived
+    ),
     contributionShare:
       totalSharedExpenses === 0 ? 0 : entry.targetContribution / totalSharedExpenses,
     incomeByCategory: byCategory(entry.incomeByCategory),

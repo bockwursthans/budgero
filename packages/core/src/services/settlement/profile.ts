@@ -49,6 +49,8 @@ export const SETTLEMENT_MAX_NAME_LENGTH = 80;
 
 const MAX_PARTICIPANT_ID_LENGTH = 64;
 const MIN_YEAR = 1900;
+/** The first day a settlement can cover: "since the start" settles from here. */
+export const SETTLEMENT_EARLIEST_DATE = `${MIN_YEAR}-01-01`;
 const FIRST_DAY_OF_MONTH = 1;
 const ISO_DATE_PATTERN = /^(\d{4})-\d{2}-(\d{2})$/;
 const MS_PER_DAY = 86_400_000;

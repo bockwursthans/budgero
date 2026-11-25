@@ -21,7 +21,7 @@ interface SettlementSummaryProps {
 const PERCENT_POINTS = 100;
 const SHARE_DECIMALS = 1;
 /** The detail row spans every column of the table. */
-const COLUMN_COUNT = 6;
+const COLUMN_COUNT = 7;
 
 const headClass = 'h-8 text-xs font-medium uppercase tracking-wide text-muted-foreground';
 const moneyCell = 'text-right font-mono text-sm tabular-nums';
@@ -92,6 +92,9 @@ export function SettlementSummary({
                 <Trans>Fair share</Trans>
               </TableHead>
               <TableHead className={cn(headClass, 'text-right')}>
+                <Trans>Settlement payments</Trans>
+              </TableHead>
+              <TableHead className={cn(headClass, 'text-right')}>
                 <Trans>Balance</Trans>
               </TableHead>
             </TableRow>
@@ -137,6 +140,9 @@ export function SettlementSummary({
                     <TableCell className={moneyCell}>
                       {money(participant.targetContribution)}
                     </TableCell>
+                    <TableCell className={moneyCell}>
+                      {money(participant.paymentsSent - participant.paymentsReceived)}
+                    </TableCell>
                     <TableCell
                       className={cn(
                         moneyCell,
@@ -179,6 +185,12 @@ export function SettlementSummary({
           <h3 className="text-sm font-semibold">
             <Trans>To settle up</Trans>
           </h3>
+          <p className="text-xs text-muted-foreground">
+            <Trans>
+              Record the payment as a transfer between your personal accounts. It counts as a
+              settlement payment, so the open balance goes back to zero.
+            </Trans>
+          </p>
           {result.transfers.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               <Trans>Everyone has paid their share. Nothing to settle.</Trans>

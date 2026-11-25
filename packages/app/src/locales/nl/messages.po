@@ -14942,6 +14942,10 @@ msgstr "Open een rekening, kies ‘Afstemmen’ en vul het saldo in dat je bank 
 msgid "Open as question"
 msgstr "Openen als vraag"
 
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
+msgid "Open balance"
+msgstr "Openstaand saldo"
+
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Open Budgero tomorrow and record yesterday’s spending."
 msgstr "Open Budgero morgen en noteer wat je gisteren hebt uitgegeven."
@@ -16819,6 +16823,10 @@ msgstr "Opnieuw koppelen"
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Record something you spent today, or import a file from your bank."
 msgstr "Noteer iets wat je vandaag hebt uitgegeven, of importeer een bestand van je bank."
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Record the payment as a transfer between your personal accounts. It counts as a settlement payment, so the open balance goes back to zero."
+msgstr "Leg de betaling vast als overboeking tussen jullie persoonlijke rekeningen. Ze telt als verrekenbetaling, en het openstaande saldo gaat weer naar nul."
 
 #: src/pages/settings/recurring/RecurringTransactionsSection.tsx
 msgid "Recorded in {accountName}. You can review it in the Transactions view."
@@ -18913,6 +18921,10 @@ msgstr "Opties"
 #: src/app/startup/screens.tsx
 msgid "Settings → Workspaces"
 msgstr "Instellingen → Werkruimtes"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Settlement payments"
+msgstr "Verrekenbetalingen"
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "Settlement saved. It takes effect once everyone has agreed."

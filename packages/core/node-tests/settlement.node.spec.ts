@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   apportion,
+  approvedSettlementTermsKeys,
   calculateSettlement,
   cleanSettlementName,
   createSettlementApprovalKey,
@@ -11,12 +12,16 @@ import {
   readSettlementProfile,
   removeSettlementTerms,
   ServiceManager,
+  SETTLEMENT_EARLIEST_DATE,
   SETTLEMENT_MAX_TERMS,
   SETTLEMENT_PROFILE_FORMAT_VERSION,
+  SETTLEMENT_PROFILE_KEY,
   SETTLEMENT_PROFILE_STATUS,
   SETTLEMENT_STRATEGY,
   SETTLEMENT_TERMS_ISSUE,
   SETTLEMENT_WARNING,
+  settlementProfileScope,
+  settlementReport,
   settlementSegments,
   settlementTermsConsent,
   settlementTermsFingerprint,
@@ -26,6 +31,7 @@ import {
   upsertSettlementTerms,
   validateSettlementTerms,
   type SettlementLineTotal,
+  type SettlementPaymentTotal,
   type SettlementProfile,
   type SettlementTerms,
   type Services,
@@ -84,12 +90,25 @@ const line = (
 const settleOne = (
   settlementTerms: SettlementTerms,
   lines: SettlementLineTotal[],
+  payments: SettlementPaymentTotal[] = [],
   range: [string, string] = ['2026-01-01', '2026-01-31']
 ) =>
   calculateSettlement(
-    [{ segment: { terms: settlementTerms, startDate: range[0], endDate: range[1] }, lines }],
+    [
+      {
+        segment: { terms: settlementTerms, startDate: range[0], endDate: range[1] },
+        lines,
+        payments,
+      },
+    ],
     ...range
   );
+
+const payment = (fromAccountId: number, toAccountId: number, amount: number) => ({
+  fromAccountId,
+  toAccountId,
+  amount: asMilli(amount),
+});
 
 const byId = (result: ReturnType<typeof settleOne>, id: string) =>
   result.participants.find((participant) => participant.participantId === id)!;
@@ -152,6 +171,7 @@ describe('calculateSettlement', () => {
       [
         {
           segment: { terms: terms(), startDate: '2026-01-01', endDate: '2026-01-31' },
+          payments: [],
           lines: [
             line(ALEX_ACCOUNT, SALARY, 1_000_000, 0),
             line(ALEX_ACCOUNT, RENT, 0, 800_000),
@@ -160,6 +180,7 @@ describe('calculateSettlement', () => {
         },
         {
           segment: { terms: later, startDate: '2026-02-01', endDate: '2026-02-28' },
+          payments: [],
           lines: [line(ALEX_ACCOUNT, RENT, 0, 800_000), line(ALEX_ACCOUNT, GROCERIES, 200_000, 0)],
         },
       ],
@@ -174,6 +195,40 @@ describe('calculateSettlement', () => {
       { categoryId: SALARY, amount: 1_000_000 },
     ]);
     expect(byId(result, SAM).sharedExpensesByCategory).toEqual([]);
+  });
+
+  it('counts transfers between participants as settlement payments, so paying evens out', () => {
+    const lines = [
+      line(ALEX_ACCOUNT, SALARY, 1_000_000, 0),
+      line(SAM_ACCOUNT, SALARY, 1_000_000, 0),
+      line(ALEX_ACCOUNT, RENT, 0, 1_000_000),
+    ];
+
+    const owing = settleOne(terms(), lines);
+    expect(nets(owing)).toEqual({ [ALEX]: 500_000, [SAM]: -500_000 });
+
+    const paid = settleOne(terms(), lines, [payment(SAM_ACCOUNT, ALEX_ACCOUNT, 500_000)]);
+    expect(nets(paid)).toEqual({ [ALEX]: 0, [SAM]: 0 });
+    expect(byId(paid, SAM).paymentsSent).toBe(500_000);
+    expect(byId(paid, ALEX).paymentsReceived).toBe(500_000);
+    expect(paid.transfers).toEqual([]);
+  });
+
+  it('ignores transfers within one participant and to accounts outside the settlement', () => {
+    const twoAccounts = terms({
+      participants: [
+        { ...terms().participants[0], accountIds: [ALEX_ACCOUNT, JOINT_ACCOUNT] },
+        terms().participants[1],
+      ],
+    });
+    const result = settleOne(
+      twoAccounts,
+      [line(ALEX_ACCOUNT, RENT, 0, 1_000_000)],
+      [payment(ALEX_ACCOUNT, JOINT_ACCOUNT, 300_000), payment(SAM_ACCOUNT, 99, 200_000)]
+    );
+
+    expect(byId(result, ALEX).paymentsSent).toBe(0);
+    expect(byId(result, SAM).paymentsSent).toBe(0);
   });
 
   it('ignores categories and accounts outside the terms', () => {
@@ -279,6 +334,7 @@ describe('calculateSettlement', () => {
       [
         {
           segment: { terms: terms(), startDate: '2026-01-01', endDate: '2026-01-31' },
+          payments: [],
           lines: [
             line(ALEX_ACCOUNT, SALARY, 3_000_000, 0),
             line(SAM_ACCOUNT, SALARY, 1_000_000, 0),
@@ -287,6 +343,7 @@ describe('calculateSettlement', () => {
         },
         {
           segment: { terms: later, startDate: '2026-02-01', endDate: '2026-02-28' },
+          payments: [],
           lines: [line(SAM_ACCOUNT, RENT, 0, 1_000_000)],
         },
       ],
@@ -318,10 +375,12 @@ describe('calculateSettlement', () => {
             startDate: '2026-01-01',
             endDate: '2026-01-31',
           },
+          payments: [],
           lines: [line(ALEX_ACCOUNT, RENT, 0, 1_000_000)],
         },
         {
           segment: { terms: withFlatmate, startDate: '2026-02-01', endDate: '2026-02-28' },
+          payments: [],
           lines: [line(ALEX_ACCOUNT, RENT, 0, 900_000)],
         },
       ],
@@ -443,6 +502,25 @@ describe('settlement consent', () => {
     expect(
       settlementTermsConsent(terms({ participants: [] }), fingerprint, approvals).approved
     ).toBe(false);
+  });
+
+  it('lists the terms every participant approved', async () => {
+    const profile = {
+      ...profileOf(terms(), terms({ effectiveFrom: '2026-03-01' })),
+      approvalKey: APPROVAL_KEY,
+    };
+    const initial = await settlementTermsFingerprint(APPROVAL_KEY, 1, profile.terms[0]);
+    const change = await settlementTermsFingerprint(APPROVAL_KEY, 1, profile.terms[1]);
+    const approvals = [
+      { userId: ALEX, fingerprint: initial },
+      { userId: SAM, fingerprint: initial },
+      { userId: ALEX, fingerprint: change },
+    ];
+
+    expect(await approvedSettlementTermsKeys(1, profile, approvals)).toEqual([
+      INITIAL_SETTLEMENT_TERMS_KEY,
+    ]);
+    expect(await approvedSettlementTermsKeys(1, profileOf(terms()), approvals)).toEqual([]);
   });
 
   it('keys terms by their start', () => {
@@ -826,11 +904,13 @@ describe('SettlementService (Node/sql.js)', () => {
     expect(nets(result)).toEqual({ [ALEX]: 100_000, [SAM]: -100_000 });
   });
 
-  it('ignores transfers between the participants and other budgets', async () => {
+  it('counts transfers between participants as payments, not as shared expenses', async () => {
     await add(alexAccount, salary, '2026-01-25', 1_000_000);
     await add(samAccount, salary, '2026-01-25', 1_000_000);
     await add(alexAccount, transfers, '2026-01-05', 0, 400_000, budgetId, 'pair-1');
     await add(samAccount, transfers, '2026-01-05', 400_000, 0, budgetId, 'pair-1');
+    await add(alexAccount, transfers, '2026-01-06', 0, 50_000, budgetId, 'to-joint');
+    await add(jointAccount, transfers, '2026-01-06', 50_000, 0, budgetId, 'to-joint');
     const other = await createHousehold('Other');
     await add(await other.account('Elsewhere'), rent, '2026-01-05', 0, 1_000_000, other.id);
 
@@ -839,7 +919,10 @@ describe('SettlementService (Node/sql.js)', () => {
     );
 
     expect(result.totalSharedExpenses).toBe(0);
-    expect(result.transfers).toEqual([]);
+    expect(nets(result)).toEqual({ [ALEX]: 400_000, [SAM]: -400_000 });
+    expect(result.transfers).toEqual([
+      { fromParticipantId: SAM, toParticipantId: ALEX, amount: 400_000 },
+    ]);
   });
 
   it('uses budget-currency amounts and the date part of stored dates', async () => {
@@ -858,6 +941,45 @@ describe('SettlementService (Node/sql.js)', () => {
 
   it('reads nothing for terms without accounts', () => {
     expect(services.settlement.getLineTotals(budgetId, '2026-01-01', '2026-01-31', [])).toEqual([]);
+  });
+
+  it('evens out over all months once the suggested payment is made', async () => {
+    await add(alexAccount, salary, '2026-01-25', 1_000_000);
+    await add(samAccount, salary, '2026-01-25', 1_000_000);
+    await add(alexAccount, rent, '2026-01-03', 0, 1_000_000);
+    const sinceStart = () =>
+      services.settlement.calculate(
+        budgetId,
+        profileOf(householdTerms()),
+        SETTLEMENT_EARLIEST_DATE,
+        '2026-02-28',
+        ALL_APPROVED
+      );
+    expect(nets(sinceStart())).toEqual({ [ALEX]: 500_000, [SAM]: -500_000 });
+
+    await add(samAccount, transfers, '2026-02-02', 0, 500_000, budgetId, 'settle-1');
+    await add(alexAccount, transfers, '2026-02-02', 500_000, 0, budgetId, 'settle-1');
+
+    expect(nets(sinceStart())).toEqual({ [ALEX]: 0, [SAM]: 0 });
+    expect(sinceStart().transfers).toEqual([]);
+  });
+
+  it('reads the stored profile from the budget’s synced state', () => {
+    const stored = upsertSettlementTerms(null, householdTerms());
+    services.syncedState.set(
+      settlementProfileScope(budgetId),
+      SETTLEMENT_PROFILE_KEY,
+      stored,
+      '2026-01-01T00:00:00Z'
+    );
+
+    expect(services.settlement.readProfile(budgetId)).toEqual({
+      status: SETTLEMENT_PROFILE_STATUS.ready,
+      profile: stored,
+    });
+    expect(services.settlement.readProfile(budgetId + 1).status).toBe(
+      SETTLEMENT_PROFILE_STATUS.unset
+    );
   });
 
   it('applies dated terms from their date on', async () => {
@@ -941,5 +1063,47 @@ describe('SettlementService without everyone’s consent (Node/sql.js)', () => {
       services.settlement.calculate(budgetId, profile, '2026-01-01', '2026-02-28', () => false)
         .participants
     ).toEqual([]);
+  });
+});
+
+describe('settlementReport', () => {
+  it('describes the result in currency units with names', () => {
+    const result = settleOne(
+      terms(),
+      [
+        line(ALEX_ACCOUNT, SALARY, 3_000_000, 0),
+        line(SAM_ACCOUNT, SALARY, 2_000_000, 0),
+        line(ALEX_ACCOUNT, RENT, 0, 1_000_005),
+      ],
+      [payment(SAM_ACCOUNT, ALEX_ACCOUNT, 100_000)]
+    );
+
+    const report = settlementReport(
+      { ...result, unapprovedSegments: [{ startDate: '2026-02-01', endDate: '2026-02-28' }] },
+      {
+        currency: 'EUR',
+        categoryNames: new Map([[RENT, 'Rent']]),
+        memberNames: new Map([[ALEX, 'Alex (current)']]),
+      }
+    );
+
+    expect(report).toMatchObject({
+      startDate: '2026-01-01',
+      endDate: '2026-01-31',
+      currency: 'EUR',
+      totalSharedExpenses: 1000.005,
+      totalEligibleIncome: 5000,
+      toSettleUp: [{ from: 'Sam', to: 'Alex (current)', amount: 300 }],
+      awaitingConsent: [{ startDate: '2026-02-01', endDate: '2026-02-28' }],
+    });
+    expect(report.participants[0]).toMatchObject({
+      userId: ALEX,
+      name: 'Alex (current)',
+      sharePercent: 60,
+      sharedExpensesPaid: 1000.005,
+      paymentsReceived: 100,
+      sharedExpensesByCategory: [{ categoryId: RENT, category: 'Rent', amount: 1000.005 }],
+      incomeByCategory: [{ categoryId: SALARY, category: '', amount: 3000 }],
+    });
   });
 });

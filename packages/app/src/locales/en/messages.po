@@ -14944,6 +14944,10 @@ msgstr "Open an account, choose Reconcile and enter the balance your bank shows.
 msgid "Open as question"
 msgstr "Open as question"
 
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
+msgid "Open balance"
+msgstr "Open balance"
+
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Open Budgero tomorrow and record yesterday’s spending."
 msgstr "Open Budgero tomorrow and record yesterday’s spending."
@@ -16821,6 +16825,10 @@ msgstr "Reconnect"
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Record something you spent today, or import a file from your bank."
 msgstr "Record something you spent today, or import a file from your bank."
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Record the payment as a transfer between your personal accounts. It counts as a settlement payment, so the open balance goes back to zero."
+msgstr "Record the payment as a transfer between your personal accounts. It counts as a settlement payment, so the open balance goes back to zero."
 
 #: src/pages/settings/recurring/RecurringTransactionsSection.tsx
 msgid "Recorded in {accountName}. You can review it in the Transactions view."
@@ -18915,6 +18923,10 @@ msgstr "Settings"
 #: src/app/startup/screens.tsx
 msgid "Settings → Workspaces"
 msgstr "Settings → Workspaces"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Settlement payments"
+msgstr "Settlement payments"
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "Settlement saved. It takes effect once everyone has agreed."

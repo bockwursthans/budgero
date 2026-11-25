@@ -14942,6 +14942,10 @@ msgstr "Ouvrez un compte, choisissez « Rapprocher » et saisissez le solde affi
 msgid "Open as question"
 msgstr "Ouvrir comme question"
 
+#: src/pages/settlement/components/SettlementPeriodPicker.tsx
+msgid "Open balance"
+msgstr "Solde ouvert"
+
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Open Budgero tomorrow and record yesterday’s spending."
 msgstr "Ouvrez Budgero demain et notez les dépenses de la veille."
@@ -16819,6 +16823,10 @@ msgstr "Reconnecter"
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Record something you spent today, or import a file from your bank."
 msgstr "Saisissez une dépense du jour, ou importez un fichier de votre banque."
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Record the payment as a transfer between your personal accounts. It counts as a settlement payment, so the open balance goes back to zero."
+msgstr "Enregistrez le paiement comme un virement entre vos comptes personnels. Il compte comme paiement de règlement, et le solde ouvert revient à zéro."
 
 #: src/pages/settings/recurring/RecurringTransactionsSection.tsx
 msgid "Recorded in {accountName}. You can review it in the Transactions view."
@@ -18913,6 +18921,10 @@ msgstr "Réglages"
 #: src/app/startup/screens.tsx
 msgid "Settings → Workspaces"
 msgstr "Paramètres → Espaces de travail"
+
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Settlement payments"
+msgstr "Paiements de règlement"
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "Settlement saved. It takes effect once everyone has agreed."

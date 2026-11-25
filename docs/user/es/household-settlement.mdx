@@ -37,15 +37,16 @@ El servidor solo guarda quién aceptó qué huella de las condiciones. Las condi
 
 ## Leer la liquidación
 
-Elige un mes o un periodo personalizado. Para cada participante ves:
+El **saldo pendiente** - la vista predeterminada - abarca todos los meses hasta hoy, pagos ya hechos incluidos: es cero cuando todos están en paz. También puedes elegir un solo mes o un periodo personalizado. Para cada participante ves:
 
 - **Ingresos** - los ingresos computables en sus cuentas personales.
 - **Proporción** - la parte de los gastos compartidos que asume.
 - **Pagado** - los gastos compartidos pagados desde sus cuentas personales (los reembolsos se descuentan).
 - **Parte justa** - lo que debería haber pagado.
-- **Saldo** - pagado menos parte justa. Positivo significa que recibe dinero; negativo, que debe.
+- **Pagos de liquidación** - las transferencias de sus cuentas personales a otro participante, menos las que recibió.
+- **Saldo** - pagado menos parte justa, más pagos de liquidación. Positivo significa que recibe dinero; negativo, que debe; cero, que está en paz.
 
-Abre un participante para ver los importes por categoría. **Para saldar cuentas** muestra los pagos que lo equilibran todo. Registra el pago como una [transferencia](/docs/accounts) normal entre vuestras cuentas.
+Abre un participante para ver los importes por categoría. **Para saldar cuentas** muestra los pagos que lo equilibran todo. Registra el pago como una [transferencia](/docs/accounts) normal entre vuestras cuentas personales: cuenta como pago de liquidación, y el saldo pendiente vuelve a cero.
 
 ## Cambios con el tiempo
 
@@ -56,4 +57,5 @@ Usa **Añadir cambio** cuando algo cambie - un trabajo nuevo, otro reparto. Un c
 - Solo cuentan las transacciones registradas, no las recurrentes programadas.
 - Los importes están en la moneda del presupuesto, también en cuentas en moneda extranjera.
 - Las transacciones divididas cuentan línea por línea.
+- Toda transferencia entre las cuentas personales de dos participantes cuenta como pago de liquidación.
 - Los gastos pagados desde cuentas que no pertenecen a ningún participante (una cuenta conjunta, por ejemplo) no forman parte de la liquidación.

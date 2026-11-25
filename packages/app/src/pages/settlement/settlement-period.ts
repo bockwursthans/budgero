@@ -1,7 +1,10 @@
+import { SETTLEMENT_EARLIEST_DATE } from '@budgero/core/browser';
 import { lastDayOfMonth } from '@pages/analytics/analytics-state';
 import { shiftMonthKey } from '@pages/analytics/analytics-model';
 
 export const SETTLEMENT_PERIOD_MODE = {
+  /** Everything up to today: the balance still open between the participants. */
+  sinceStart: 'since-start',
   month: 'month',
   custom: 'custom',
 } as const;
@@ -11,6 +14,8 @@ export type SettlementPeriodMode =
 
 export interface SettlementPeriod {
   mode: SettlementPeriodMode;
+  /** YYYY-MM-DD the open balance runs to (today when the page opened). */
+  today: string;
   /** YYYY-MM, used in month mode. */
   month: string;
   /** YYYY-MM-DD, used in custom mode ('' until picked). */
@@ -41,10 +46,14 @@ export function defaultChangeDate(todayISO: string): string {
   return monthStart(shiftMonthKey(monthKeyOf(todayISO), 1));
 }
 
-/** The current month, so the settlement opens on what is still open. */
+/**
+ * Opens on the open balance: every month so far, with the payments already
+ * made between the participants. It is zero once everyone is even.
+ */
 export function initialSettlementPeriod(todayISO: string): SettlementPeriod {
   return {
-    mode: SETTLEMENT_PERIOD_MODE.month,
+    mode: SETTLEMENT_PERIOD_MODE.sinceStart,
+    today: todayISO,
     month: monthKeyOf(todayISO),
     customStart: '',
     customEnd: '',
@@ -53,10 +62,14 @@ export function initialSettlementPeriod(todayISO: string): SettlementPeriod {
 
 /** The inclusive date range a period covers; empty dates until a custom range is picked. */
 export function resolveSettlementRange(period: SettlementPeriod): SettlementRange {
-  if (period.mode === SETTLEMENT_PERIOD_MODE.custom) {
-    return { startDate: period.customStart, endDate: period.customEnd || period.customStart };
+  switch (period.mode) {
+    case SETTLEMENT_PERIOD_MODE.sinceStart:
+      return { startDate: SETTLEMENT_EARLIEST_DATE, endDate: period.today };
+    case SETTLEMENT_PERIOD_MODE.custom:
+      return { startDate: period.customStart, endDate: period.customEnd || period.customStart };
+    case SETTLEMENT_PERIOD_MODE.month:
+      return { startDate: monthStart(period.month), endDate: lastDayOfMonth(period.month) };
   }
-  return { startDate: monthStart(period.month), endDate: lastDayOfMonth(period.month) };
 }
 
 export function shiftSettlementMonth(period: SettlementPeriod, months: number): SettlementPeriod {

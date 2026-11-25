@@ -68,9 +68,18 @@ export interface SettlementSegment {
   endDate: string;
 }
 
+/** Money moved between two accounts by transfers over a period, in budget currency. */
+export interface SettlementPaymentTotal {
+  fromAccountId: number;
+  toAccountId: number;
+  amount: MilliUnits;
+}
+
 export interface SettlementSegmentTotals {
   segment: SettlementSegment;
   lines: readonly SettlementLineTotal[];
+  /** Transfers between the segment's accounts: settlement payments between participants. */
+  payments: readonly SettlementPaymentTotal[];
 }
 
 export interface SettlementParticipantResult {
@@ -79,7 +88,14 @@ export interface SettlementParticipantResult {
   eligibleIncome: MilliUnits;
   sharedExpensesPaid: MilliUnits;
   targetContribution: MilliUnits;
-  /** Paid minus target: positive means money back, negative means owed. */
+  /** Transfers from this participant's personal accounts to another participant's. */
+  paymentsSent: MilliUnits;
+  /** Transfers into this participant's personal accounts from another participant's. */
+  paymentsReceived: MilliUnits;
+  /**
+   * Paid minus target, plus payments sent, minus payments received: positive
+   * means money back, negative means owed, zero means settled.
+   */
   netSettlement: MilliUnits;
   /** Part of all shared expenses this participant carries (0 to 1). */
   contributionShare: number;

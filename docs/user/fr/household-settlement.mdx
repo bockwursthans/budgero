@@ -37,15 +37,16 @@ Le serveur ne conserve que qui a accepté quelle empreinte des conditions. Les c
 
 ## Lire la répartition
 
-Choisissez un mois ou une période personnalisée. Pour chaque participant, vous voyez :
+Le **solde ouvert** - la vue par défaut - couvre tous les mois jusqu'à aujourd'hui, paiements déjà effectués compris : il est nul quand tout le monde est quitte. Vous pouvez aussi choisir un seul mois ou une période personnalisée. Pour chaque participant, vous voyez :
 
 - **Revenu** - les revenus pris en compte sur ses comptes personnels.
 - **Part** - la part des dépenses communes qu'il prend en charge.
 - **Payé** - les dépenses communes payées depuis ses comptes personnels (les remboursements sont déduits).
 - **Part due** - ce qu'il aurait dû payer.
-- **Solde** - payé moins part due. Positif signifie un remboursement, négatif signifie qu'il doit de l'argent.
+- **Paiements de règlement** - les virements de ses comptes personnels vers un autre participant, moins ceux qu'il a reçus.
+- **Solde** - payé moins part due, plus paiements de règlement. Positif signifie un remboursement, négatif signifie qu'il doit de l'argent, zéro signifie quitte.
 
-Ouvrez un participant pour voir les montants par catégorie. **Pour équilibrer** liste les paiements qui équilibrent le tout. Enregistrez le paiement lui-même comme un [virement](/docs/accounts) normal entre vos comptes.
+Ouvrez un participant pour voir les montants par catégorie. **Pour équilibrer** liste les paiements qui équilibrent le tout. Enregistrez le paiement comme un [virement](/docs/accounts) normal entre vos comptes personnels : il compte comme paiement de règlement, et le solde ouvert revient à zéro.
 
 ## Changements dans le temps
 
@@ -56,4 +57,5 @@ Utilisez **Ajouter un changement** quand quelque chose change - un nouvel emploi
 - Seules les transactions passées comptent, pas les transactions récurrentes planifiées.
 - Les montants sont dans la devise du budget, y compris pour les comptes en devise étrangère.
 - Les transactions ventilées comptent ligne par ligne.
+- Tout virement entre les comptes personnels de deux participants compte comme paiement de règlement.
 - Les dépenses payées depuis des comptes qui n'appartiennent à aucun participant (un compte joint, par exemple) ne font pas partie de la répartition.

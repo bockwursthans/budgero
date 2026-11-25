@@ -37,15 +37,16 @@ Der Server speichert nur, wer welchem Fingerabdruck der Regeln zugestimmt hat. D
 
 ## Den Ausgleich lesen
 
-Wähle einen Monat oder einen eigenen Zeitraum. Für jede beteiligte Person siehst du:
+Der **offene Saldo** - die Standardansicht - umfasst alle Monate bis heute, einschließlich bereits geleisteter Zahlungen: Er ist null, wenn alle quitt sind. Du kannst auch einen einzelnen Monat oder einen eigenen Zeitraum wählen. Für jede beteiligte Person siehst du:
 
 - **Einkommen** - berücksichtigtes Einkommen auf ihren persönlichen Konten.
 - **Anteil** - der Teil der gemeinsamen Ausgaben, den sie trägt.
 - **Bezahlt** - gemeinsame Ausgaben, die von ihren persönlichen Konten bezahlt wurden (Erstattungen werden abgezogen).
 - **Soll-Anteil** - was sie hätte zahlen sollen.
-- **Saldo** - Bezahlt minus Soll-Anteil. Positiv heißt Geld zurück, negativ heißt, sie schuldet etwas.
+- **Ausgleichszahlungen** - Umbuchungen von ihren persönlichen Konten an eine andere beteiligte Person, abzüglich der erhaltenen.
+- **Saldo** - Bezahlt minus Soll-Anteil plus Ausgleichszahlungen. Positiv heißt Geld zurück, negativ heißt, sie schuldet etwas, null heißt quitt.
 
-Öffne eine Person, um die Beträge je Kategorie zu sehen. **Zum Ausgleich** listet die Zahlungen, die alles ausgleichen. Die Zahlung selbst erfasst du als normale [Umbuchung](/docs/accounts) zwischen euren Konten.
+Öffne eine Person, um die Beträge je Kategorie zu sehen. **Zum Ausgleich** listet die Zahlungen, die alles ausgleichen. Erfasse die Zahlung als normale [Umbuchung](/docs/accounts) zwischen euren persönlichen Konten: Sie zählt als Ausgleichszahlung, und der offene Saldo geht wieder auf null.
 
 ## Änderungen im Lauf der Zeit
 
@@ -56,4 +57,5 @@ Nutze **Änderung hinzufügen**, wenn sich etwas ändert - ein neuer Job, eine a
 - Es zählen nur gebuchte Transaktionen, keine geplanten wiederkehrenden.
 - Beträge sind in der Budgetwährung, auch bei Konten in Fremdwährung.
 - Aufgeteilte Buchungen zählen Zeile für Zeile.
+- Jede Umbuchung zwischen den persönlichen Konten zweier Beteiligter zählt als Ausgleichszahlung.
 - Ausgaben von Konten, die keiner beteiligten Person gehören (etwa ein Gemeinschaftskonto), gehören nicht zum Ausgleich.

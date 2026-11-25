@@ -45,20 +45,27 @@ async function fingerprintsOf(
   return Object.fromEntries(entries);
 }
 
-/** Every approval recorded in the open workspace, as the server reports them. */
+/** Every approval recorded in a workspace, as the server reports them. */
+export async function fetchSettlementApprovals(
+  spaceId: string
+): Promise<SettlementApprovalRecord[]> {
+  const approvals = await spaceApi.listSettlementApprovals(spaceId);
+  return approvals.map((approval) => ({
+    userId: approval.user_id,
+    fingerprint: approval.fingerprint,
+  }));
+}
+
+/** Every approval recorded in the open workspace. */
 export function useSettlementApprovals() {
   const spaceId = useActiveSpaceId();
   return useQuery<SettlementApprovalRecord[]>({
     queryKey: [SETTLEMENT_APPROVALS_QUERY_KEY, spaceId],
     enabled: Boolean(spaceId),
     staleTime: APPROVALS_STALE_MS,
-    queryFn: async () => {
+    queryFn: () => {
       if (!spaceId) throw new Error('Space id is required');
-      const approvals = await spaceApi.listSettlementApprovals(spaceId);
-      return approvals.map((approval) => ({
-        userId: approval.user_id,
-        fingerprint: approval.fingerprint,
-      }));
+      return fetchSettlementApprovals(spaceId);
     },
   });
 }

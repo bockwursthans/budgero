@@ -17,6 +17,7 @@ import {
 } from '../settlement-period';
 
 const MODE_LABELS: Record<SettlementPeriodMode, MessageDescriptor> = {
+  [SETTLEMENT_PERIOD_MODE.sinceStart]: msg`Open balance`,
   [SETTLEMENT_PERIOD_MODE.month]: msg`Month`,
   [SETTLEMENT_PERIOD_MODE.custom]: msg`Custom range`,
 };
@@ -77,7 +78,9 @@ export function SettlementPeriodPicker({ period, onChange }: SettlementPeriodPic
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-      ) : (
+      ) : null}
+
+      {period.mode === SETTLEMENT_PERIOD_MODE.custom ? (
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-9 gap-2">
@@ -98,7 +101,7 @@ export function SettlementPeriodPicker({ period, onChange }: SettlementPeriodPic
             />
           </PopoverContent>
         </Popover>
-      )}
+      ) : null}
     </div>
   );
 }

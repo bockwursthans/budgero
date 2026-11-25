@@ -37,15 +37,16 @@ The server only stores who agreed to which fingerprint of the terms. The terms t
 
 ## Reading the settlement
 
-Pick a month or a custom range. For each participant you see:
+**Open balance** - the default - covers every month up to today, payments already made included: it is zero when everyone is even. You can also pick a single month or a custom range. For each participant you see:
 
 - **Income** - eligible income in their personal accounts.
 - **Share** - the part of the shared expenses they carry.
 - **Paid** - shared expenses paid from their personal accounts (refunds count against it).
 - **Fair share** - what they should have paid.
-- **Balance** - paid minus fair share. Positive means money back, negative means they owe.
+- **Settlement payments** - transfers from their personal accounts to another participant's, minus the ones they received.
+- **Balance** - paid minus fair share, plus settlement payments. Positive means money back, negative means they owe, zero means even.
 
-Open a participant to see the amounts per category. **To settle up** lists the payments that even it out. Record the payment itself as a normal [transfer](/docs/accounts) between your accounts.
+Open a participant to see the amounts per category. **To settle up** lists the payments that even it out. Record the payment as a normal [transfer](/docs/accounts) between your personal accounts: it counts as a settlement payment, and the open balance goes back to zero.
 
 ## Changes over time
 
@@ -56,4 +57,5 @@ Use **Add change** when something changes - a new job, a different split. A chan
 - Only posted transactions count; scheduled recurring ones don't.
 - Amounts are in the budget currency, including foreign-currency accounts.
 - Split transactions count line by line.
+- Every transfer between the personal accounts of two participants counts as a settlement payment.
 - Expenses paid from accounts that belong to no participant (a joint account, say) are not part of the settlement.

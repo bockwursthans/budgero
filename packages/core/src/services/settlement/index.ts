@@ -1,6 +1,12 @@
 import { DatabaseAdapter } from '../../database/interface.js';
 import { calculateSettlement } from './calculation.js';
-import { settlementSegments } from './profile.js';
+import { SyncedStateService, type SyncedStateScope } from '../synced-state/index.js';
+import {
+  readSettlementProfile,
+  SETTLEMENT_PROFILE_KEY,
+  settlementSegments,
+  type SettlementProfileReading,
+} from './profile.js';
 import { SettlementQueries } from './queries.js';
 import type {
   SettlementLineTotal,
@@ -12,7 +18,13 @@ import type {
 export * from './types.js';
 export * from './profile.js';
 export * from './consent.js';
+export * from './report.js';
 export { apportion, calculateSettlement, settlementTransfers } from './calculation.js';
+
+/** The synced state scope a budget's settlement profile is stored in. */
+export function settlementProfileScope(budgetId: number): SyncedStateScope {
+  return `budget:${budgetId}`;
+}
 
 /** Decides whether terms took effect (every participant approved them). */
 export type SettlementTermsFilter = (terms: SettlementTerms) => boolean;
@@ -28,8 +40,18 @@ const accountIdsOf = (terms: SettlementTerms): number[] => [
 export class SettlementService {
   private queries: SettlementQueries;
 
+  private syncedState: SyncedStateService;
+
   constructor(private db: DatabaseAdapter) {
     this.queries = new SettlementQueries(db);
+    this.syncedState = new SyncedStateService(db);
+  }
+
+  /** The budget's stored settlement profile and whether it may be changed. */
+  readProfile(budgetId: number): SettlementProfileReading {
+    return readSettlementProfile(
+      this.syncedState.get(settlementProfileScope(budgetId), SETTLEMENT_PROFILE_KEY)
+    );
   }
 
   getLineTotals(
@@ -55,15 +77,19 @@ export class SettlementService {
   ): SettlementResult {
     const segments = settlementSegments(profile, startDate, endDate);
     const approved = segments.filter((segment) => isApproved(segment.terms));
-    const parts = approved.map((segment) => ({
-      segment,
-      lines: this.getLineTotals(
-        budgetId,
-        segment.startDate,
-        segment.endDate,
-        accountIdsOf(segment.terms)
-      ),
-    }));
+    const parts = approved.map((segment) => {
+      const accountIds = accountIdsOf(segment.terms);
+      return {
+        segment,
+        lines: this.getLineTotals(budgetId, segment.startDate, segment.endDate, accountIds),
+        payments: this.queries.paymentTotals(
+          budgetId,
+          segment.startDate,
+          segment.endDate,
+          accountIds
+        ),
+      };
+    });
     return {
       ...calculateSettlement(parts, startDate, endDate),
       unapprovedSegments: segments

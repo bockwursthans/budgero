@@ -11,7 +11,7 @@
  * Browser-safe: Web Crypto only, no DB or UI dependencies.
  */
 
-import type { SettlementTerms } from './types.js';
+import type { SettlementProfile, SettlementTerms } from './types.js';
 
 /** Stands for the undated initial terms wherever terms are looked up by start. */
 export const INITIAL_SETTLEMENT_TERMS_KEY = 'initial';
@@ -133,4 +133,24 @@ export function settlementTermsConsent(
     pendingFor,
     approved: participantIds.length > 0 && pendingFor.length === 0,
   };
+}
+
+/** Keys of the profile's terms that every participant approved (in profile order). */
+export async function approvedSettlementTermsKeys(
+  budgetId: number,
+  profile: SettlementProfile,
+  approvals: readonly SettlementApprovalRecord[]
+): Promise<string[]> {
+  const { approvalKey } = profile;
+  if (!approvalKey) return [];
+  const consents = await Promise.all(
+    profile.terms.map(async (terms) => {
+      const fingerprint = await settlementTermsFingerprint(approvalKey, budgetId, terms);
+      return {
+        key: settlementTermsKey(terms),
+        consent: settlementTermsConsent(terms, fingerprint, approvals),
+      };
+    })
+  );
+  return consents.filter(({ consent }) => consent.approved).map(({ key }) => key);
 }
