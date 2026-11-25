@@ -20,6 +20,7 @@ Everyone taking part needs their own login in the workspace. Invite them under *
 Choose **Set up settlement** and fill in:
 
 - **Participants** - members of the workspace, with the **personal accounts** each of them pays from and earns into. An account belongs to one person only.
+- **Personal categories** (optional, per participant) - spending that is this person's alone, such as their hobby or clothes. It is never shared: when someone else pays it from their personal accounts, this person owes them the full amount.
 - **Shared expense categories** - only spending in these categories is shared. Everything else stays personal.
 - **Income categories** - income in these categories, arriving in someone's personal accounts, sets their share when splitting by income.
 - **How shared expenses are split**:
@@ -44,13 +45,16 @@ The server only stores who agreed to which fingerprint of the terms. The terms t
 - **Paid** - shared expenses paid from their personal accounts (refunds count against it).
 - **Fair share** - what they should have paid.
 - **Settlement payments** - transfers from their personal accounts to another participant's, minus the ones they received.
-- **Balance** - paid minus fair share, plus settlement payments. Positive means money back, negative means they owe, zero means even.
+- **Paid for each other** - shown when someone paid in another participant's personal categories: what they paid for others minus what others paid for them.
+- **Balance** - paid minus fair share, plus settlement payments and what was paid for each other. Positive means money back, negative means they owe, zero means even.
 
 Open a participant to see the amounts per category. **To settle up** lists the payments that even it out. Record the payment as a normal [transfer](/docs/accounts) between your personal accounts: it counts as a settlement payment, and the open balance goes back to zero.
 
 ## Changes over time
 
 Use **Add change** when something changes - a new job, a different split. A change starts with a month; earlier months keep being settled with the terms before it.
+
+When splitting by income, each set of terms is settled on one income ratio over the whole time it applies. To settle every year on its own ratio, add a change with the same terms each January.
 
 ## Good to know
 

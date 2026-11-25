@@ -20,8 +20,8 @@ interface SettlementSummaryProps {
 
 const PERCENT_POINTS = 100;
 const SHARE_DECIMALS = 1;
-/** The detail row spans every column of the table. */
-const COLUMN_COUNT = 7;
+/** Columns of the table without the personal one; the detail row spans them all. */
+const BASE_COLUMN_COUNT = 7;
 
 const headClass = 'h-8 text-xs font-medium uppercase tracking-wide text-muted-foreground';
 const moneyCell = 'text-right font-mono text-sm tabular-nums';
@@ -37,6 +37,11 @@ export function SettlementSummary({
   const nameOf = new Map(result.participants.map((p) => [p.participantId, p.name]));
   // Without any agreed part, "nothing to settle" would read as "everyone is even".
   const nothingAgreed = result.segments.length === 0 && result.unapprovedSegments.length > 0;
+  // Personal categories paid by someone else: shown only when there are any.
+  const showPersonal = result.participants.some(
+    (p) => p.paidForOthers !== 0 || p.paidByOthers !== 0
+  );
+  const columnCount = BASE_COLUMN_COUNT + (showPersonal ? 1 : 0);
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
   const toggle = (id: string) =>
     setOpenIds((previous) => {
@@ -96,6 +101,11 @@ export function SettlementSummary({
               <TableHead className={cn(headClass, 'text-right')}>
                 <Trans>Settlement payments</Trans>
               </TableHead>
+              {showPersonal ? (
+                <TableHead className={cn(headClass, 'text-right')}>
+                  <Trans>Paid for each other</Trans>
+                </TableHead>
+              ) : null}
               <TableHead className={cn(headClass, 'text-right')}>
                 <Trans>Balance</Trans>
               </TableHead>
@@ -145,6 +155,11 @@ export function SettlementSummary({
                     <TableCell className={moneyCell}>
                       {money(participant.paymentsSent - participant.paymentsReceived)}
                     </TableCell>
+                    {showPersonal ? (
+                      <TableCell className={moneyCell}>
+                        {money(participant.paidForOthers - participant.paidByOthers)}
+                      </TableCell>
+                    ) : null}
                     <TableCell
                       className={cn(
                         moneyCell,
@@ -157,7 +172,7 @@ export function SettlementSummary({
                   </TableRow>
                   {open ? (
                     <TableRow id={detailsId}>
-                      <TableCell colSpan={COLUMN_COUNT} className="bg-muted/40">
+                      <TableCell colSpan={columnCount} className="bg-muted/40">
                         <div className="grid gap-4 py-1 sm:grid-cols-2">
                           <CategoryAmounts
                             title={t`Shared expenses paid`}
@@ -171,6 +186,22 @@ export function SettlementSummary({
                             categoryName={categoryName}
                             money={money}
                           />
+                          {showPersonal ? (
+                            <>
+                              <CategoryAmounts
+                                title={t`Paid for others (back in full)`}
+                                amounts={participant.paidForOthersByCategory}
+                                categoryName={categoryName}
+                                money={money}
+                              />
+                              <CategoryAmounts
+                                title={t`Paid by others (owed in full)`}
+                                amounts={participant.paidByOthersByCategory}
+                                categoryName={categoryName}
+                                money={money}
+                              />
+                            </>
+                          ) : null}
                         </div>
                       </TableCell>
                     </TableRow>

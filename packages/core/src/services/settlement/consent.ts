@@ -71,17 +71,23 @@ const ascending = (ids: readonly number[]): number[] => [...ids].sort((a, b) => 
 /**
  * What an approval agrees to, in a fixed layout so every device signs the
  * same bytes: the budget, the start, the split and, per participant, who
- * they are, which accounts are theirs and their fixed share. Display names
- * are left out: renaming someone is no new agreement.
+ * they are, which accounts are theirs, their fixed share and – only when
+ * they have any – their personal categories (so terms without personal
+ * categories keep the fingerprint they had before those existed). Display
+ * names are left out: renaming someone is no new agreement.
  */
 export function settlementTermsMessage(budgetId: number, terms: SettlementTerms): string {
   const participants = [...terms.participants]
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
-    .map((participant) => [
-      participant.id,
-      ascending(participant.accountIds),
-      participant.customShareBasisPoints,
-    ]);
+    .map((participant) => {
+      const personal = ascending(participant.personalCategoryIds ?? []);
+      return [
+        participant.id,
+        ascending(participant.accountIds),
+        participant.customShareBasisPoints,
+        ...(personal.length > 0 ? [personal] : []),
+      ];
+    });
   return JSON.stringify([
     FINGERPRINT_LAYOUT_VERSION,
     budgetId,

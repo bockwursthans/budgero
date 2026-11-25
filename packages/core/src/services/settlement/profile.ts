@@ -86,6 +86,7 @@ export const SETTLEMENT_TERMS_ISSUE = {
   missingExpenseCategories: 'missing-expense-categories',
   missingIncomeCategories: 'missing-income-categories',
   categoryCountedTwice: 'category-counted-twice',
+  personalCategoryCountedTwice: 'personal-category-counted-twice',
   invalidEffectiveDate: 'invalid-effective-date',
   effectiveDateTaken: 'effective-date-taken',
   participantNotAMember: 'participant-not-a-member',
@@ -160,16 +161,18 @@ class ProfileReader {
 
   participant(raw: unknown): SettlementParticipant | null {
     if (!isPlainObject(raw)) return null;
-    const { id, name, customShareBasisPoints } = raw;
+    const { id, name, customShareBasisPoints, personalCategoryIds } = raw;
     if (typeof id !== 'string' || id === '' || id.length > MAX_PARTICIPANT_ID_LENGTH) return null;
     const cleanName = typeof name === 'string' ? cleanSettlementName(name) : '';
     if (cleanName !== name) this.lossy = true;
     if (!isBasisPoints(customShareBasisPoints)) this.lossy = true;
+    const personal = personalCategoryIds === undefined ? [] : this.ids(personalCategoryIds);
     return {
       id,
       name: cleanName,
       accountIds: this.ids(raw.accountIds),
       customShareBasisPoints: isBasisPoints(customShareBasisPoints) ? customShareBasisPoints : 0,
+      ...(personal.length > 0 ? { personalCategoryIds: personal } : {}),
     };
   }
 
@@ -406,6 +409,27 @@ function participantIssues(
   return issues;
 }
 
+/**
+ * A personal category belongs to one participant and is never shared or
+ * counted as income: otherwise one amount would settle twice.
+ */
+function personalCategoryIssues(terms: SettlementTerms): SettlementTermsIssue[] {
+  const elsewhere = new Set([...terms.incomeCategoryIds, ...terms.expenseCategoryIds]);
+  const claimed = new Set<number>();
+  const issues: SettlementTermsIssue[] = [];
+  for (const participant of terms.participants) {
+    const personal = participant.personalCategoryIds ?? [];
+    if (personal.some((id) => elsewhere.has(id) || claimed.has(id))) {
+      issues.push({
+        code: SETTLEMENT_TERMS_ISSUE.personalCategoryCountedTwice,
+        participantId: participant.id,
+      });
+    }
+    for (const id of personal) claimed.add(id);
+  }
+  return issues;
+}
+
 export interface SettlementTermsValidationContext {
   /** Dates other terms of the profile start on. */
   otherEffectiveDates?: readonly string[];
@@ -438,6 +462,7 @@ export function validateSettlementTerms(
   if (terms.expenseCategoryIds.some((id) => incomeCategories.has(id))) {
     issues.push({ code: SETTLEMENT_TERMS_ISSUE.categoryCountedTwice });
   }
+  issues.push(...personalCategoryIssues(terms));
   if (terms.effectiveFrom !== undefined) {
     if (!isSettlementChangeDate(terms.effectiveFrom)) {
       issues.push({ code: SETTLEMENT_TERMS_ISSUE.invalidEffectiveDate });

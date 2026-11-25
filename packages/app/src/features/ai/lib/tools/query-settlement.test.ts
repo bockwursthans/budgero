@@ -47,10 +47,14 @@ const participant = (id: string, name: string, paid: number, net: number) => ({
   targetContribution: asMilli(500_000),
   paymentsSent: asMilli(0),
   paymentsReceived: asMilli(0),
+  paidForOthers: asMilli(0),
+  paidByOthers: asMilli(0),
   netSettlement: asMilli(net),
   contributionShare: 0.5,
   incomeByCategory: [],
   sharedExpensesByCategory: paid ? [{ categoryId: RENT, amount: asMilli(paid) }] : [],
+  paidForOthersByCategory: [],
+  paidByOthersByCategory: [],
 });
 
 const result: SettlementResult = {

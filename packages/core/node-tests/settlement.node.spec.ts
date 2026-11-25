@@ -281,6 +281,59 @@ describe('calculateSettlement', () => {
     expect(nets(result)).toEqual({ [ALEX]: 1_000_000, [SAM]: -1_000_000 });
   });
 
+  it('settles a personal category paid by someone else in full to its owner', () => {
+    const withPersonal = terms({
+      participants: [
+        { ...terms().participants[0], personalCategoryIds: [HOBBY] },
+        terms().participants[1],
+      ],
+    });
+    const result = settleOne(withPersonal, [
+      line(ALEX_ACCOUNT, SALARY, 3_000_000, 0),
+      line(SAM_ACCOUNT, SALARY, 1_000_000, 0),
+      line(ALEX_ACCOUNT, RENT, 0, 1_000_000),
+      // Sam pays 120 of Alex's hobby (20 of it refunded): Alex owes the full 100.
+      line(SAM_ACCOUNT, HOBBY, 20_000, 120_000),
+      // Alex paying their own hobby stays out of the settlement.
+      line(ALEX_ACCOUNT, HOBBY, 0, 500_000),
+    ]);
+
+    expect(result.totalSharedExpenses).toBe(1_000_000);
+    expect(byId(result, SAM)).toMatchObject({
+      paidForOthers: 100_000,
+      paidByOthers: 0,
+      paidForOthersByCategory: [{ categoryId: HOBBY, amount: 100_000 }],
+      // 25 % of the rent is 250; Sam gets the hobby back: -250 + 100.
+      netSettlement: -150_000,
+    });
+    expect(byId(result, ALEX)).toMatchObject({
+      paidByOthers: 100_000,
+      paidByOthersByCategory: [{ categoryId: HOBBY, amount: 100_000 }],
+      netSettlement: 150_000,
+    });
+    expect(result.transfers).toEqual([
+      { fromParticipantId: SAM, toParticipantId: ALEX, amount: 150_000 },
+    ]);
+  });
+
+  it('keeps a personal category out of income and the shared pool', () => {
+    // Saved before the validation existed, a category could be both: personal wins.
+    const overlapping = terms({
+      participants: [
+        terms().participants[0],
+        { ...terms().participants[1], personalCategoryIds: [RENT] },
+      ],
+    });
+    const result = settleOne(overlapping, [
+      line(ALEX_ACCOUNT, SALARY, 1_000_000, 0),
+      line(SAM_ACCOUNT, SALARY, 1_000_000, 0),
+      line(ALEX_ACCOUNT, RENT, 0, 400_000),
+    ]);
+
+    expect(result.totalSharedExpenses).toBe(0);
+    expect(nets(result)).toEqual({ [ALEX]: 400_000, [SAM]: -400_000 });
+  });
+
   it('splits equally and by custom shares', () => {
     const lines = [line(ALEX_ACCOUNT, RENT, 0, 1_000_000)];
 
@@ -477,6 +530,26 @@ describe('settlement consent', () => {
     expect(await settlementTermsFingerprint(APPROVAL_KEY, 1, renamed)).toBe(base);
   });
 
+  it('keeps the fingerprint of terms without personal categories, and signs them when set', async () => {
+    const base = await settlementTermsFingerprint(APPROVAL_KEY, 1, terms());
+    const withParticipants = (personal: number[] | undefined) =>
+      terms({
+        participants: [
+          { ...terms().participants[0], personalCategoryIds: personal },
+          terms().participants[1],
+        ],
+      });
+
+    // Approvals given before personal categories existed stay valid.
+    expect(await settlementTermsFingerprint(APPROVAL_KEY, 1, withParticipants([]))).toBe(base);
+    expect(await settlementTermsFingerprint(APPROVAL_KEY, 1, withParticipants(undefined))).toBe(
+      base
+    );
+    expect(await settlementTermsFingerprint(APPROVAL_KEY, 1, withParticipants([HOBBY]))).not.toBe(
+      base
+    );
+  });
+
   it('refuses a malformed approval key', async () => {
     await expect(settlementTermsFingerprint('short', 1, terms())).rejects.toThrow();
   });
@@ -556,6 +629,23 @@ describe('settlement profile', () => {
       status: SETTLEMENT_PROFILE_STATUS.ready,
       profile: stored,
     });
+  });
+
+  it('reads personal categories, and leaves them out where there are none', () => {
+    const withPersonal = terms({
+      participants: [
+        { ...terms().participants[0], personalCategoryIds: [HOBBY] },
+        { ...terms().participants[1], personalCategoryIds: [] },
+      ],
+    });
+    const reading = readSettlementProfile(
+      JSON.parse(JSON.stringify(upsertSettlementTerms(null, withPersonal)))
+    );
+
+    expect(reading.status).toBe(SETTLEMENT_PROFILE_STATUS.ready);
+    const [alex, sam] = reading.profile!.terms[0].participants;
+    expect(alex.personalCategoryIds).toEqual([HOBBY]);
+    expect(sam).not.toHaveProperty('personalCategoryIds');
   });
 
   it('tells unset, newer and unreadable values apart', () => {
@@ -748,6 +838,30 @@ describe('settlement profile', () => {
       SETTLEMENT_TERMS_ISSUE.missingExpenseCategories,
       SETTLEMENT_TERMS_ISSUE.missingIncomeCategories,
     ]);
+  });
+
+  it('keeps each personal category to one person and out of income and sharing', () => {
+    const personal = (alex: number[], sam: number[]) =>
+      terms({
+        participants: [
+          { ...terms().participants[0], personalCategoryIds: alex },
+          { ...terms().participants[1], personalCategoryIds: sam },
+        ],
+      });
+
+    expect(validateSettlementTerms(personal([HOBBY], []))).toEqual([]);
+    for (const [alex, sam] of [
+      [[RENT], []],
+      [[SALARY], []],
+      [[HOBBY], [HOBBY]],
+    ]) {
+      expect(validateSettlementTerms(personal(alex, sam))).toEqual([
+        {
+          code: SETTLEMENT_TERMS_ISSUE.personalCategoryCountedTwice,
+          participantId: alex.includes(HOBBY) && sam.includes(HOBBY) ? SAM : ALEX,
+        },
+      ]);
+    }
   });
 
   it('takes only workspace members, each once', () => {
