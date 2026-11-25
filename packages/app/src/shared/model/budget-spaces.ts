@@ -16,6 +16,23 @@ export interface BudgetSpaceMember {
   accepted_at?: string | null;
 }
 
+/** `BudgetSpaceMember.invitation_status` values (server: budget_space_members). */
+export const MEMBER_INVITATION_STATUS = {
+  pending: 'pending',
+  accepted: 'accepted',
+} as const;
+
+/**
+ * A member's approval of settlement terms (server: settlement_approvals).
+ * The server sets user_id from the session, so it is who really approved.
+ */
+export interface SettlementApprovalDto {
+  space_id: string;
+  user_id: string;
+  fingerprint: string;
+  created_at: string;
+}
+
 export interface BudgetSpaceInvite {
   id: string;
   space_id: string;

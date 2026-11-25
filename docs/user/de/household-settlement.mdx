@@ -1,0 +1,61 @@
+---
+title: "Haushaltsausgleich"
+summary: "Teile gemeinsame Haushaltskosten fair zwischen den Mitgliedern eines Arbeitsbereichs auf - nach Einkommen, zu gleichen Teilen oder mit festen Anteilen - und sieh jeden Monat, wer wem was schuldet."
+section: collaboration
+topicId: household-settlement
+takeaways:
+  - "Alle Beteiligten sind Mitglieder des Arbeitsbereichs mit eigenem Login."
+  - "Regeln gelten erst, wenn alle Beteiligten zugestimmt haben."
+  - "Der Ausgleich liest nur deine Buchungen; das Ausgleichen selbst bleibt eine normale Umbuchung."
+---
+
+Viele Haushalte zahlen gemeinsame Kosten von persönlichen Konten: Eine Person zahlt die Miete, die andere die Einkäufe, und beide verdienen unterschiedlich viel. **Berichte → Haushaltsausgleich** rechnet aus, was jede Person hätte tragen sollen und wer wem was schuldet - ohne Tabelle nebenher.
+
+## Bevor du anfängst
+
+Alle Beteiligten brauchen ein eigenes Login im Arbeitsbereich. Lade sie zuerst unter **Einstellungen → Arbeitsbereiche** ein (siehe [Budget-Freigabe](/docs/sharing)). Jede Person erfasst und verwaltet dann ihre eigenen Buchungen auf ihren eigenen Konten.
+
+## Einrichten
+
+Wähle **Ausgleich einrichten** und lege fest:
+
+- **Beteiligte** - Mitglieder des Arbeitsbereichs, jeweils mit den **persönlichen Konten**, von denen sie zahlen und auf die ihr Einkommen geht. Ein Konto gehört genau einer Person.
+- **Kategorien gemeinsamer Ausgaben** - nur Ausgaben in diesen Kategorien werden geteilt. Alles andere bleibt persönlich.
+- **Einkommenskategorien** - Einkommen in diesen Kategorien auf den persönlichen Konten einer Person bestimmt ihren Anteil bei der Aufteilung nach Einkommen.
+- **Wie gemeinsame Ausgaben aufgeteilt werden**:
+  - **Nach Einkommen** - jede Person trägt den Teil, der ihrem Anteil am Einkommen im Zeitraum entspricht.
+  - **Zu gleichen Teilen** - alle tragen den gleichen Teil.
+  - **Feste Anteile** - jede Person trägt einen festen Prozentsatz; zusammen ergeben die Anteile 100 %.
+
+## Zustimmung
+
+Niemand wird nach Regeln abgerechnet, denen er nicht zugestimmt hat. Regeln gelten erst, wenn **alle Beteiligten** mit ihrem eigenen Login **zugestimmt** haben - wer Regeln speichert, an denen er beteiligt ist, stimmt damit zu. Bis alle zugestimmt haben, bleibt der Zeitraum dieser Regeln beim Ausgleich außen vor.
+
+Jede Änderung, die etwas bewirkt (Beteiligte, Konten, Kategorien, Aufteilung oder Startmonat), braucht erneut die Zustimmung aller. Jede beteiligte Person kann ihre Zustimmung jederzeit zurückziehen.
+
+Der Server speichert nur, wer welchem Fingerabdruck der Regeln zugestimmt hat. Die Regeln selbst bleiben mit dem Rest deines Budgets Ende-zu-Ende-verschlüsselt.
+
+## Den Ausgleich lesen
+
+Der **offene Saldo** - die Standardansicht - umfasst alle Monate bis heute, einschließlich bereits geleisteter Zahlungen: Er ist null, wenn alle quitt sind. Du kannst auch einen einzelnen Monat oder einen eigenen Zeitraum wählen. Für jede beteiligte Person siehst du:
+
+- **Einkommen** - berücksichtigtes Einkommen auf ihren persönlichen Konten.
+- **Anteil** - der Teil der gemeinsamen Ausgaben, den sie trägt.
+- **Bezahlt** - gemeinsame Ausgaben, die von ihren persönlichen Konten bezahlt wurden (Erstattungen werden abgezogen).
+- **Soll-Anteil** - was sie hätte zahlen sollen.
+- **Ausgleichszahlungen** - Umbuchungen von ihren persönlichen Konten an eine andere beteiligte Person, abzüglich der erhaltenen.
+- **Saldo** - Bezahlt minus Soll-Anteil plus Ausgleichszahlungen. Positiv heißt Geld zurück, negativ heißt, sie schuldet etwas, null heißt quitt.
+
+Öffne eine Person, um die Beträge je Kategorie zu sehen. **Zum Ausgleich** listet die Zahlungen, die alles ausgleichen. Erfasse die Zahlung als normale [Umbuchung](/docs/accounts) zwischen euren persönlichen Konten: Sie zählt als Ausgleichszahlung, und der offene Saldo geht wieder auf null.
+
+## Änderungen im Lauf der Zeit
+
+Nutze **Änderung hinzufügen**, wenn sich etwas ändert - ein neuer Job, eine andere Aufteilung. Eine Änderung beginnt mit einem Monat; frühere Monate werden weiter mit den Regeln davor abgerechnet.
+
+## Gut zu wissen
+
+- Es zählen nur gebuchte Transaktionen, keine geplanten wiederkehrenden.
+- Beträge sind in der Budgetwährung, auch bei Konten in Fremdwährung.
+- Aufgeteilte Buchungen zählen Zeile für Zeile.
+- Jede Umbuchung zwischen den persönlichen Konten zweier Beteiligter zählt als Ausgleichszahlung.
+- Ausgaben von Konten, die keiner beteiligten Person gehören (etwa ein Gemeinschaftskonto), gehören nicht zum Ausgleich.

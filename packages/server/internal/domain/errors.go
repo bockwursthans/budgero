@@ -42,4 +42,8 @@ var (
 	// Snapshot history errors
 	ErrSnapshotHistoryNotFound = errors.New("snapshot history entry not found")
 	ErrSnapshotNotRestorable   = errors.New("snapshot history entry not restorable")
+
+	// Settlement approval errors
+	ErrInvalidSettlementFingerprint   = errors.New("invalid settlement fingerprint")
+	ErrSettlementApprovalLimitReached = errors.New("settlement approval limit reached")
 )

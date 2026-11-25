@@ -155,6 +155,13 @@ type SentEmail struct {
 	SentAt   time.Time `json:"sent_at"`
 }
 
+type SettlementApproval struct {
+	SpaceID     string    `json:"space_id"`
+	UserID      string    `json:"user_id"`
+	Fingerprint string    `json:"fingerprint"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 type SpaceBlobHistory struct {
 	ID                   int64     `json:"id"`
 	SpaceID              string    `json:"space_id"`

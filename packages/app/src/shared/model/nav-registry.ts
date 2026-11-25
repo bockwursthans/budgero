@@ -23,6 +23,7 @@ import {
   FileText,
   SquarePlus,
   LayoutGrid,
+  Scale,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -36,11 +37,20 @@ export interface NavRouteItem {
   beta?: boolean;
 }
 
+/** Household settlement: who owes whom for shared expenses (a report). */
+export const NAV_HOUSEHOLD_SETTLEMENT: NavRouteItem = {
+  to: '/reports/settlement',
+  icon: Scale,
+  label: msg`Household settlement`,
+  beta: true,
+};
+
 /** Reports submenu links (all indented `ml-4 mr-2`). */
 export const NAV_REPORTS: NavRouteItem[] = [
   { to: '/reports', icon: FileText, label: msg`All reports` },
   { to: '/reports/question/new', icon: SquarePlus, label: msg`New question` },
   { to: '/reports/dashboards', icon: LayoutGrid, label: msg`Custom Dashboards`, exact: false },
+  NAV_HOUSEHOLD_SETTLEMENT,
 ];
 
 /** Settings → Account & Access links (only shown when not a self-hostable build). */
@@ -54,9 +64,16 @@ export const NAV_SETTINGS_ACCOUNT: NavRouteItem[] = [
   { to: '/settings/security', icon: Shield, label: msg`Security & Privacy` },
 ];
 
+/** Settings → Workspaces: members and invites. */
+export const NAV_WORKSPACES: NavRouteItem = {
+  to: '/settings/workspaces',
+  icon: Users,
+  label: msg`Workspaces`,
+};
+
 /** Settings → Budgets & Data links. */
 export const NAV_SETTINGS_DATA: NavRouteItem[] = [
-  { to: '/settings/workspaces', icon: Users, label: msg`Workspaces` },
+  NAV_WORKSPACES,
   { to: '/settings/imports', icon: Inbox, label: msg`Imports` },
   { to: '/settings/payees', icon: User, label: msg`Payees` },
   { to: '/settings/labels', icon: Tag, label: msg`Labels` },

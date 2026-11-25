@@ -16,7 +16,9 @@ import {
 } from '@features/chat/api/useChat';
 import { useCategories } from '@entities/category/api/useCategories';
 import { useAccounts } from '@entities/account/api/useAccounts';
-import { useRuntime } from '@shared/runtime/runtime-provider';
+import { fetchSettlementApprovals } from '@entities/settlement/api/useSettlementConsent';
+import { useSpaceMembers } from '@features/budget-sharing/api/useBudgetSpaceSharing';
+import { useActiveSpaceId, useRuntime } from '@shared/runtime/runtime-provider';
 import {
   streamChat,
   generateConversationTitle,
@@ -47,6 +49,8 @@ export function useChatPanelState() {
   const globalLocalizer = useUiStore((s) => s.globalLocalizer);
   const budgetId = selectedBudget?.ID ?? null;
   const runtime = useRuntime();
+  const spaceId = useActiveSpaceId();
+  const { data: spaceMembers } = useSpaceMembers(spaceId);
   const scrollRef = useRef<HTMLDivElement>(null);
   // Live analytics schema, fetched once and reused across messages (it's static for the session).
   const analyticsSchemaRef = useRef<string | null>(null);
@@ -168,6 +172,13 @@ export function useChatPanelState() {
         return executeReportQuery(sql, db, options);
       },
       enabledTools: chatSettings?.EnabledTools ?? null,
+      listSettlementApprovals: spaceId ? () => fetchSettlementApprovals(spaceId) : undefined,
+      memberNames: new Map(
+        (spaceMembers ?? []).map((member) => [
+          member.user_id,
+          member.user_name.trim() || member.user_email.trim() || member.user_id,
+        ])
+      ),
       categories: categories.map((c) => ({ ID: c.ID, Name: c.Name })),
       accounts: accounts.map((a) => ({
         ID: a.ID,
@@ -194,6 +205,8 @@ export function useChatPanelState() {
     accounts,
     selectedBudget,
     globalLocalizer,
+    spaceId,
+    spaceMembers,
   ]);
 
   const handleSend = async () => {

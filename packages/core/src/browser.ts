@@ -75,6 +75,7 @@ export {
   type SyncedStateMergePatch,
   type SyncedStateScope,
 } from './services/synced-state/index.js';
+export * from './services/settlement/index.js';
 export { RECURRING_SPLIT_ERROR_CODES } from './services/recurring/index.js';
 export {
   DatabaseCustomDashboardService,

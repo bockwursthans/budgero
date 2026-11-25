@@ -1,0 +1,104 @@
+import { DatabaseAdapter } from '../../database/interface.js';
+import { calculateSettlement } from './calculation.js';
+import { SyncedStateService, type SyncedStateScope } from '../synced-state/index.js';
+import {
+  readSettlementProfile,
+  SETTLEMENT_PROFILE_KEY,
+  settlementSegments,
+  type SettlementProfileReading,
+} from './profile.js';
+import { SettlementQueries } from './queries.js';
+import type {
+  SettlementLineTotal,
+  SettlementProfile,
+  SettlementResult,
+  SettlementTerms,
+} from './types.js';
+
+export * from './types.js';
+export * from './profile.js';
+export * from './consent.js';
+export * from './report.js';
+export { apportion, calculateSettlement, settlementTransfers } from './calculation.js';
+
+/** The synced state scope a budget's settlement profile is stored in. */
+export function settlementProfileScope(budgetId: number): SyncedStateScope {
+  return `budget:${budgetId}`;
+}
+
+/** Decides whether terms took effect (every participant approved them). */
+export type SettlementTermsFilter = (terms: SettlementTerms) => boolean;
+
+const accountIdsOf = (terms: SettlementTerms): number[] => [
+  ...new Set(terms.participants.flatMap((participant) => participant.accountIds)),
+];
+
+/**
+ * SettlementService - income-weighted (or equal / fixed-share) settlement of
+ * shared household expenses paid from the participants' personal accounts.
+ */
+export class SettlementService {
+  private queries: SettlementQueries;
+
+  private syncedState: SyncedStateService;
+
+  constructor(private db: DatabaseAdapter) {
+    this.queries = new SettlementQueries(db);
+    this.syncedState = new SyncedStateService(db);
+  }
+
+  /** The budget's stored settlement profile and whether it may be changed. */
+  readProfile(budgetId: number): SettlementProfileReading {
+    return readSettlementProfile(
+      this.syncedState.get(settlementProfileScope(budgetId), SETTLEMENT_PROFILE_KEY)
+    );
+  }
+
+  getLineTotals(
+    budgetId: number,
+    startDate: string,
+    endDate: string,
+    accountIds: readonly number[]
+  ): SettlementLineTotal[] {
+    return this.queries.lineTotals(budgetId, startDate, endDate, accountIds);
+  }
+
+  /**
+   * Settles the inclusive date range with the terms in effect on each day.
+   * Parts whose terms `isApproved` refuses are not settled; they are listed
+   * as unapproved instead, so nobody is settled on terms they didn't agree to.
+   */
+  calculate(
+    budgetId: number,
+    profile: SettlementProfile,
+    startDate: string,
+    endDate: string,
+    isApproved: SettlementTermsFilter
+  ): SettlementResult {
+    const segments = settlementSegments(profile, startDate, endDate);
+    const approved = segments.filter((segment) => isApproved(segment.terms));
+    const parts = approved.map((segment) => {
+      const accountIds = accountIdsOf(segment.terms);
+      return {
+        segment,
+        lines: this.getLineTotals(budgetId, segment.startDate, segment.endDate, accountIds),
+        payments: this.queries.paymentTotals(
+          budgetId,
+          segment.startDate,
+          segment.endDate,
+          accountIds
+        ),
+      };
+    });
+    return {
+      ...calculateSettlement(parts, startDate, endDate),
+      unapprovedSegments: segments
+        .filter((segment) => !approved.includes(segment))
+        .map(({ startDate: from, endDate: until, terms }) => ({
+          startDate: from,
+          endDate: until,
+          effectiveFrom: terms.effectiveFrom,
+        })),
+    };
+  }
+}

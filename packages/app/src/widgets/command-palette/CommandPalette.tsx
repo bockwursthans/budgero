@@ -34,6 +34,7 @@ import {
   CommandShortcut,
 } from '@shared/ui/command';
 import {
+  NAV_HOUSEHOLD_SETTLEMENT,
   NAV_SETTINGS_ACCOUNT,
   NAV_SETTINGS_AUTOMATION,
   NAV_SETTINGS_DATA,
@@ -520,6 +521,10 @@ export function CommandPalette() {
               <span>
                 <Trans>Custom Dashboards</Trans>
               </span>
+            </CommandItem>
+            <CommandItem onSelect={() => handleNavigation(NAV_HOUSEHOLD_SETTLEMENT.to)}>
+              <NAV_HOUSEHOLD_SETTLEMENT.icon className="mr-2 h-4 w-4" />
+              <span>{t(NAV_HOUSEHOLD_SETTLEMENT.label)}</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation('/settings/recurring')}>
               <RefreshCw className="mr-2 h-4 w-4" />

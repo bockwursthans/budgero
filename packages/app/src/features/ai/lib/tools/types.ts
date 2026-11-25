@@ -1,4 +1,4 @@
-import type { Services, ChartConfiguration } from '@budgero/core/browser';
+import type { Services, ChartConfiguration, SettlementApprovalRecord } from '@budgero/core/browser';
 import type { QueryResult } from '@shared/lib/sql/report-query-executor';
 import type { AIClientConfig } from '../client';
 
@@ -33,6 +33,10 @@ export interface ToolContext {
   analyticsSchema?: string;
   /** Enabled chat tool keys. null/undefined means all tools are enabled. */
   enabledTools?: string[] | null;
+  /** The workspace's settlement approvals (server); without it nothing counts as agreed. */
+  listSettlementApprovals?: () => Promise<SettlementApprovalRecord[]>;
+  /** Current names of the workspace members by user id. */
+  memberNames?: ReadonlyMap<string, string>;
   aiConfig: AIClientConfig;
   currencySymbol: string;
   /** Formats a DECIMAL currency amount (tools convert stored milliunits first). */

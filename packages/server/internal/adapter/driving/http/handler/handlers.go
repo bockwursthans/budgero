@@ -203,6 +203,12 @@ func mapServiceError(err error) error {
 	if errors.Is(err, domain.ErrUserNotFound) {
 		return echo.NewHTTPError(http.StatusNotFound, "user not found")
 	}
+	if errors.Is(err, domain.ErrInvalidSettlementFingerprint) {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid settlement fingerprint")
+	}
+	if errors.Is(err, domain.ErrSettlementApprovalLimitReached) {
+		return echo.NewHTTPError(http.StatusConflict, "settlement approval limit reached")
+	}
 	// Don't leak raw internal/driver error strings to clients: the central
 	// error handler logs and reports the cause, the client gets a fixed message.
 	return internalErr("internal server error", err)

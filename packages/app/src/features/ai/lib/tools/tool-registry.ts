@@ -45,6 +45,13 @@ export const CHAT_TOOL_DEFS: ChatToolDef[] = [
     mutating: false,
   },
   {
+    key: 'query_settlement',
+    label: 'Household settlement',
+    description:
+      'Who owes whom between the workspace members, using only terms everyone agreed to.',
+    mutating: false,
+  },
+  {
     key: 'add_transaction',
     label: 'Add transaction',
     description: 'Record an expense or income. Honors the execution mode (confirm / auto).',

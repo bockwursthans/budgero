@@ -2,6 +2,7 @@ import type {
   BudgetSpaceSummary,
   BudgetSpaceMember,
   BudgetSpaceInvite,
+  SettlementApprovalDto,
   SpaceInviteInspection,
 } from '@shared/model/budget-spaces';
 import {
@@ -541,6 +542,14 @@ export const spaceApi = {
     apiClient.put(`/budget-spaces/${spaceId}`, payload),
   listMembers: (spaceId: string) =>
     apiClient.get<BudgetSpaceMember[]>(`/budget-spaces/${spaceId}/members`),
+  listSettlementApprovals: (spaceId: string) =>
+    apiClient.get<SettlementApprovalDto[]>(`/budget-spaces/${spaceId}/settlement-approvals`),
+  approveSettlement: (spaceId: string, fingerprint: string) =>
+    apiClient.post<SettlementApprovalDto>(`/budget-spaces/${spaceId}/settlement-approvals`, {
+      fingerprint,
+    }),
+  revokeSettlementApproval: (spaceId: string, fingerprint: string) =>
+    apiClient.delete(`/budget-spaces/${spaceId}/settlement-approvals/${fingerprint}`),
   removeMember: (spaceId: string, memberId: string) =>
     apiClient.delete(`/budget-spaces/${spaceId}/members/${memberId}`),
   listInvites: (spaceId: string) =>

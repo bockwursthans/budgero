@@ -1,0 +1,61 @@
+---
+title: Household Settlement
+summary: Split shared household costs fairly between the members of a workspace - by income, equally or by fixed shares - and see each month who owes whom.
+section: collaboration
+topicId: household-settlement
+takeaways:
+  - Everyone taking part is a member of the workspace with their own login.
+  - Terms count only after every participant has agreed to them.
+  - The settlement only reads your transactions; settling up stays a normal transfer.
+---
+
+Many households pay shared costs from personal accounts: one person pays the rent, the other the groceries, and both earn different amounts. **Reports → Household settlement** works out what everyone should have carried and who owes whom, without a spreadsheet on the side.
+
+## Before you start
+
+Everyone taking part needs their own login in the workspace. Invite them under **Settings → Workspaces** first (see [Sharing Budgets](/docs/sharing)). Each person then enters and manages their own transactions in their own accounts.
+
+## Setting it up
+
+Choose **Set up settlement** and fill in:
+
+- **Participants** - members of the workspace, with the **personal accounts** each of them pays from and earns into. An account belongs to one person only.
+- **Shared expense categories** - only spending in these categories is shared. Everything else stays personal.
+- **Income categories** - income in these categories, arriving in someone's personal accounts, sets their share when splitting by income.
+- **How shared expenses are split**:
+  - **By income** - everyone carries the part that matches their part of the income in the period.
+  - **Equal split** - everyone carries the same part.
+  - **Fixed shares** - everyone carries a fixed percentage; the shares add up to 100 %.
+
+## Consent
+
+Nobody can be settled on terms they didn't accept. Terms take effect only when **every participant has agreed** from their own login - saving terms you take part in counts as your agreement. Until everyone has agreed, the period those terms cover is left out of the settlement.
+
+Changing anything that matters (participants, accounts, categories, split or start month) needs everyone's agreement again. Each participant can withdraw their consent at any time.
+
+The server only stores who agreed to which fingerprint of the terms. The terms themselves stay end-to-end encrypted with the rest of your budget.
+
+## Reading the settlement
+
+**Open balance** - the default - covers every month up to today, payments already made included: it is zero when everyone is even. You can also pick a single month or a custom range. For each participant you see:
+
+- **Income** - eligible income in their personal accounts.
+- **Share** - the part of the shared expenses they carry.
+- **Paid** - shared expenses paid from their personal accounts (refunds count against it).
+- **Fair share** - what they should have paid.
+- **Settlement payments** - transfers from their personal accounts to another participant's, minus the ones they received.
+- **Balance** - paid minus fair share, plus settlement payments. Positive means money back, negative means they owe, zero means even.
+
+Open a participant to see the amounts per category. **To settle up** lists the payments that even it out. Record the payment as a normal [transfer](/docs/accounts) between your personal accounts: it counts as a settlement payment, and the open balance goes back to zero.
+
+## Changes over time
+
+Use **Add change** when something changes - a new job, a different split. A change starts with a month; earlier months keep being settled with the terms before it.
+
+## Good to know
+
+- Only posted transactions count; scheduled recurring ones don't.
+- Amounts are in the budget currency, including foreign-currency accounts.
+- Split transactions count line by line.
+- Every transfer between the personal accounts of two participants counts as a settlement payment.
+- Expenses paid from accounts that belong to no participant (a joint account, say) are not part of the settlement.
