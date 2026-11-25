@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"budgero-server/internal/domain"
@@ -30,10 +31,11 @@ func NewSettlementApprovalService(repo repository.SettlementApprovalRepository, 
 var _ driving.SettlementApprovalService = (*SettlementApprovalService)(nil)
 
 // memberSpace is the space the caller asked for, when they are an accepted
-// member of it. An empty id is refused: ResolveSpaceID would fall back to the
-// caller's first space, and approvals must never land in another one.
+// member of it. An empty (or blank) id is refused: ResolveSpaceID trims it and
+// would fall back to the caller's first space, and approvals must never land
+// in another one.
 func (s *SettlementApprovalService) memberSpace(ctx context.Context, userID, spaceID string) (string, error) {
-	if userID == "" || spaceID == "" {
+	if userID == "" || strings.TrimSpace(spaceID) == "" {
 		return "", domain.ErrSpaceAccessDenied
 	}
 	return s.spaces.ResolveSpaceID(ctx, userID, spaceID)

@@ -14589,6 +14589,10 @@ msgstr "Nothing to chart for these rows."
 msgid "Nothing to explore for this value."
 msgstr "Nothing to explore for this value."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing to settle until everyone taking part has agreed to the terms."
+msgstr "Nothing to settle until everyone taking part has agreed to the terms."
+
 #: src/widgets/dashboard/UpcomingTransactionsCard.tsx
 msgid "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."
 msgstr "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."

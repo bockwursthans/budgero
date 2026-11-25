@@ -14587,6 +14587,10 @@ msgstr "No hay nada que representar para estas filas."
 msgid "Nothing to explore for this value."
 msgstr "No hay nada que explorar para este valor."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing to settle until everyone taking part has agreed to the terms."
+msgstr "No hay nada que saldar hasta que todos los participantes hayan aceptado las reglas."
+
 #: src/widgets/dashboard/UpcomingTransactionsCard.tsx
 msgid "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."
 msgstr "Nada próximo. Los cargos recurrentes y las transacciones con fecha en los próximos {ONE_OFF_LOOKAHEAD_MONTHS}meses aparecen aquí."

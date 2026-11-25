@@ -35,6 +35,8 @@ export function SettlementSummary({
 }: SettlementSummaryProps) {
   const { t } = useLingui();
   const nameOf = new Map(result.participants.map((p) => [p.participantId, p.name]));
+  // Without any agreed part, "nothing to settle" would read as "everyone is even".
+  const nothingAgreed = result.segments.length === 0 && result.unapprovedSegments.length > 0;
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
   const toggle = (id: string) =>
     setOpenIds((previous) => {
@@ -193,7 +195,11 @@ export function SettlementSummary({
           </p>
           {result.transfers.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              <Trans>Everyone has paid their share. Nothing to settle.</Trans>
+              {nothingAgreed ? (
+                <Trans>Nothing to settle until everyone taking part has agreed to the terms.</Trans>
+              ) : (
+                <Trans>Everyone has paid their share. Nothing to settle.</Trans>
+              )}
             </p>
           ) : (
             <ul className="flex flex-col gap-1">

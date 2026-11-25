@@ -131,6 +131,25 @@ describe('SettlementSummary', () => {
     ).toBeInTheDocument();
   });
 
+  it('does not call it even while nothing is agreed yet', () => {
+    render(
+      <SettlementSummary
+        result={result({
+          transfers: [],
+          segments: [],
+          unapprovedSegments: [{ startDate: '2026-01-01', endDate: '2026-01-31' }],
+        })}
+        money={money}
+        categoryNames={CATEGORY_NAMES}
+      />
+    );
+
+    expect(
+      screen.getByText('Nothing to settle until everyone taking part has agreed to the terms.')
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Everyone has paid their share. Nothing to settle.')).toBeNull();
+  });
+
   it('explains an equal split for lack of income', () => {
     render(
       <SettlementSummary

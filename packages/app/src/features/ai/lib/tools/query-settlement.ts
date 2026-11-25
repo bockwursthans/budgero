@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   approvedSettlementTermsKeys,
   SETTLEMENT_EARLIEST_DATE,
+  SETTLEMENT_PROFILE_STATUS,
   settlementReport,
   settlementTermsKey,
   type SettlementReport,
@@ -19,7 +20,16 @@ export const SETTLEMENT_TOOL_PERIOD = {
   range: 'range',
 } as const;
 
-const MONTH_KEY_PATTERN = /^\d{4}-\d{2}$/;
+const MONTH_KEY_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+/** What the tool says instead of a settlement when the saved terms can't be used. */
+export const SETTLEMENT_TOOL_MESSAGE = {
+  unset: 'No household settlement is set up for this budget.',
+  newerFormat:
+    'The household settlement was saved by a newer version of Budgero. Update Budgero to read it.',
+  unreadable:
+    'The household settlement terms could not be read completely, so no settlement is calculated. Open Reports → Household settlement to check them.',
+} as const;
 
 export const querySettlementSchema = withoutNulls(
   z.object({
@@ -81,9 +91,16 @@ export async function executeQuerySettlement(
   context: ToolContext
 ): Promise<ToolExecutionResult> {
   try {
-    const { profile } = context.services.settlement.readProfile(context.budgetId);
+    const { status, profile } = context.services.settlement.readProfile(context.budgetId);
+    // Settling only the readable part would silently stretch other terms over the rest.
+    if (status === SETTLEMENT_PROFILE_STATUS.newerFormat) {
+      return { success: false, message: SETTLEMENT_TOOL_MESSAGE.newerFormat };
+    }
+    if (status === SETTLEMENT_PROFILE_STATUS.unreadable) {
+      return { success: false, message: SETTLEMENT_TOOL_MESSAGE.unreadable };
+    }
     if (!profile) {
-      return { success: true, message: 'No household settlement is set up for this budget.' };
+      return { success: true, message: SETTLEMENT_TOOL_MESSAGE.unset };
     }
     const range = rangeOf(args);
     if ('error' in range) {
