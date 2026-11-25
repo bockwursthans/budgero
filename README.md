@@ -1,0 +1,1 @@
+Screenshots for the household settlement discussion (tombadilo-bombadilo/budgero#3). Test data only (personas Alex and Sam), taken by an end-to-end run on a throwaway self-host instance.
