@@ -14,8 +14,12 @@ import { useActiveSpaceId } from '@shared/runtime/runtime-provider';
 
 const SETTLEMENT_APPROVALS_QUERY_KEY = 'settlementApprovals';
 const SETTLEMENT_FINGERPRINTS_QUERY_KEY = 'settlementFingerprints';
-/** Approvals change when another member approves; check again now and then. */
-const APPROVALS_STALE_MS = 30_000;
+/**
+ * Approvals change when another member approves from their own login, which the
+ * open page can't hear about: check again every half minute and whenever the
+ * window regains focus (both off by default in this app).
+ */
+const APPROVALS_REFRESH_MS = 30_000;
 
 export interface SettlementConsentState {
   /** Consent per terms, by settlementTermsKey. */
@@ -62,7 +66,9 @@ export function useSettlementApprovals() {
   return useQuery<SettlementApprovalRecord[]>({
     queryKey: [SETTLEMENT_APPROVALS_QUERY_KEY, spaceId],
     enabled: Boolean(spaceId),
-    staleTime: APPROVALS_STALE_MS,
+    staleTime: APPROVALS_REFRESH_MS,
+    refetchInterval: APPROVALS_REFRESH_MS,
+    refetchOnWindowFocus: 'always',
     queryFn: () => {
       if (!spaceId) throw new Error('Space id is required');
       return fetchSettlementApprovals(spaceId);

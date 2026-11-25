@@ -11,7 +11,7 @@ export interface SettlementMember {
 }
 
 export interface SettlementMembers {
-  /** Members who accepted their invite, in the server's order (owner first). */
+  /** Members who accepted their invite, in the server's order. */
   members: SettlementMember[];
   memberIds: ReadonlySet<string>;
   currentUserId: string | null;
