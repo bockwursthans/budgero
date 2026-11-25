@@ -14587,6 +14587,10 @@ msgstr "Rien à représenter pour ces lignes."
 msgid "Nothing to explore for this value."
 msgstr "Rien à explorer pour cette valeur."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing to settle until everyone taking part has agreed to the terms."
+msgstr "Rien à régler tant que tous les participants n’ont pas accepté les règles."
+
 #: src/widgets/dashboard/UpcomingTransactionsCard.tsx
 msgid "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."
 msgstr "Rien à venir. Les charges récurrentes et les transactions datées dans les {ONE_OFF_LOOKAHEAD_MONTHS} mois à venir apparaissent ici."

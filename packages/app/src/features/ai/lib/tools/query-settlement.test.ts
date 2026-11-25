@@ -7,10 +7,16 @@ import {
   SETTLEMENT_STRATEGY,
   settlementTermsFingerprint,
   type SettlementProfile,
+  type SettlementProfileStatus,
   type SettlementResult,
   type SettlementTerms,
 } from '@budgero/core/browser';
-import { executeQuerySettlement, SETTLEMENT_TOOL_PERIOD } from './query-settlement';
+import {
+  executeQuerySettlement,
+  querySettlementSchema,
+  SETTLEMENT_TOOL_MESSAGE,
+  SETTLEMENT_TOOL_PERIOD,
+} from './query-settlement';
 import type { ToolContext } from './types';
 
 const ALEX = 'user-alex';
@@ -62,13 +68,17 @@ const result: SettlementResult = {
   warnings: [],
 };
 
-function context(overrides: Partial<ToolContext> = {}, stored: SettlementProfile | null = profile) {
+function context(
+  overrides: Partial<ToolContext> = {},
+  stored: SettlementProfile | null = profile,
+  status: SettlementProfileStatus = SETTLEMENT_PROFILE_STATUS.ready
+) {
   const calculate = vi.fn(() => result);
   const ctx = {
     budgetId: 1,
     services: {
       settlement: {
-        readProfile: () => ({ status: SETTLEMENT_PROFILE_STATUS.ready, profile: stored }),
+        readProfile: () => ({ status, profile: stored }),
         calculate,
       },
     },
@@ -167,6 +177,30 @@ describe('query_settlement tool', () => {
       ctx
     );
 
-    expect(answer.message).toBe('No household settlement is set up for this budget.');
+    expect(answer.message).toBe(SETTLEMENT_TOOL_MESSAGE.unset);
+  });
+
+  it.each([
+    [SETTLEMENT_PROFILE_STATUS.newerFormat, null, SETTLEMENT_TOOL_MESSAGE.newerFormat],
+    [SETTLEMENT_PROFILE_STATUS.unreadable, profile, SETTLEMENT_TOOL_MESSAGE.unreadable],
+  ] as const)('settles nothing when the terms are %s', async (status, stored, message) => {
+    const { ctx, calculate } = context({}, stored, status);
+
+    const answer = await executeQuerySettlement(
+      { period: SETTLEMENT_TOOL_PERIOD.openBalance },
+      ctx
+    );
+
+    expect(answer).toEqual({ success: false, message });
+    expect(calculate).not.toHaveBeenCalled();
+  });
+
+  it('accepts only real months', () => {
+    expect(querySettlementSchema.safeParse({ period: 'month', month: '2026-12' }).success).toBe(
+      true
+    );
+    for (const month of ['2026-13', '2026-00']) {
+      expect(querySettlementSchema.safeParse({ period: 'month', month }).success).toBe(false);
+    }
   });
 });

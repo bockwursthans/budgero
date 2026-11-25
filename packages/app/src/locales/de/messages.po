@@ -14587,6 +14587,10 @@ msgstr "Für diese Zeilen gibt es nichts darzustellen."
 msgid "Nothing to explore for this value."
 msgstr "Für diesen Wert gibt es nichts zu erkunden."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing to settle until everyone taking part has agreed to the terms."
+msgstr "Nichts auszugleichen, bis alle Beteiligten den Regeln zugestimmt haben."
+
 #: src/widgets/dashboard/UpcomingTransactionsCard.tsx
 msgid "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."
 msgstr "Nichts anstehend. Wiederkehrende Gebühren und Transaktionen mit Datum in den nächsten {ONE_OFF_LOOKAHEAD_MONTHS} Monaten erscheinen hier."

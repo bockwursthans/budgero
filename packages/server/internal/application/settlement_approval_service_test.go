@@ -48,6 +48,7 @@ func TestSettlementApprovalService_OnlyAcceptedMembers(t *testing.T) {
 		{name: "pending member", userID: approvalPending, spaceID: approvalSpace, wantErr: domain.ErrSpaceAccessDenied},
 		{name: "outsider", userID: approvalOutside, spaceID: approvalSpace, wantErr: domain.ErrSpaceAccessDenied},
 		{name: "no space id", userID: approvalOwner, spaceID: "", wantErr: domain.ErrSpaceAccessDenied},
+		{name: "blank space id", userID: approvalOwner, spaceID: "  ", wantErr: domain.ErrSpaceAccessDenied},
 		{name: "no user", userID: "", spaceID: approvalSpace, wantErr: domain.ErrSpaceAccessDenied},
 	}
 	for _, tt := range tests {

@@ -104,7 +104,8 @@ export function useSettlementConsent(
       approvedTermsKeys: [...byTerms].filter(([, consent]) => consent.approved).map(([key]) => key),
       // A profile without an approval key has no approved terms: known at once.
       ready: approvalKey === undefined || (fingerprints.isSuccess && approvals.isSuccess),
-      isError: fingerprints.isError || approvals.isError,
+      // A failed recheck keeps the approvals already loaded: only no data at all is an error.
+      isError: fingerprints.isError || (approvals.isError && approvals.data === undefined),
     };
   }, [
     profile,

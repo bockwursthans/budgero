@@ -14587,6 +14587,10 @@ msgstr "Niets om in een grafiek te tonen voor deze rijen."
 msgid "Nothing to explore for this value."
 msgstr "Niets te verkennen voor deze waarde."
 
+#: src/pages/settlement/components/SettlementSummary.tsx
+msgid "Nothing to settle until everyone taking part has agreed to the terms."
+msgstr "Niets te verrekenen totdat iedereen die meedoet met de regels heeft ingestemd."
+
 #: src/widgets/dashboard/UpcomingTransactionsCard.tsx
 msgid "Nothing upcoming. Recurring charges and transactions dated in the next {ONE_OFF_LOOKAHEAD_MONTHS} months appear here."
 msgstr "Niets gepland. Terugkerende afschrijvingen en transacties met een datum in de komende {ONE_OFF_LOOKAHEAD_MONTHS}maanden verschijnen hier."

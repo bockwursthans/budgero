@@ -925,6 +925,33 @@ describe('SettlementService (Node/sql.js)', () => {
     ]);
   });
 
+  it('counts a transfer with a shared category as the expense only, not also as a payment', async () => {
+    await add(alexAccount, salary, '2026-01-25', 1_000_000);
+    await add(samAccount, salary, '2026-01-25', 1_000_000);
+    // To and from tracking accounts a transfer can carry a spending category.
+    await add(alexAccount, rent, '2026-01-05', 0, 300_000, budgetId, 'rent-via-sam');
+    await add(samAccount, transfers, '2026-01-05', 300_000, 0, budgetId, 'rent-via-sam');
+
+    const result = settleJanuary();
+
+    expect(result.totalSharedExpenses).toBe(300_000);
+    expect(nets(result)).toEqual({ [ALEX]: 150_000, [SAM]: -150_000 });
+  });
+
+  it('does not pair the mirror rows of split transfer lines as payments', async () => {
+    await add(alexAccount, salary, '2026-01-25', 1_000_000);
+    await add(samAccount, salary, '2026-01-25', 1_000_000);
+    // Two transfer lines of one split share their mirrors' id.
+    const mirrors = 'split_transfer_9001_2026-01-05';
+    await add(alexAccount, transfers, '2026-01-05', 0, 200_000, budgetId, mirrors);
+    await add(samAccount, transfers, '2026-01-05', 0, 100_000, budgetId, mirrors);
+
+    const result = settleJanuary();
+
+    expect(nets(result)).toEqual({ [ALEX]: 0, [SAM]: 0 });
+    expect(result.transfers).toEqual([]);
+  });
+
   it('uses budget-currency amounts and the date part of stored dates', async () => {
     await add(alexAccount, salary, '2026-01-25', 1_000_000);
     await add(samAccount, salary, '2026-01-25', 1_000_000);
