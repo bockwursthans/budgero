@@ -1,1 +1,1 @@
-Screenshots for the household settlement discussion (tombadilo-bombadilo/budgero#3). Test data only (personas Alex and Sam), taken by an end-to-end run on a throwaway self-host instance.
+Screenshots for the household settlement discussion (tombadilo-bombadilo/budgero#3). Test data only (personas Alex and Sam), taken by the end-to-end tests in https://github.com/bockwursthans/budgero-e2e on a throwaway self-host instance.
