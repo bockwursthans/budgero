@@ -53,6 +53,10 @@ vi.mock('sonner', () => ({ toast }));
 vi.mock('@entities/settlement/api/useSettlement', () => ({
   useSettlementProfile: () => profileState,
   useSettlement: () => settlementState,
+  useSettlementProgress: () => ({ data: null }),
+}));
+vi.mock('./useSettleUp', () => ({
+  useSettleUp: () => ({ settleUp: vi.fn(), isPending: false }),
 }));
 vi.mock('@entities/settlement/api/useSettlementConsent', () => ({
   useSettlementConsent: () => consentState,
@@ -74,6 +78,9 @@ vi.mock('./useSettlementOptions', () => ({
     ],
     categoryGroups: [{ key: 1, heading: 'Home', items: [{ id: 20, name: 'Rent' }] }],
     incomeCategoryIds: [10],
+    categoryNames: new Map(),
+    accounts: [],
+    transfersCategoryId: null,
     isLoading: false,
   }),
 }));

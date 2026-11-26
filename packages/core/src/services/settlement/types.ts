@@ -160,3 +160,68 @@ export interface SettlementResult {
   unapprovedSegments: { startDate: string; endDate: string; effectiveFrom?: string }[];
   warnings: SettlementWarning[];
 }
+
+/**
+ * How far the settlement payments made so far reach back. A month is settled
+ * once the payments cover everything owed up to its end; the month after the
+ * last settled one may be partly settled; the rest is open.
+ */
+export const SETTLEMENT_PROGRESS_STATUS = {
+  settled: 'settled',
+  partly: 'partly',
+  open: 'open',
+} as const;
+
+export type SettlementProgressStatus =
+  (typeof SETTLEMENT_PROGRESS_STATUS)[keyof typeof SETTLEMENT_PROGRESS_STATUS];
+
+export interface SettlementMonthProgress {
+  /** YYYY-MM */
+  month: string;
+  status: SettlementProgressStatus;
+}
+
+/** A booking in one participant's personal category that another participant paid. */
+export interface SettlementPersonalItem {
+  transactionId: number;
+  /** YYYY-MM-DD */
+  date: string;
+  categoryId: number;
+  payee: string;
+  memo: string;
+  /** Who paid it from their personal accounts: they get it back in full. */
+  paidById: string;
+  /** Whose personal category it is: they owe it in full. */
+  ownerId: string;
+  /** Outflow minus inflow, in budget currency. */
+  amount: MilliUnits;
+  /** The status of the item's month. */
+  status: SettlementProgressStatus;
+}
+
+export interface SettlementProgress {
+  /** Every month from the first booking to the end of the range, in date order. */
+  months: SettlementMonthProgress[];
+  /** YYYY-MM of the last settled month; absent while none is. */
+  settledThrough?: string;
+  /** Personal categories paid by someone else, in date order. */
+  personalItems: SettlementPersonalItem[];
+}
+
+/** A booking line in the settlement's accounts, for the per-item view. */
+export interface SettlementBookingLine {
+  transactionId: number;
+  date: string;
+  accountId: number;
+  categoryId: number;
+  payee: string;
+  memo: string;
+  inflow: MilliUnits;
+  outflow: MilliUnits;
+}
+
+/** Net amounts of one account in one category over one month. */
+export interface SettlementMonthLineTotal extends SettlementLineTotal {
+  /** YYYY-MM */
+  month: string;
+}

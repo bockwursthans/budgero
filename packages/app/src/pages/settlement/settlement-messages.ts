@@ -2,9 +2,11 @@ import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import {
   SETTLEMENT_MAX_PARTICIPANTS,
+  SETTLEMENT_PROGRESS_STATUS,
   SETTLEMENT_STRATEGY,
   SETTLEMENT_TERMS_ISSUE,
   SETTLEMENT_WARNING,
+  type SettlementProgressStatus,
   type SettlementStrategy,
   type SettlementTermsIssueCode,
   type SettlementWarning,
@@ -42,4 +44,11 @@ export const TERMS_ISSUE_MESSAGES: Record<SettlementTermsIssueCode, MessageDescr
 export const WARNING_MESSAGES: Record<SettlementWarning, MessageDescriptor> = {
   [SETTLEMENT_WARNING.noIncomeSplitEqually]: msg`No eligible income was found for part of this period, so the shared expenses there are split equally.`,
   [SETTLEMENT_WARNING.noSharesSplitEqually]: msg`All fixed shares are zero for part of this period, so the shared expenses there are split equally.`,
+};
+
+/** How far the payments made so far settle a month or a booking. */
+export const PROGRESS_STATUS_LABELS: Record<SettlementProgressStatus, MessageDescriptor> = {
+  [SETTLEMENT_PROGRESS_STATUS.settled]: msg`Settled`,
+  [SETTLEMENT_PROGRESS_STATUS.partly]: msg`Partly settled`,
+  [SETTLEMENT_PROGRESS_STATUS.open]: msg({ message: 'Open', context: 'settlement-status' }),
 };

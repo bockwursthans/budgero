@@ -6,6 +6,7 @@ import {
   settlementTermsKey,
   type SettlementProfile,
   type SettlementProfileStatus,
+  type SettlementProgress,
   type SettlementResult,
 } from '@budgero/core/browser';
 import { useSpaceQuery } from '@shared/api/useSpaceQuery';
@@ -82,6 +83,41 @@ export function useSettlement(
     queryFn: (services) =>
       profile
         ? services.settlement.calculate(budgetId, profile, startDate, endDate, (terms) =>
+            approved.includes(settlementTermsKey(terms))
+          )
+        : null,
+  });
+}
+
+const SETTLEMENT_PROGRESS_QUERY_PART = 'householdSettlementProgress';
+
+/**
+ * How far the payments made so far settle the range, month by month (see
+ * SettlementService.progress); idle unless `enabled`, like useSettlement.
+ */
+export function useSettlementProgress(
+  budgetId: number,
+  profile: SettlementProfile | null,
+  startDate: string,
+  endDate: string,
+  consent: Pick<SettlementConsentState, 'approvedTermsKeys' | 'ready'>,
+  enabled: boolean
+) {
+  const approved = consent.approvedTermsKeys;
+  return useSpaceQuery<SettlementProgress | null>({
+    key: [
+      SETTLEMENT_QUERY_ROOT,
+      SETTLEMENT_PROGRESS_QUERY_PART,
+      budgetId,
+      startDate,
+      endDate,
+      JSON.stringify(profile),
+      approved.join(APPROVED_KEYS_SEPARATOR),
+    ],
+    enabled: enabled && consent.ready && budgetId > 0 && profile !== null && startDate <= endDate,
+    queryFn: (services) =>
+      profile
+        ? services.settlement.progress(budgetId, profile, startDate, endDate, (terms) =>
             approved.includes(settlementTermsKey(terms))
           )
         : null,

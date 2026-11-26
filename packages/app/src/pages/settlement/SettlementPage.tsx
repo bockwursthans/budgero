@@ -1,3 +1,4 @@
+import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -16,8 +17,13 @@ import {
   type SettlementResult,
   type SettlementTerms,
   type SettlementTermsConsent,
+  type SettlementTransfer,
 } from '@budgero/core/browser';
-import { useSettlement, useSettlementProfile } from '@entities/settlement/api/useSettlement';
+import {
+  useSettlement,
+  useSettlementProfile,
+  useSettlementProgress,
+} from '@entities/settlement/api/useSettlement';
 import {
   fingerprintOf,
   useSettlementApprovalActions,
@@ -32,7 +38,9 @@ import { Button } from '@shared/ui/button';
 import { Card, CardContent } from '@shared/ui/card';
 import { CenteredLoader } from '@shared/ui/CenteredLoader';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
+import { SettleUpDialog } from './components/SettleUpDialog';
 import { SettlementPeriodPicker } from './components/SettlementPeriodPicker';
+import { SettlementProgressCard } from './components/SettlementProgressCard';
 import { SettlementSummary } from './components/SettlementSummary';
 import { SettlementTermsDialog } from './components/SettlementTermsDialog';
 import { SettlementTermsList } from './components/SettlementTermsList';
@@ -40,7 +48,10 @@ import {
   defaultChangeDate,
   initialSettlementPeriod,
   resolveSettlementRange,
+  SETTLEMENT_PERIOD_MODE,
 } from './settlement-period';
+import { itemsToSettle } from './settle-up';
+import { useSettleUp, type SettleUpRequest } from './useSettleUp';
 import { useSettlementMembers, type SettlementMember } from './useSettlementMembers';
 import { useSettlementOptions } from './useSettlementOptions';
 
@@ -99,6 +110,20 @@ export default function SettlementPage() {
     () => (settlement.data ? withMemberNames(settlement.data, membership.members) : null),
     [settlement.data, membership.members]
   );
+  // Progress and recording payments are about the open balance only.
+  const openBalance = period.mode === SETTLEMENT_PERIOD_MODE.sinceStart;
+  const progress = useSettlementProgress(
+    budgetId,
+    profile,
+    startDate,
+    endDate,
+    consent,
+    openBalance
+  );
+  const budgetCurrency = useUiStore((state) => state.selectedBudget?.DisplayCurrency ?? '');
+  const localizer = useUiStore((state) => state.globalLocalizer);
+  const { settleUp, isPending: settlingUp } = useSettleUp(budgetId, options.transfersCategoryId);
+  const [settling, setSettling] = useState<SettlementTransfer | null>(null);
 
   const [editor, setEditor] = useState<TermsEditor | null>(null);
   const [termsToRemove, setTermsToRemove] = useState<SettlementTerms | null>(null);
@@ -209,17 +234,57 @@ export default function SettlementPage() {
       onError: () => toast.error(t`Your consent could not be withdrawn. Check your connection.`),
     });
 
+  const participantNames = new Map(
+    (result?.participants ?? []).map((participant) => [participant.participantId, participant.name])
+  );
+  const categoryName = (id: number) => options.categoryNames.get(id) ?? t`Deleted category`;
+
+  /** A participant's open personal accounts under today's terms. */
+  const accountsOf = (participantId: string) => {
+    const current = profile ? settlementTermsOn(profile, period.today) : undefined;
+    const ids = current?.participants.find((p) => p.id === participantId)?.accountIds ?? [];
+    return options.accounts.filter(
+      (account) => ids.includes(account.ID) && !account.Archived && !account.Deleted
+    );
+  };
+
+  const handleSettleUp = async (request: SettleUpRequest) => {
+    try {
+      await settleUp(request);
+      setSettling(null);
+      toast.success(
+        plural(request.lines.length, {
+          one: 'Settlement payment recorded.',
+          other: '# settlement payments recorded.',
+        })
+      );
+    } catch {
+      toast.error(t`The payment could not be recorded. Check your connection and try again.`);
+    }
+  };
+
   if (!loaded || options.isLoading) return <CenteredLoader />;
 
   const renderSettlement = () => {
     if (result) {
       return (
-        <SettlementSummary
-          result={result}
-          money={money}
-          currentUserId={membership.currentUserId}
-          categoryNames={options.categoryNames}
-        />
+        <>
+          <SettlementSummary
+            result={result}
+            money={money}
+            currentUserId={membership.currentUserId}
+            categoryNames={options.categoryNames}
+            onSettleUp={openBalance && canWrite ? setSettling : undefined}
+          />
+          {openBalance && progress.data && progress.data.months.length > 0 ? (
+            <SettlementProgressCard
+              progress={progress.data}
+              names={participantNames}
+              categoryName={categoryName}
+              money={money}
+            />
+          ) : null}
+        </>
       );
     }
     if (settlement.isError) {
@@ -367,6 +432,26 @@ export default function SettlementPage() {
           accountGroups={options.accountGroups}
           categoryGroups={options.categoryGroups}
           onSave={handleSave}
+        />
+      ) : null}
+
+      {settling ? (
+        <SettleUpDialog
+          key={`${settling.fromParticipantId}-${settling.toParticipantId}-${settling.amount}`}
+          open
+          onOpenChange={(open) => !open && setSettling(null)}
+          transfer={settling}
+          names={participantNames}
+          fromAccounts={accountsOf(settling.fromParticipantId)}
+          toAccounts={accountsOf(settling.toParticipantId)}
+          items={itemsToSettle(settling, progress.data?.personalItems ?? [])}
+          categoryName={categoryName}
+          money={money}
+          currency={budgetCurrency}
+          localizer={localizer}
+          today={getTodayISO()}
+          busy={settlingUp}
+          onSubmit={handleSettleUp}
         />
       ) : null}
 

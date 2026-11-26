@@ -95,7 +95,7 @@ export function apportion(total: number, weights: readonly bigint[]): number[] {
 }
 
 /** Which participant each personal account belongs to (the first one listed, if two claim it). */
-function accountOwners(terms: SettlementTerms): Map<number, string> {
+export function accountOwners(terms: SettlementTerms): Map<number, string> {
   const ownerOf = new Map<number, string>();
   for (const participant of terms.participants) {
     for (const accountId of participant.accountIds) {
@@ -124,7 +124,7 @@ function paymentTotalsOf(terms: SettlementTerms, payments: readonly SettlementPa
 }
 
 /** Whose personal category each category is (the first participant listing it). */
-function personalCategoryOwners(terms: SettlementTerms): Map<number, string> {
+export function personalCategoryOwners(terms: SettlementTerms): Map<number, string> {
   const ownerOf = new Map<number, string>();
   for (const participant of terms.participants) {
     for (const categoryId of participant.personalCategoryIds ?? []) {
