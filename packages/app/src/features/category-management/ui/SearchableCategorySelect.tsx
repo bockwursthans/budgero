@@ -20,6 +20,7 @@ import {
   useAddCategory,
 } from '@entities/category/api/useCategories';
 import { useIsMobile } from '@shared/hooks/useIsMobile';
+import { useComboboxKeyboardEntry } from '@shared/hooks/useComboboxKeyboardEntry';
 import { useMonthlyBudget, useReadyToAssign } from '@entities/budget/api/useMonthlyBudget';
 import { useUiStore } from '@shared/store/useUiStore';
 import { getTodayISO } from '@shared/lib/date-utils';
@@ -52,6 +53,8 @@ interface SearchableCategorySelectProps {
   onOpenChange?: (open: boolean) => void;
   /** System-only by default; enable only for transfers with an off-budget leg. */
   includeTransfers?: boolean;
+  /** Type to open, Enter/Tab picks and moves on (see useComboboxKeyboardEntry). */
+  keyboardEntry?: boolean;
 }
 
 export function SearchableCategorySelect({
@@ -74,6 +77,7 @@ export function SearchableCategorySelect({
   defaultOpen = false,
   onOpenChange,
   includeTransfers = false,
+  keyboardEntry = false,
 }: SearchableCategorySelectProps) {
   const { t } = useLingui();
   const [open, setOpen] = React.useState(defaultOpen);
@@ -105,6 +109,15 @@ export function SearchableCategorySelect({
   const canOfferCreate = normalizedSearch.length > 0 && noMatchesForSearch;
   const isMobile = useIsMobile();
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const entry = useComboboxKeyboardEntry({
+    enabled: keyboardEntry,
+    triggerRef,
+    openWithSearch: (typed) => {
+      setSearchTerm(typed);
+      setOpen(true);
+    },
+    close: () => setOpen(false),
+  });
   const popoverContentRef = React.useRef<HTMLDivElement | null>(null);
   const headerAnchorRef = React.useRef<VirtualElement | null>(null);
   const [, forceVirtualAnchorUpdate] = React.useReducer((count: number) => count + 1, 0);
@@ -391,6 +404,7 @@ export function SearchableCategorySelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            onKeyDown={entry.onTriggerKeyDown}
             className={cn(
               'min-w-0 w-[200px] max-w-full justify-between overflow-hidden',
               !currentSelectedCategoryName && 'text-muted-foreground',
@@ -420,6 +434,8 @@ export function SearchableCategorySelect({
           sideOffset={isMobile ? 8 : 6}
           avoidCollisions={!isMobile}
           collisionPadding={popoverCollisionPadding}
+          onOpenAutoFocus={entry.onOpenAutoFocus}
+          onCloseAutoFocus={entry.onCloseAutoFocus}
         >
           <Command className="h-full" filter={commandFilter}>
             <CommandInput
@@ -427,6 +443,8 @@ export function SearchableCategorySelect({
               value={searchTerm}
               onValueChange={setSearchTerm}
               onKeyDown={(event) => {
+                entry.onInputKeyDown(event);
+                if (event.defaultPrevented) return;
                 if (event.key === 'Enter' && canOfferCreate) {
                   event.preventDefault();
                   openCreateDialog();
@@ -462,6 +480,7 @@ export function SearchableCategorySelect({
                     value={readyToAssignLabel.toLowerCase()}
                     onSelect={() => {
                       onCategorySelect(0);
+                      entry.onPicked();
                       setOpen(false);
                       setSearchTerm('');
                     }}
@@ -489,6 +508,7 @@ export function SearchableCategorySelect({
                       value={category.Name} // Used for search filtering
                       onSelect={() => {
                         onCategorySelect(category.ID);
+                        entry.onPicked();
                         setOpen(false);
                         setSearchTerm('');
                       }}

@@ -160,9 +160,18 @@ export function convertAmountToFlow(
 /**
  * Validates that required fields are present for a transaction
  */
+/** Form fields a validation error can point at, so focus can go there. */
+export const TRANSACTION_FIELD = {
+  fromAccount: 'from-account',
+  toAccount: 'to-account',
+  category: 'category',
+} as const;
+
+export type TransactionField = (typeof TRANSACTION_FIELD)[keyof typeof TRANSACTION_FIELD];
+
 export interface TransactionValidation {
   isValid: boolean;
-  error?: { title: string; description: string };
+  error?: { title: string; description: string; field?: TransactionField };
 }
 
 export function validateTransaction(params: {
@@ -177,7 +186,11 @@ export function validateTransaction(params: {
   if (!selectedFromAccount) {
     return {
       isValid: false,
-      error: { title: t`Missing account`, description: t`Please select an account.` },
+      error: {
+        title: t`Missing account`,
+        description: t`Please select an account.`,
+        field: TRANSACTION_FIELD.fromAccount,
+      },
     };
   }
 
@@ -187,6 +200,7 @@ export function validateTransaction(params: {
       error: {
         title: t`Missing destination`,
         description: t`Please select a destination account.`,
+        field: TRANSACTION_FIELD.toAccount,
       },
     };
   }
@@ -194,7 +208,11 @@ export function validateTransaction(params: {
   if (!isTransfer && !isSplit && !selectedCategory) {
     return {
       isValid: false,
-      error: { title: t`Missing category`, description: t`Please select a category.` },
+      error: {
+        title: t`Missing category`,
+        description: t`Please select a category.`,
+        field: TRANSACTION_FIELD.category,
+      },
     };
   }
 

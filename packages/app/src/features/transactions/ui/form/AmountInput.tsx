@@ -5,11 +5,13 @@ import { Trans, useLingui } from '@lingui/react/macro';
  * Calculator-enabled amount input with visual indicator for transaction type.
  */
 
+import { useRef } from 'react';
 import { ArrowDownUp } from 'lucide-react';
 import { CalculatorCell } from '@shared/ui/calculator-cell';
 import { Label } from '@shared/ui/label';
 import { usePlainNumberFormatter } from '@shared/hooks/useNumberFormatter';
 import { ZERO_MILLI, type MilliUnits } from '@shared/lib/currency/milli';
+import { FOCUS_DIRECTION, focusAdjacentField } from '@shared/lib/focus-navigation';
 
 import type { TransactionType } from './TransactionTypeSelector';
 
@@ -42,6 +44,13 @@ export function AmountInput({
   const { t } = useLingui();
 
   const plainNumberFormatter = usePlainNumberFormatter(globalLocalizer);
+  const fieldRef = useRef<HTMLDivElement | null>(null);
+
+  // Enter takes the amount and moves on to the next field (once the input has made way).
+  const moveOn = () =>
+    requestAnimationFrame(() => {
+      if (fieldRef.current) focusAdjacentField(fieldRef.current, FOCUS_DIRECTION.next);
+    });
 
   const handleCommit = (val: MilliUnits) => {
     onCommit(val);
@@ -63,7 +72,7 @@ export function AmountInput({
             <span className="text-destructive">−</span>
           )}
         </div>
-        <div className="flex-1" data-testid="transaction-amount-input">
+        <div className="flex-1" ref={fieldRef} data-testid="transaction-amount-input">
           <CalculatorCell
             key={nonce}
             autoFocus
@@ -86,6 +95,7 @@ export function AmountInput({
             inputClassName="h-8 sm:h-10"
             displayClassName="bg-background border-input hover:bg-muted/40 py-1 rounded-md px-3"
             onEditingChange={onEditingChange}
+            onEnter={moveOn}
           />
         </div>
       </div>

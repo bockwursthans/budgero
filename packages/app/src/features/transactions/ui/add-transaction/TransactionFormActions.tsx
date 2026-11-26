@@ -14,6 +14,9 @@ import { Loader2 } from 'lucide-react';
 import { DialogFooter } from '@shared/ui/dialog';
 import { Button } from '@shared/ui/button';
 import { getKeyboardShortcutLabels } from '@shared/lib/keyboard-shortcuts';
+import { formatNativeAmount } from '@entities/currency/lib/currency-utils';
+import { TYPE_SHORTCUT_DIGITS } from '@features/transactions/lib/quick-entry-shortcuts';
+import type { SavedTransactionSummary } from './useAddTransactionForm';
 
 interface TransactionFormActionsProps {
   onCancel: () => void;
@@ -24,6 +27,9 @@ interface TransactionFormActionsProps {
   isOutflow: boolean;
   recurringMode?: 'create' | 'edit' | null;
   isSubmitting?: boolean;
+  /** The last transaction saved with "add another", confirmed below the buttons. */
+  lastSaved?: SavedTransactionSummary | null;
+  currencyCode?: string;
 }
 
 export const TransactionFormActions = React.memo(function TransactionFormActions({
@@ -35,9 +41,28 @@ export const TransactionFormActions = React.memo(function TransactionFormActions
   isOutflow,
   recurringMode = null,
   isSubmitting = false,
+  lastSaved = null,
+  currencyCode = '',
 }: TransactionFormActionsProps) {
-  const { t } = useLingui();
-  const saveShortcut = getKeyboardShortcutLabels().mod('Enter');
+  const { t, i18n } = useLingui();
+  const shortcuts = getKeyboardShortcutLabels();
+  const saveShortcut = shortcuts.mod('Enter');
+  const saveAnotherShortcut = shortcuts.modShift('Enter');
+  const typeShortcut = shortcuts.alt(Object.values(TYPE_SHORTCUT_DIGITS).join('/'));
+  const savedSummary = lastSaved
+    ? [
+        formatNativeAmount(lastSaved.amount, currencyCode),
+        lastSaved.category,
+        lastSaved.payee,
+        lastSaved.date
+          ? new Intl.DateTimeFormat(i18n.locale, { day: 'numeric', month: 'short' }).format(
+              lastSaved.date
+            )
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : null;
 
   const submitButtonClassName = React.useMemo(() => {
     const base =
@@ -81,6 +106,7 @@ export const TransactionFormActions = React.memo(function TransactionFormActions
             disabled={isCalculatingTransfer || isSubmitting}
             variant="outline"
             type="button"
+            title={saveAnotherShortcut}
             className="h-auto min-h-9 min-w-0 whitespace-normal px-3 py-2 leading-tight"
           >
             <Trans>Quick Add</Trans>
@@ -95,12 +121,24 @@ export const TransactionFormActions = React.memo(function TransactionFormActions
           {submitButtonLabel}
         </Button>
       </div>
+      {savedSummary ? (
+        <p className="text-xs text-muted-foreground" role="status" data-testid="last-saved">
+          <Trans>Saved: {savedSummary}</Trans>
+        </p>
+      ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="outline" type="button" onClick={onCancel} className="h-9 px-3 sm:px-4">
           <Trans>Cancel</Trans>
         </Button>
         <span className="hidden sm:inline-block text-xs text-muted-foreground">
-          <Trans>Press {saveShortcut} to save</Trans>
+          {recurringMode ? (
+            <Trans>Press {saveShortcut} to save</Trans>
+          ) : (
+            <Trans>
+              {saveShortcut} save · {saveAnotherShortcut} save and add another · {typeShortcut}{' '}
+              expense, income, transfer
+            </Trans>
+          )}
         </span>
       </div>
     </DialogFooter>

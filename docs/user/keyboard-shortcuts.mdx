@@ -85,12 +85,20 @@ On an account page or **All Transactions** (desktop):
     </tr>
   </thead>
   <tbody>
-    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Move between fields</td></tr>
+    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Move between fields: amount, date, account, payee, category, memo</td></tr>
+    <tr><td><Keys>Alt+1</Keys> / <Keys>Alt+2</Keys> / <Keys>Alt+3</Keys></td><td>Expense, income, transfer</td></tr>
+    <tr><td><Keys>+</Keys> or <Keys>-</Keys> first in the amount</td><td>Income or expense</td></tr>
+    <tr><td><Keys>Enter</Keys> in the amount or the date</td><td>Take it and move to the next field</td></tr>
+    <tr><td>Typing on a picker</td><td>Open it and search for what you type (account, payee, category, label)</td></tr>
+    <tr><td><Keys>Enter</Keys> or <Keys>Tab</Keys> in a picker</td><td>Pick the highlighted entry and move on; <Keys>Shift+Tab</Keys> goes back</td></tr>
     <tr><td><Keys>Enter</Keys></td><td>Save (from a text field)</td></tr>
-    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Save from any field</td></tr>
-    <tr><td><Keys>Esc</Keys></td><td>Close without saving (inline row)</td></tr>
+    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Save and close, from any field</td></tr>
+    <tr><td><Keys>Ctrl+Shift+Enter</Keys></td><td>Save and start the next one - date, account and kind stay</td></tr>
+    <tr><td><Keys>Esc</Keys></td><td>Close a picker or stop editing the amount, then close the dialog - it asks first once you typed an amount or memo</td></tr>
   </tbody>
 </table>
+
+The date can be typed: `24` is the 24th of this month, `24.11` a day this year (written the way your language writes dates), `+1` or `-2` days from today, and the first letter of today, yesterday or tomorrow does what it says. <Keys>↑</Keys> and <Keys>↓</Keys> move the date by a day, <Keys>Page Up</Keys> and <Keys>Page Down</Keys> by a month, and <Keys>Alt+↓</Keys> opens the calendar. After saving with <Keys>Ctrl+Shift+Enter</Keys>, the line under the buttons shows what was saved.
 
 In the inline row, <Keys>Enter</Keys> on a button presses that button — Split, Cancel, or a picker — instead of saving.
 
@@ -114,5 +122,7 @@ Amount fields are calculators: type `120 + 35` or `300 / 3` and the result is sa
     <tr><td><Keys>Esc</Keys></td><td>Cancel the edit</td></tr>
   </tbody>
 </table>
+
+A dot and a comma both work as the decimal separator: `3.5` and `3,5` are three and a half, while `1.234` - three digits after the separator - stays one thousand two hundred thirty-four.
 
 To find transactions rather than move between them, see [Searching transactions](/docs/semantic-search).

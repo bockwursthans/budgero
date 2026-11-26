@@ -85,12 +85,20 @@ Sur une page de compte ou dans **Toutes les transactions** (ordinateur) :
     </tr>
   </thead>
   <tbody>
-    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Passer d'un champ à l'autre</td></tr>
+    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Passer d'un champ à l'autre : montant, date, compte, bénéficiaire, catégorie, mémo</td></tr>
+    <tr><td><Keys>Alt+1</Keys> / <Keys>Alt+2</Keys> / <Keys>Alt+3</Keys></td><td>Dépense, revenu, virement</td></tr>
+    <tr><td><Keys>+</Keys> ou <Keys>-</Keys> en premier dans le montant</td><td>Revenu ou dépense</td></tr>
+    <tr><td><Keys>Enter</Keys> dans le montant ou la date</td><td>Valider et passer au champ suivant</td></tr>
+    <tr><td>Taper sur un sélecteur</td><td>L'ouvrir et chercher ce que vous tapez (compte, bénéficiaire, catégorie, étiquette)</td></tr>
+    <tr><td><Keys>Enter</Keys> ou <Keys>Tab</Keys> dans un sélecteur</td><td>Prendre l'entrée en surbrillance et continuer ; <Keys>Shift+Tab</Keys> revient en arrière</td></tr>
     <tr><td><Keys>Enter</Keys></td><td>Enregistrer (depuis un champ de texte)</td></tr>
-    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Enregistrer depuis n'importe quel champ</td></tr>
-    <tr><td><Keys>Esc</Keys></td><td>Fermer sans enregistrer (ligne en place)</td></tr>
+    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Enregistrer et fermer, depuis n'importe quel champ</td></tr>
+    <tr><td><Keys>Ctrl+Shift+Enter</Keys></td><td>Enregistrer et commencer la suivante - la date, le compte et le type restent</td></tr>
+    <tr><td><Keys>Esc</Keys></td><td>Fermer un sélecteur ou arrêter de saisir le montant, puis fermer la fenêtre - avec confirmation dès qu'un montant ou un mémo est saisi</td></tr>
   </tbody>
 </table>
+
+La date peut être tapée : `24` est le 24 de ce mois, `24/11` un jour de cette année (écrit comme votre langue écrit les dates), `+1` ou `-2` des jours à partir d'aujourd'hui, et la première lettre d'aujourd'hui, hier ou demain fait ce qu'elle dit. <Keys>↑</Keys> et <Keys>↓</Keys> décalent la date d'un jour, <Keys>Page Up</Keys> et <Keys>Page Down</Keys> d'un mois, et <Keys>Alt+↓</Keys> ouvre le calendrier. Après un enregistrement avec <Keys>Ctrl+Shift+Enter</Keys>, la ligne sous les boutons indique ce qui a été enregistré.
 
 Dans la ligne en place, <Keys>Enter</Keys> sur un bouton active ce bouton — Ventiler, Annuler ou un sélecteur — au lieu d'enregistrer.
 
@@ -114,5 +122,7 @@ Les champs de montant sont des calculatrices : tapez `120 + 35` ou `300 / 3` et 
     <tr><td><Keys>Esc</Keys></td><td>Annuler la modification</td></tr>
   </tbody>
 </table>
+
+Le point et la virgule servent tous deux de séparateur décimal : `3.5` et `3,5` valent trois et demi, tandis que `1.234` - trois chiffres après le séparateur - reste mille deux cent trente-quatre.
 
 Pour trouver des transactions plutôt que de vous déplacer entre elles, consultez [Rechercher des transactions](/docs/semantic-search).

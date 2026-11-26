@@ -45,7 +45,10 @@ import { useCategories } from '@entities/category/api/useCategories';
 import { useAccounts } from '@entities/account/api/useAccounts';
 import { useUiStore } from '@shared/store/useUiStore';
 import { Dialog, DialogContent } from '@shared/ui/dialog';
-import { AddTransactionForm } from '@features/transactions/ui/add-transaction';
+import {
+  AddTransactionForm,
+  useAddTransactionDialogEscape,
+} from '@features/transactions/ui/add-transaction';
 import {
   useAddTransaction,
   useAddTransfer,
@@ -81,6 +84,7 @@ export function CommandPalette() {
   const { t } = useLingui();
   const shortcuts = getKeyboardShortcutLabels();
   const [showTransactionDialog, setShowTransactionDialog] = React.useState(false);
+  const addTransactionEscape = useAddTransactionDialogEscape();
   const [searchValue, setSearchValue] = React.useState('');
   const [selectedTransaction, setSelectedTransaction] =
     React.useState<SelectedTransactionData | null>(null);
@@ -693,8 +697,12 @@ export function CommandPalette() {
 
       {/* Add Transaction Dialog */}
       <Dialog open={showTransactionDialog} onOpenChange={setShowTransactionDialog}>
-        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+        <DialogContent
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={addTransactionEscape.onEscapeKeyDown}
+        >
           <AddTransactionForm
+            registerEscapeHandler={addTransactionEscape.registerEscapeHandler}
             budgetId={budgetId}
             onAddTransaction={handleAddTransaction}
             onAddTransfer={handleAddTransfer}

@@ -35,6 +35,7 @@ import type {
   AddTransactionSplitLine,
   AddTransferResult,
 } from '@entities/transaction/api/useTransactions';
+import { ZERO_MILLI, type MilliUnits } from '@shared/lib/currency/milli';
 import { useAutofillIntegration } from './useAutofillIntegration';
 
 import type { SplitLine } from '../form';
@@ -54,7 +55,9 @@ import {
   calculateTransferRateOverrides,
   calculateImpliedTransferRate,
   resolveTransferCategoryIds,
+  type TransactionField,
 } from './add-transaction.utils';
+import type { TransactionType } from '../form/TransactionTypeSelector';
 
 export interface UseAddTransactionFormOptions {
   budgetId: number;
@@ -85,6 +88,20 @@ export interface UseAddTransactionFormOptions {
   disableLastUsed?: boolean;
   disableAutofill?: boolean;
   disableCurrencyConversion?: boolean;
+  /** A required field is missing: the form can move focus to it. */
+  onInvalidField?: (field: TransactionField) => void;
+  /** Saved with "add another": what was saved, before the form is cleared. */
+  onSavedAnother?: (saved: SavedTransactionSummary) => void;
+}
+
+/** What a save with "add another" recorded, to confirm it in the cleared form. */
+export interface SavedTransactionSummary {
+  /** Milliunits, in the account currency. */
+  amount: MilliUnits;
+  transactionType: TransactionType;
+  category: string;
+  payee: string;
+  date: Date | null;
 }
 
 export function useAddTransactionForm({
@@ -98,6 +115,8 @@ export function useAddTransactionForm({
   disableLastUsed = false,
   disableAutofill = false,
   disableCurrencyConversion = false,
+  onInvalidField,
+  onSavedAnother,
 }: UseAddTransactionFormOptions) {
   const { t } = useLingui();
 
@@ -568,6 +587,14 @@ export function useAddTransactionForm({
 
   const handleSubmit = React.useCallback(
     async (addAnother = false) => {
+      const reportSavedAnother = () =>
+        onSavedAnother?.({
+          amount: form.amount ?? ZERO_MILLI,
+          transactionType: form.transactionType,
+          category: form.isTransfer ? '' : form.selectedCategory,
+          payee: form.payee,
+          date: form.transactionDate,
+        });
       if (form.selectedLabelId !== null && !labelsLoaded) return;
       const labelId = labels.some((label) => label.ID === form.selectedLabelId)
         ? form.selectedLabelId
@@ -582,6 +609,7 @@ export function useAddTransactionForm({
 
       if (!validation.isValid && validation.error) {
         toast.error(validation.error.title, { description: validation.error.description });
+        if (validation.error.field) onInvalidField?.(validation.error.field);
         return;
       }
 
@@ -711,6 +739,7 @@ export function useAddTransactionForm({
             });
 
             if (addAnother) {
+              reportSavedAnother();
               resetFormFields();
             }
             toast.success(t`Transfer added`, { description: t`Transfer created successfully.` });
@@ -799,6 +828,7 @@ export function useAddTransactionForm({
         });
 
         if (addAnother) {
+          reportSavedAnother();
           resetFormFields();
         }
         toast.success(t`Transaction added`, { description: t`Transaction saved successfully.` });
@@ -841,6 +871,7 @@ export function useAddTransactionForm({
         });
 
         if (addAnother) {
+          reportSavedAnother();
           resetFormFields();
         } else {
           onCancel();
@@ -877,6 +908,8 @@ export function useAddTransactionForm({
       transferInvolvesOffBudget,
       receivedAmount,
       onCancel,
+      onInvalidField,
+      onSavedAnother,
     ]
   );
 

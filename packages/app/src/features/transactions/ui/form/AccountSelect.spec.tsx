@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { activateLocale } from '@shared/i18n';
@@ -81,5 +82,60 @@ describe('transaction account selectors', () => {
     const listbox = screen.getByRole('listbox');
     expect(within(listbox).queryByText('Daily Checking')).not.toBeInTheDocument();
     expect(within(listbox).getByText('Emergency Savings')).toBeInTheDocument();
+  });
+
+  describe('keyboard entry', () => {
+    const renderInForm = (onChange = vi.fn()) => {
+      render(
+        <form>
+          <FromAccountSelect
+            value=""
+            onChange={onChange}
+            accounts={accounts}
+            isLoading={false}
+            transactionType="outflow"
+            keyboardEntry
+          />
+          <input aria-label="next field" />
+        </form>
+      );
+      return onChange;
+    };
+
+    it('opens searching for the key typed on the closed picker', async () => {
+      renderInForm();
+      screen.getByTestId('transaction-from-account-select').focus();
+
+      await userEvent.keyboard('t');
+
+      expect(screen.getByPlaceholderText('Search accounts…')).toHaveValue('t');
+      const listbox = screen.getByRole('listbox');
+      expect(within(listbox).getByText('Travel Card')).toBeInTheDocument();
+    });
+
+    it('takes the highlighted account with Tab and moves on to the next field', async () => {
+      const onChange = renderInForm();
+      screen.getByTestId('transaction-from-account-select').focus();
+
+      await userEvent.keyboard('emer');
+      await userEvent.keyboard('{Tab}');
+
+      expect(onChange).toHaveBeenCalledWith('2');
+      await waitFor(() =>
+        expect(screen.getByRole('textbox', { name: 'next field' })).toHaveFocus()
+      );
+    });
+
+    it('takes the highlighted account with Enter too', async () => {
+      const onChange = renderInForm();
+      screen.getByTestId('transaction-from-account-select').focus();
+
+      await userEvent.keyboard('daily{Enter}');
+
+      expect(onChange).toHaveBeenCalledWith('1');
+      await waitFor(() =>
+        expect(screen.getByRole('textbox', { name: 'next field' })).toHaveFocus()
+      );
+    });
   });
 });

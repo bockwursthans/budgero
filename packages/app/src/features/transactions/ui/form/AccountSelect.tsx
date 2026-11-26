@@ -18,6 +18,7 @@ import {
 } from '@shared/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover';
 import { AutofillIndicator } from '@shared/ui/autofill-indicator';
+import { useComboboxKeyboardEntry } from '@shared/hooks/useComboboxKeyboardEntry';
 import { cn } from '@shared/lib/utils';
 
 import type { TransactionType } from './TransactionTypeSelector';
@@ -35,6 +36,8 @@ interface AccountComboboxProps {
   disabled: boolean;
   placeholder: string;
   testId: string;
+  /** Type to open, Enter/Tab picks and moves on (see useComboboxKeyboardEntry). */
+  keyboardEntry?: boolean;
 }
 
 function AccountCombobox({
@@ -44,27 +47,47 @@ function AccountCombobox({
   disabled,
   placeholder,
   testId,
+  keyboardEntry = false,
 }: AccountComboboxProps) {
   const { t } = useLingui();
 
   const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState('');
   const selectedAccount = accounts.find((account) => account.ID.toString() === value);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const entry = useComboboxKeyboardEntry({
+    enabled: keyboardEntry,
+    triggerRef,
+    openWithSearch: (typed) => {
+      setSearch(typed);
+      setOpen(true);
+    },
+    close: () => setOpen(false),
+  });
+
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) setSearch('');
+  };
 
   const handleSelect = (accountId: string) => {
     onChange(accountId);
-    setOpen(false);
+    entry.onPicked();
+    handleOpenChange(false);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
+    <Popover open={open} onOpenChange={handleOpenChange} modal>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           type="button"
           variant="outline"
           role="combobox"
           aria-label={placeholder}
           aria-expanded={open}
           disabled={disabled}
+          onKeyDown={entry.onTriggerKeyDown}
           className={cn(
             'h-8 w-full justify-between text-left font-normal sm:h-10',
             !selectedAccount && 'text-muted-foreground'
@@ -78,9 +101,16 @@ function AccountCombobox({
       <PopoverContent
         className="w-[var(--radix-popover-trigger-width)] min-w-[240px] p-0"
         align="start"
+        onOpenAutoFocus={entry.onOpenAutoFocus}
+        onCloseAutoFocus={entry.onCloseAutoFocus}
       >
         <Command loop>
-          <CommandInput placeholder={t`Search accounts…`} />
+          <CommandInput
+            placeholder={t`Search accounts…`}
+            value={search}
+            onValueChange={setSearch}
+            onKeyDown={entry.onInputKeyDown}
+          />
           <CommandList className="max-h-[44dvh] overscroll-contain">
             <CommandEmpty>
               <Trans>No matching accounts.</Trans>
@@ -117,6 +147,7 @@ interface FromAccountSelectProps {
   isLoading: boolean;
   transactionType: TransactionType;
   showAutofillIndicator?: boolean;
+  keyboardEntry?: boolean;
 }
 
 export function FromAccountSelect({
@@ -126,6 +157,7 @@ export function FromAccountSelect({
   isLoading,
   transactionType,
   showAutofillIndicator = false,
+  keyboardEntry = false,
 }: FromAccountSelectProps) {
   const { t } = useLingui();
 
@@ -157,6 +189,7 @@ export function FromAccountSelect({
                   : t`Select account`
             }
             testId="transaction-from-account-select"
+            keyboardEntry={keyboardEntry}
           />
         </div>
       </div>
@@ -170,6 +203,7 @@ interface ToAccountSelectProps {
   accounts: Account[];
   excludeAccountId: string;
   isLoading: boolean;
+  keyboardEntry?: boolean;
 }
 
 export function ToAccountSelect({
@@ -178,6 +212,7 @@ export function ToAccountSelect({
   accounts,
   excludeAccountId,
   isLoading,
+  keyboardEntry = false,
 }: ToAccountSelectProps) {
   const { t } = useLingui();
 
@@ -195,6 +230,7 @@ export function ToAccountSelect({
             disabled={isLoading}
             placeholder={isLoading ? t`Loading accounts...` : t`Select to account`}
             testId="transaction-to-account-select"
+            keyboardEntry={keyboardEntry}
           />
         </div>
       </div>

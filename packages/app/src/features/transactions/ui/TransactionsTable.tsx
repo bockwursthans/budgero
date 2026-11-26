@@ -2,7 +2,10 @@ import { useLingui } from '@lingui/react/macro';
 import React from 'react';
 import type { DateRange } from 'react-day-picker';
 import { Dialog, DialogContent } from '@shared/ui/dialog';
-import { AddTransactionForm } from '@features/transactions/ui/add-transaction';
+import {
+  AddTransactionForm,
+  useAddTransactionDialogEscape,
+} from '@features/transactions/ui/add-transaction';
 import { TransactionsBatchToolbar } from '@features/transactions/ui/TransactionsBatchToolbar';
 import { TransactionsToolbar } from '@features/transactions/ui/TransactionsToolbar';
 import type { GetTransactionsByAccountRow, Category } from '@budgero/core/browser';
@@ -201,6 +204,7 @@ export function TransactionsTable({
   // Override with budget currency if forced (e.g., All Transactions page)
   const transactionCurrencyDisplay = forceBudgetCurrency ? 'budget' : storeCurrencyDisplay;
   const selectedBudget = useUiStore((state) => state.selectedBudget);
+  const addTransactionEscape = useAddTransactionDialogEscape();
 
   const {
     data: rawData,
@@ -530,8 +534,12 @@ export function TransactionsTable({
             setShowOnlyUncleared={setShowOnlyUncleared}
           />
 
-          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
+          <DialogContent
+            onInteractOutside={(e) => e.preventDefault()}
+            onEscapeKeyDown={addTransactionEscape.onEscapeKeyDown}
+          >
             <AddTransactionForm
+              registerEscapeHandler={addTransactionEscape.registerEscapeHandler}
               onAddTransaction={handleAddTransaction}
               onAddTransfer={handleAddTransfer}
               onCancel={() => setOpenDialog(false)}

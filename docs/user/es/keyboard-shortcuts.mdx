@@ -85,12 +85,20 @@ En la página de una cuenta o en **Todas las transacciones** (escritorio):
     </tr>
   </thead>
   <tbody>
-    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Moverte entre campos</td></tr>
+    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Moverse entre campos: importe, fecha, cuenta, beneficiario, categoría, nota</td></tr>
+    <tr><td><Keys>Alt+1</Keys> / <Keys>Alt+2</Keys> / <Keys>Alt+3</Keys></td><td>Gasto, ingreso, transferencia</td></tr>
+    <tr><td><Keys>+</Keys> o <Keys>-</Keys> al principio del importe</td><td>Ingreso o gasto</td></tr>
+    <tr><td><Keys>Enter</Keys> en el importe o la fecha</td><td>Aceptarlo y pasar al siguiente campo</td></tr>
+    <tr><td>Escribir sobre un selector</td><td>Abrirlo y buscar lo que escribes (cuenta, beneficiario, categoría, etiqueta)</td></tr>
+    <tr><td><Keys>Enter</Keys> o <Keys>Tab</Keys> en un selector</td><td>Elegir la entrada resaltada y seguir; <Keys>Shift+Tab</Keys> vuelve atrás</td></tr>
     <tr><td><Keys>Enter</Keys></td><td>Guardar (desde un campo de texto)</td></tr>
-    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Guardar desde cualquier campo</td></tr>
-    <tr><td><Keys>Esc</Keys></td><td>Cerrar sin guardar (fila en línea)</td></tr>
+    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Guardar y cerrar, desde cualquier campo</td></tr>
+    <tr><td><Keys>Ctrl+Shift+Enter</Keys></td><td>Guardar y empezar la siguiente - la fecha, la cuenta y el tipo se mantienen</td></tr>
+    <tr><td><Keys>Esc</Keys></td><td>Cerrar un selector o dejar de editar el importe, y luego cerrar el diálogo - pregunta antes si ya escribiste un importe o una nota</td></tr>
   </tbody>
 </table>
+
+La fecha se puede escribir: `24` es el día 24 de este mes, `24/11` un día de este año (escrito como tu idioma escribe las fechas), `+1` o `-2` son días a partir de hoy, y la primera letra de hoy, ayer o mañana hace lo que dice. <Keys>↑</Keys> y <Keys>↓</Keys> mueven la fecha un día, <Keys>Page Up</Keys> y <Keys>Page Down</Keys> un mes, y <Keys>Alt+↓</Keys> abre el calendario. Tras guardar con <Keys>Ctrl+Shift+Enter</Keys>, la línea bajo los botones muestra lo que se guardó.
 
 En la fila en línea, <Keys>Enter</Keys> sobre un botón pulsa ese botón — Dividir, Cancelar o un selector — en lugar de guardar.
 
@@ -114,5 +122,7 @@ Los campos de importe son calculadoras: escribe `120 + 35` o `300 / 3` y se guar
     <tr><td><Keys>Esc</Keys></td><td>Cancelar la edición</td></tr>
   </tbody>
 </table>
+
+El punto y la coma sirven ambos como separador decimal: `3.5` y `3,5` son tres y medio, mientras que `1.234` - tres cifras tras el separador - sigue siendo mil doscientos treinta y cuatro.
 
 Para encontrar transacciones en lugar de moverte entre ellas, consulta [Buscar transacciones](/docs/semantic-search).

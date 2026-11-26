@@ -237,7 +237,11 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
         onEditingChange={onAmountEditingChange}
       />
 
-      <TransactionTypeSelector value={transactionType} onChange={onTransactionTypeChange} />
+      <TransactionTypeSelector
+        value={transactionType}
+        onChange={onTransactionTypeChange}
+        keyboardShortcuts
+      />
 
       <DatePickerQuick
         value={transactionDate}
@@ -255,6 +259,7 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
         isLoading={accountsLoading}
         transactionType={transactionType}
         showAutofillIndicator={autofillAppliedFields?.has('account') ?? false}
+        keyboardEntry
       />
 
       {isTransfer && (
@@ -264,6 +269,7 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
           accounts={accounts}
           excludeAccountId={selectedFromAccount}
           isLoading={accountsLoading}
+          keyboardEntry
         />
       )}
 
@@ -303,24 +309,7 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
                 onChange={onPayeeChange}
                 placeholder={t`Select payee`}
                 triggerClassName="h-8 sm:h-10"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Label Selector */}
-      {showLabel && (
-        <div className="space-y-1.5 sm:space-y-2" data-testid="transaction-label-field">
-          <div className="flex items-center gap-2">
-            <Tags className="h-4 w-4 text-muted-foreground" />
-            <div className="min-w-0 flex-1">
-              <LabelCombobox
-                budgetId={budgetId}
-                value={selectedLabelId}
-                onChange={onLabelChange}
-                placeholder={t`No label`}
-                triggerClassName="h-8 sm:h-10 rounded-full border-border/70 bg-muted/20 hover:bg-muted/40"
+                keyboardEntry
               />
             </div>
           </div>
@@ -353,6 +342,7 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
                 triggerClassName="w-full h-8 sm:h-10 bg-background border-input hover:bg-accent hover:text-accent-foreground transition-colors"
                 popoverContentClassName="w-[320px] max-w-[90vw]"
                 includeTransfers={transferInvolvesOffBudget}
+                keyboardEntry
               />
             </div>
           </div>
@@ -388,6 +378,25 @@ export const TransactionDetailsSection = React.memo(function TransactionDetailsS
           />
         </div>
       </div>
+
+      {/* Label Selector - after the memo: optional, so it doesn't sit between the main fields. */}
+      {showLabel && (
+        <div className="space-y-1.5 sm:space-y-2" data-testid="transaction-label-field">
+          <div className="flex items-center gap-2">
+            <Tags className="h-4 w-4 text-muted-foreground" />
+            <div className="min-w-0 flex-1">
+              <LabelCombobox
+                budgetId={budgetId}
+                value={selectedLabelId}
+                onChange={onLabelChange}
+                placeholder={t`No label`}
+                keyboardEntry
+                triggerClassName="h-8 sm:h-10 rounded-full border-border/70 bg-muted/20 hover:bg-muted/40"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

@@ -5,6 +5,7 @@
  */
 
 export { AddTransactionForm } from './AddTransactionForm';
+export { useAddTransactionDialogEscape } from './useAddTransactionDialogEscape';
 export type { AddTransactionFormProps } from './AddTransactionForm';
 
 export { TransactionFormHeader } from './TransactionFormHeader';

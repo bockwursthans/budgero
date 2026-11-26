@@ -29,7 +29,9 @@ const fixtures = vi.hoisted(() => ({
 
 vi.mock('@shared/runtime/runtime-provider', () => ({ useActiveSpaceId: () => fixtures.spaceId }));
 vi.mock('@shared/hooks/useConnectivity', () => ({ useConnectivity: () => ({}) }));
-vi.mock('@entities/currency/lib/currency-utils', () => ({}));
+vi.mock('@entities/currency/lib/currency-utils', () => ({
+  formatNativeAmount: (amount: number) => (amount / 1000).toFixed(2),
+}));
 vi.mock('@shared/store/useUiStore', () => ({
   useUiStore: (selector: (state: unknown) => unknown) =>
     selector({
@@ -336,5 +338,94 @@ describe('split lines the form refuses', () => {
       line('b', { transferAccountId: 41 }),
     ]);
     expect(form.save).not.toHaveBeenCalled();
+  });
+});
+
+describe('add transaction keyboard entry', () => {
+  const ADD_ANOTHER_ARG = 9;
+
+  const renderForm = (
+    extra: Pick<React.ComponentProps<typeof AddTransactionForm>, 'registerEscapeHandler'> = {}
+  ) => {
+    remember(4, { payee: 'Cafe A', category: 'Groceries', accountId: '41' });
+    fixtures.budgetId = 4;
+    const onAddTransaction = vi.fn().mockResolvedValue(101);
+    const onCancel = vi.fn();
+    render(
+      <AddTransactionForm
+        budgetId={4}
+        selectedAccountId={41}
+        onAddTransaction={onAddTransaction}
+        onAddTransfer={vi.fn()}
+        onCancel={onCancel}
+        {...extra}
+      />
+    );
+    return { onAddTransaction, onCancel };
+  };
+  const memo = () => screen.getByRole('textbox', { name: 'Memo' });
+
+  it('saves and closes with Ctrl+Enter, and with Enter in a text field', async () => {
+    const { onAddTransaction } = renderForm();
+
+    fireEvent.keyDown(memo(), { key: 'Enter', ctrlKey: true });
+    await vi.waitFor(() => expect(onAddTransaction).toHaveBeenCalledTimes(1));
+    expect(onAddTransaction.mock.calls[0][ADD_ANOTHER_ARG]).toBe(false);
+
+    fireEvent.keyDown(memo(), { key: 'Enter' });
+    await vi.waitFor(() => expect(onAddTransaction).toHaveBeenCalledTimes(2));
+  });
+
+  it('saves and starts the next one with Ctrl+Shift+Enter, confirming what was saved', async () => {
+    const { onAddTransaction } = renderForm();
+
+    fireEvent.keyDown(memo(), { key: 'Enter', ctrlKey: true, shiftKey: true });
+
+    await vi.waitFor(() => expect(onAddTransaction).toHaveBeenCalledTimes(1));
+    expect(onAddTransaction.mock.calls[0][ADD_ANOTHER_ARG]).toBe(true);
+    expect(await screen.findByTestId('last-saved')).toHaveTextContent(/Saved: .*Groceries.*Cafe A/);
+  });
+
+  it('leaves Enter on a button to the button', () => {
+    const { onAddTransaction } = renderForm();
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Single transaction' }), {
+      key: 'Enter',
+    });
+
+    expect(onAddTransaction).not.toHaveBeenCalled();
+  });
+
+  it('picks the kind with Alt + 1/2/3', () => {
+    renderForm();
+
+    fireEvent.keyDown(memo(), { key: '2', code: 'Digit2', altKey: true });
+    expect(screen.getByTestId('add-transaction-submit')).toHaveTextContent('Add Income');
+    fireEvent.keyDown(memo(), { key: '3', code: 'Digit3', altKey: true });
+    expect(screen.getByTestId('add-transaction-submit')).toHaveTextContent('Add Transfer');
+    fireEvent.keyDown(memo(), { key: '1', code: 'Digit1', altKey: true });
+    expect(screen.getByTestId('add-transaction-submit')).toHaveTextContent('Add Expense');
+  });
+
+  it('asks before Escape throws a started transaction away', async () => {
+    let escape: ((event: KeyboardEvent) => void) | null = null;
+    const { onCancel } = renderForm({
+      registerEscapeHandler: (handler) => {
+        escape = handler;
+      },
+    });
+    const pressEscape = () => {
+      const event = new KeyboardEvent('keydown', { key: 'Escape', cancelable: true });
+      act(() => escape?.(event));
+      return event;
+    };
+
+    expect(pressEscape().defaultPrevented).toBe(false);
+
+    fireEvent.change(memo(), { target: { value: 'Lunch' } });
+    expect(pressEscape().defaultPrevented).toBe(true);
+    fireEvent.click(await screen.findByRole('button', { name: 'Discard' }));
+
+    expect(onCancel).toHaveBeenCalled();
   });
 });
