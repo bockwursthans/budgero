@@ -85,12 +85,20 @@ Auf einer Kontoseite oder in **Alle Transaktionen** (Desktop):
     </tr>
   </thead>
   <tbody>
-    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Zwischen Feldern wechseln</td></tr>
+    <tr><td><Keys>Tab</Keys> / <Keys>Shift+Tab</Keys></td><td>Zwischen Feldern wechseln: Betrag, Datum, Konto, Empfänger, Kategorie, Memo</td></tr>
+    <tr><td><Keys>Alt+1</Keys> / <Keys>Alt+2</Keys> / <Keys>Alt+3</Keys></td><td>Ausgabe, Einnahme, Umbuchung</td></tr>
+    <tr><td><Keys>+</Keys> oder <Keys>-</Keys> zuerst im Betrag</td><td>Einnahme oder Ausgabe</td></tr>
+    <tr><td><Keys>Enter</Keys> im Betrag oder im Datum</td><td>Übernehmen und ins nächste Feld wechseln</td></tr>
+    <tr><td>Tippen auf einer Auswahl</td><td>Sie öffnen und nach dem Getippten suchen (Konto, Empfänger, Kategorie, Label)</td></tr>
+    <tr><td><Keys>Enter</Keys> oder <Keys>Tab</Keys> in einer Auswahl</td><td>Den markierten Eintrag übernehmen und weiter; <Keys>Shift+Tab</Keys> geht zurück</td></tr>
     <tr><td><Keys>Enter</Keys></td><td>Speichern (aus einem Textfeld)</td></tr>
-    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Aus jedem Feld speichern</td></tr>
-    <tr><td><Keys>Esc</Keys></td><td>Schließen, ohne zu speichern (Inline-Zeile)</td></tr>
+    <tr><td><Keys>Ctrl+Enter</Keys></td><td>Speichern und schließen, aus jedem Feld</td></tr>
+    <tr><td><Keys>Ctrl+Shift+Enter</Keys></td><td>Speichern und die nächste beginnen - Datum, Konto und Art bleiben</td></tr>
+    <tr><td><Keys>Esc</Keys></td><td>Eine Auswahl schließen oder die Betragseingabe beenden, dann den Dialog schließen - mit Rückfrage, sobald ein Betrag oder Memo eingegeben ist</td></tr>
   </tbody>
 </table>
+
+Das Datum lässt sich tippen: `24` ist der 24. dieses Monats, `24.11` ein Tag in diesem Jahr (so geschrieben, wie deine Sprache Daten schreibt), `+1` oder `-2` sind Tage ab heute, und der erste Buchstabe von heute, gestern oder morgen tut, was er sagt. <Keys>↑</Keys> und <Keys>↓</Keys> verschieben das Datum um einen Tag, <Keys>Bild↑</Keys> und <Keys>Bild↓</Keys> um einen Monat, und <Keys>Alt+↓</Keys> öffnet den Kalender. Nach dem Speichern mit <Keys>Ctrl+Shift+Enter</Keys> zeigt die Zeile unter den Schaltflächen, was gespeichert wurde.
 
 In der Inline-Zeile löst <Keys>Enter</Keys> auf einer Schaltfläche diese Schaltfläche aus – Aufteilen, Abbrechen oder eine Auswahl – statt zu speichern.
 
@@ -114,5 +122,7 @@ Betragsfelder sind Rechner: Tippe `120 + 35` oder `300 / 3` ein, und das Ergebni
     <tr><td><Keys>Esc</Keys></td><td>Bearbeitung abbrechen</td></tr>
   </tbody>
 </table>
+
+Punkt und Komma funktionieren beide als Dezimaltrenner: `3.5` und `3,5` sind dreieinhalb, `1.234` - drei Ziffern nach dem Trenner - bleibt eintausendzweihundertvierunddreißig.
 
 Um Transaktionen zu finden, statt zwischen ihnen zu wechseln, siehe [Transaktionen durchsuchen](/docs/semantic-search).

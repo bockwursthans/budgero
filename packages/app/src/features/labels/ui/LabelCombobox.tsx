@@ -12,6 +12,7 @@ import {
 } from '@shared/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover';
 import { cn } from '@shared/lib/utils';
+import { useComboboxKeyboardEntry } from '@shared/hooks/useComboboxKeyboardEntry';
 import { hexToRgba } from '@shared/lib/color/hex';
 import { useLabels } from '@entities/label/api/useLabels';
 import type { LabelListItem } from '@budgero/core/browser';
@@ -28,6 +29,8 @@ export interface LabelComboboxProps {
   labels?: LabelListItem[];
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Type to open, Enter/Tab picks and moves on (see useComboboxKeyboardEntry). */
+  keyboardEntry?: boolean;
 }
 
 export function LabelCombobox({
@@ -42,11 +45,22 @@ export function LabelCombobox({
   labels: providedLabels,
   defaultOpen = false,
   onOpenChange,
+  keyboardEntry = false,
 }: LabelComboboxProps) {
   const { t } = useLingui();
   const placeholder = placeholderProp ?? t`No label`;
   const [open, setOpen] = React.useState(defaultOpen);
   const [search, setSearch] = React.useState('');
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const entry = useComboboxKeyboardEntry({
+    enabled: keyboardEntry,
+    triggerRef,
+    openWithSearch: (typed) => {
+      setSearch(typed);
+      setOpen(true);
+    },
+    close: () => setOpen(false),
+  });
   const labelsQuery = useLabels(budgetId, providedLabels === undefined);
   const labels = providedLabels ?? labelsQuery.labels;
   const isFetching = providedLabels === undefined && labelsQuery.isFetching;
@@ -80,10 +94,11 @@ export function LabelCombobox({
       if ((selectedId ?? null) !== nextLabelId) {
         onChange(nextLabelId);
       }
+      entry.onPicked();
       setOpen(false);
       setSearch('');
     },
-    [onChange, selectedId]
+    [onChange, selectedId, entry]
   );
 
   const triggerStyle = selectedLabel
@@ -97,11 +112,13 @@ export function LabelCombobox({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
           disabled={disabled || isFetching}
+          onKeyDown={entry.onTriggerKeyDown}
           className={cn(
             'w-full justify-between text-left font-normal hover:text-foreground focus-visible:text-foreground',
             selectedLabel ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
@@ -125,12 +142,18 @@ export function LabelCombobox({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className={cn('w-[300px] p-0', popoverContentClassName)} align="start">
+      <PopoverContent
+        className={cn('w-[300px] p-0', popoverContentClassName)}
+        align="start"
+        onOpenAutoFocus={entry.onOpenAutoFocus}
+        onCloseAutoFocus={entry.onCloseAutoFocus}
+      >
         <Command loop>
           <CommandInput
             placeholder={t`Search labels...`}
             value={search}
             onValueChange={setSearch}
+            onKeyDown={entry.onInputKeyDown}
             disabled={disabled || isFetching}
           />
           <CommandList>

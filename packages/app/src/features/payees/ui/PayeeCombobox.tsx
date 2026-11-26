@@ -12,6 +12,7 @@ import {
 } from '@shared/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/ui/popover';
 import { cn } from '@shared/lib/utils';
+import { useComboboxKeyboardEntry } from '@shared/hooks/useComboboxKeyboardEntry';
 import { usePayees } from '@entities/payee/api/usePayees';
 
 const EMPTY_PAYEES: string[] = [];
@@ -44,6 +45,8 @@ export interface PayeeComboboxProps {
   selectedTransferAccountId?: number | null;
   /** Offered while a transfer is selected: turn the row back into a regular transaction. */
   onUnlinkTransfer?: () => void;
+  /** Type to open, Enter/Tab picks and moves on (see useComboboxKeyboardEntry). */
+  keyboardEntry?: boolean;
 }
 
 /**
@@ -67,11 +70,25 @@ export function PayeeCombobox({
   displayValue,
   selectedTransferAccountId = null,
   onUnlinkTransfer,
+  keyboardEntry = false,
 }: PayeeComboboxProps) {
   const { t } = useLingui();
   const placeholder = placeholderProp ?? t`Select or create payee`;
   const [open, setOpen] = React.useState(defaultOpen);
   const [search, setSearch] = React.useState('');
+  // Opened by typing: the search is that key, not the current payee.
+  const typedSearch = React.useRef<string | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const entry = useComboboxKeyboardEntry({
+    enabled: keyboardEntry,
+    triggerRef,
+    openWithSearch: (typed) => {
+      typedSearch.current = typed;
+      setSearch(typed);
+      setOpen(true);
+    },
+    close: () => setOpen(false),
+  });
   const payeesQuery = usePayees(budgetId, providedPayees === undefined);
   const payees = providedPayees ?? payeesQuery.data ?? EMPTY_PAYEES;
   const isFetching = providedPayees === undefined && payeesQuery.isFetching;
@@ -98,10 +115,11 @@ export function PayeeCombobox({
     (next: string) => {
       const trimmed = next.trim();
       onChange(trimmed);
+      entry.onPicked();
       setOpen(false);
       setSearch('');
     },
-    [onChange]
+    [onChange, entry]
   );
 
   const handleSelectTransfer = React.useCallback(
@@ -129,7 +147,8 @@ export function PayeeCombobox({
 
   React.useEffect(() => {
     if (open) {
-      setSearch(normalizedValue);
+      if (typedSearch.current === null) setSearch(normalizedValue);
+      typedSearch.current = null;
     }
   }, [open, normalizedValue]);
 
@@ -137,11 +156,13 @@ export function PayeeCombobox({
     <Popover open={open} onOpenChange={setOpen} modal>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
+          onKeyDown={entry.onTriggerKeyDown}
           className={cn(
             'w-full justify-between text-left font-normal',
             !normalizedValue && !displayValue && 'text-muted-foreground',
@@ -157,12 +178,15 @@ export function PayeeCombobox({
       <PopoverContent
         className={cn('p-0 max-h-[50dvh] overflow-hidden', popoverContentClassName)}
         align="start"
+        onOpenAutoFocus={entry.onOpenAutoFocus}
+        onCloseAutoFocus={entry.onCloseAutoFocus}
       >
         <Command className="h-full" loop>
           <CommandInput
             placeholder={t`Search payees…`}
             value={search}
             onValueChange={setSearch}
+            onKeyDown={entry.onInputKeyDown}
             disabled={isFetching}
           />
           <CommandList className="overflow-y-auto overscroll-contain touch-pan-y max-h-[44dvh]">

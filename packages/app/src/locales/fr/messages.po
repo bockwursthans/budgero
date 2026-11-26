@@ -1625,6 +1625,10 @@ msgstr "{rowsWithoutAccount, plural, one {Une ligne n’a pas de valeur « {0} �
 msgid "{rtaMonths, plural, one {In # month, Ready to Assign differs from what YNAB showed.} other {In # months, Ready to Assign differs from what YNAB showed.}}"
 msgstr "{rtaMonths, plural, one {Sur # mois, À affecter diffère de ce qu’affichait YNAB.} other {Sur # mois, À affecter diffère de ce qu’affichait YNAB.}}"
 
+#: src/features/transactions/ui/add-transaction/TransactionFormActions.tsx
+msgid "{saveShortcut} save · {saveAnotherShortcut} save and add another · {typeShortcut} expense, income, transfer"
+msgstr "{saveShortcut} enregistrer · {saveAnotherShortcut} enregistrer et ajouter une autre · {typeShortcut} dépense, revenu, virement"
+
 #: src/features/reports/ui/notebook/FilterEditor.tsx
 msgid "{selectedCount, plural, one {# selected} other {# selected}}"
 msgstr "{selectedCount, plural, one {# sélectionné} other {# sélectionnés}}"
@@ -3724,6 +3728,10 @@ msgstr "Ajouter une transaction ({0})"
 msgid "Add transaction (register)"
 msgstr "Ajouter une transaction (registre)"
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Add transaction dialog"
+msgstr "Fenêtre « Ajouter une transaction »"
+
 #: src/pages/settings/AppearancePage.tsx
 msgid "Add transactions"
 msgstr "Ajouter des transactions"
@@ -4149,6 +4157,10 @@ msgstr "Montant dû"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Amount to start the month with"
 msgstr "Montant en début de mois"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Amount, date, account, payee, category, memo"
+msgstr "Montant, date, compte, bénéficiaire, catégorie, mémo"
 
 #: src/features/rules/ui/RuleHistoryDrawer.tsx
 msgid "Amount:"
@@ -6405,6 +6417,10 @@ msgstr "Salle d’escalade"
 msgid "Close"
 msgstr "Fermer"
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Close a picker, then the dialog"
+msgstr "Fermer le sélecteur, puis la fenêtre"
+
 #: src/features/debt/ui/PayoffPlanSheet.tsx
 msgid "Close payment plan"
 msgstr "Fermer le plan de paiement"
@@ -7786,6 +7802,7 @@ msgstr "Statistiques de la base de données"
 #: src/features/debt/ui/PayoffPlanSheet.tsx
 #: src/features/reports/ui/notebook/FilterEditor.tsx
 #: src/features/reports/ui/notebook/question-labels.ts
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
 #: src/pages/admin/admin-users/user-details/BillingTab.tsx
 #: src/pages/settings/subscription/InvoicesTable.tsx
 msgid "Date"
@@ -8277,9 +8294,17 @@ msgstr "Désactivé"
 msgid "Disabled by DISABLE_REGISTRATION. Remove this environment flag and restart the server to enable sign-ups here."
 msgstr "Désactivé par DISABLE_REGISTRATION. Supprimez cette variable d'environnement et redémarrez le serveur pour autoriser les inscriptions ici."
 
+#: src/features/transactions/ui/add-transaction/AddTransactionForm.tsx
+msgid "Discard"
+msgstr "Abandonner"
+
 #: src/pages/reports/question/NotebookQuestionView.tsx
 msgid "Discard them"
 msgstr "Les abandonner"
+
+#: src/features/transactions/ui/add-transaction/AddTransactionForm.tsx
+msgid "Discard this transaction?"
+msgstr "Abandonner cette transaction ?"
 
 #: src/features/snapshot-history/ui/SnapshotHistoryList.tsx
 msgid "Discards any change made after it, imports included."
@@ -9333,6 +9358,7 @@ msgstr "Afficher les détails"
 msgid "Expand sidebar"
 msgstr "Afficher le panneau latéral"
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
 #: src/features/analytics/ui/IncomeExpenseByGroupChart.tsx
 #: src/features/page-guides/ui/guide-visuals.tsx
 #: src/features/transactions/ui/form/TransactionTypeSelector.tsx
@@ -11127,6 +11153,7 @@ msgstr "Incluez votre jeton API dans l'en-tête Authorization :"
 msgid "Includes occurrences already posted or skipped."
 msgstr "Inclut les occurrences déjà enregistrées ou ignorées."
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
 #: src/features/analytics/ui/IncomeExpenseByGroupChart.tsx
 #: src/features/budget-management/model/icon-options.ts
 #: src/features/budget-management/ui/create-budget-form/YnabImportStatus.tsx
@@ -11184,6 +11211,10 @@ msgstr "Les revenus répartis dans les groupes et les catégories"
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "Income minus spending"
 msgstr "Revenus moins dépenses"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Income or expense, typed first into the amount"
+msgstr "Revenu ou dépense, tapé en premier dans le montant"
 
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Income this month"
@@ -11646,6 +11677,10 @@ msgstr "Garder les utilisateurs Clerk synchronisés avec Budgero."
 #: src/features/transactions/ui/TransactionsBatchToolbar.tsx
 msgid "Keep current labels"
 msgstr "Conserver les étiquettes actuelles"
+
+#: src/features/transactions/ui/add-transaction/AddTransactionForm.tsx
+msgid "Keep editing"
+msgstr "Continuer la saisie"
 
 #: src/features/first-steps/ui/FirstStepsCard.tsx
 msgid "Keep going until Ready to Assign shows 0. Then every coin has a job."
@@ -14264,6 +14299,10 @@ msgstr "Aucun"
 msgid "Noodle bar"
 msgstr "Bar à nouilles"
 
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
+msgid "Not a date. Try a day like 24, or +1 for tomorrow."
+msgstr "Ce n'est pas une date. Essayez un jour comme 24, ou +1 pour demain."
+
 #: src/features/transactions/ui/form/DuplicateTransactionHint.tsx
 msgid "Not a duplicate"
 msgstr "Pas un doublon"
@@ -14731,6 +14770,10 @@ msgstr "Ouvrir comme question"
 msgid "Open Budgero tomorrow and record yesterday’s spending."
 msgstr "Ouvrez Budgero demain et notez les dépenses de la veille."
 
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
+msgid "Open calendar"
+msgstr "Ouvrir le calendrier"
+
 #: src/features/chat/ui/ChatBubble.tsx
 msgid "Open chat assistant"
 msgstr "Ouvrir l'assistant de chat"
@@ -14762,6 +14805,10 @@ msgstr "Ouvrir mon budget →"
 #: src/pages/admin/sql-explorer/AdminSqlExplorer.tsx
 msgid "Open schema sidebar"
 msgstr "Ouvrir la barre latérale du schéma"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Open the calendar"
+msgstr "Ouvrir le calendrier"
 
 #: src/pages/onboarding/OnboardingFlow.tsx
 msgid "Open the demo →"
@@ -15548,6 +15595,10 @@ msgstr "Choisissez la date de début de ce taux."
 #: src/features/page-guides/ui/guide-content.tsx
 msgid "Pick the dates"
 msgstr "Choisissez les dates"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Pick the entry and move on"
+msgstr "Prendre l'entrée et continuer"
 
 #: src/pages/accounts/hooks/useRecurringEditorFromTransaction.ts
 #: src/pages/settings/recurring/RecurringTransactionsSection.tsx
@@ -17664,6 +17715,7 @@ msgstr "Enregistrez d’abord une question dans Rapports."
 msgid "Save amounts"
 msgstr "Enregistrer les montants"
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
 #: src/features/transactions/ui/desktop-table/InlineTransactionRow.tsx
 msgid "Save and add another"
 msgstr "Enregistrer et en ajouter une autre"
@@ -17671,6 +17723,10 @@ msgstr "Enregistrer et en ajouter une autre"
 #: src/features/reports/ui/notebook/SaveQuestionDialog.tsx
 msgid "Save and add to dashboard"
 msgstr "Enregistrer et ajouter au tableau de bord"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Save and close"
+msgstr "Enregistrer et fermer"
 
 #: src/features/transactions/ui/reconciled-edit/ReconciledEditConfirmHost.tsx
 msgid "Save and mark uncleared"
@@ -17783,6 +17839,10 @@ msgstr "Modèles enregistrés"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Saved This Month"
 msgstr "Épargné ce mois-ci"
+
+#: src/features/transactions/ui/add-transaction/TransactionFormActions.tsx
+msgid "Saved: {savedSummary}"
+msgstr "Enregistré : {savedSummary}"
 
 #: src/features/budget-management/ui/CreateBudgetForm.tsx
 #: src/pages/onboarding/apply-onboarding.ts
@@ -18284,10 +18344,6 @@ msgstr "Sélectionner une devise..."
 #: src/pages/custom-dashboards/components/DashboardSwitcher.tsx
 msgid "Select dashboard"
 msgstr "Sélectionner le tableau de bord"
-
-#: src/features/transactions/ui/form/DatePickerQuick.tsx
-msgid "Select date"
-msgstr "Sélectionner la date"
 
 #: src/pages/settings/SecurityPage.tsx
 msgid "Select days"
@@ -19499,6 +19555,10 @@ msgstr "Commencez à épargner {monthlyTarget} ce mois-ci"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Start this month's savings - aim for {target}"
 msgstr "Commencez votre épargne ce mois-ci — visez {target}"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Start typing on a picker to search it"
+msgstr "Taper sur un sélecteur pour y chercher"
 
 #: src/features/subscription/ui/SubscriptionSuccess.tsx
 msgid "Start Using Budgero"
@@ -21117,6 +21177,10 @@ msgstr "Basculer pour mettre en pause la règle sans la supprimer."
 msgid "Token copied to clipboard"
 msgstr "Jeton copié dans le presse-papiers"
 
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
+msgid "Tomorrow"
+msgstr "Demain"
+
 #: src/pages/settings/subscription/subscription.constants.ts
 msgid "Too expensive"
 msgstr "Trop cher"
@@ -21410,6 +21474,7 @@ msgstr "Transcription en cours"
 msgid "Transcription failed"
 msgstr "Échec de la transcription"
 
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
 #: src/features/budget-planning/ui/CCPaymentActivityDialog.tsx
 #: src/features/page-guides/ui/guide-visuals.tsx
 #: src/features/payees/ui/PayeeCombobox.tsx
@@ -21620,6 +21685,10 @@ msgstr "Saisissez {CONFIRM_WORD} pour confirmer"
 msgid "Type a command or search..."
 msgstr "Saisissez une commande ou recherchez…"
 
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
+msgid "Type a date or pick one."
+msgstr "Tapez une date ou choisissez-en une."
+
 #: src/features/page-guides/ui/guide-content.tsx
 msgid "Type in the search box above the list. Words like last month, outflows, uncleared or over 50 and a category name become filters (these words are English); anything else is looked up in payee, memo, category, label and account."
 msgstr "Tapez dans le champ de recherche au-dessus de la liste. Des mots comme last month, outflows, uncleared ou over 50 et un nom de catégorie deviennent des filtres (ces mots sont en anglais) ; le reste est cherché dans le bénéficiaire, le mémo, la catégorie, l’étiquette et le compte."
@@ -21627,6 +21696,10 @@ msgstr "Tapez dans le champ de recherche au-dessus de la liste. Des mots comme l
 #: src/pages/onboarding/steps/PasswordStep.tsx
 msgid "type it once more"
 msgstr "saisissez-le à nouveau"
+
+#: src/app/layout/desktop-shell/KeyboardShortcutsDialog.tsx
+msgid "Type or shift the date"
+msgstr "Taper ou décaler la date"
 
 #: src/app/startup/screens.tsx
 msgid "Type RESET to confirm"
@@ -22784,6 +22857,10 @@ msgstr "Ce que vous avez affecté face à ce que vous avez dépensé"
 msgid "What you can still do"
 msgstr "Ce que vous pouvez encore faire"
 
+#: src/features/transactions/ui/add-transaction/AddTransactionForm.tsx
+msgid "What you typed here is not saved."
+msgstr "Ce que vous avez saisi ici n'est pas enregistré."
+
 #: src/widgets/dashboard/builtin/builtin-cards.ts
 msgid "What’s left of the budget, and spending over time."
 msgstr "Ce qu’il reste du budget, et les dépenses dans le temps."
@@ -23099,6 +23176,10 @@ msgstr "Oui — vous avez dépensé {spentText} sur les {assignedText} affectés
 #: src/pages/settings/DataManagementPage.tsx
 msgid "Yes, Replace All Data"
 msgstr "Oui, remplacer toutes les données"
+
+#: src/features/transactions/ui/form/DatePickerQuick.tsx
+msgid "Yesterday"
+msgstr "Hier"
 
 #: src/features/budget-management/ui/create-budget-form/YnabImportStatus.tsx
 msgid "YNAB applies loan interest to balances without exporting a separate transaction. Budgero added visible ledger adjustments so these balances remain exact."

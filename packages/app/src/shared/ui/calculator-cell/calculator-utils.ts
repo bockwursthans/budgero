@@ -101,6 +101,61 @@ export function getSeparators(localizer?: Intl.NumberFormat): {
   return { groupSep, decimalSep };
 }
 
+/** Separators a user may type for the other one (a dot for a decimal comma and vice versa). */
+const INTERCHANGEABLE_SEPARATORS = new Set(['.', ',']);
+/** A group separator followed by this many digits at a number's end reads as decimals. */
+const MAX_TYPED_DECIMALS = 2;
+
+const interchangeable = (groupSep: string | undefined, decimalSep: string | undefined) =>
+  Boolean(
+    groupSep &&
+    decimalSep &&
+    groupSep !== decimalSep &&
+    INTERCHANGEABLE_SEPARATORS.has(groupSep) &&
+    INTERCHANGEABLE_SEPARATORS.has(decimalSep)
+  );
+
+/**
+ * Reads a group separator typed in place of the decimal one as decimals:
+ * "3.5" or "12.99" where the format writes "3,5". Only a number with no
+ * decimal separator and exactly one group separator, followed by one or two
+ * digits, counts — "1.234" stays one thousand two hundred thirty-four.
+ */
+export function tolerateTypedDecimal(
+  raw: string,
+  groupSep: string | undefined,
+  decimalSep: string | undefined
+): string {
+  if (!interchangeable(groupSep, decimalSep)) return raw;
+  const group = groupSep!;
+  const decimal = decimalSep!;
+  const numbers = new RegExp(`[0-9${escapeRegExp(group)}${escapeRegExp(decimal)}]+`, 'g');
+  return raw.replace(numbers, (number) => {
+    if (number.includes(decimal)) return number;
+    const parts = number.split(group);
+    if (parts.length !== 2) return number;
+    const [whole, fraction] = parts;
+    return whole.length > 0 && fraction.length > 0 && fraction.length <= MAX_TYPED_DECIMALS
+      ? `${whole}${decimal}${fraction}`
+      : number;
+  });
+}
+
+/**
+ * While typing: the text may still become decimals typed with the group
+ * separator ("3." on the way to "3.5"), so it must not be regrouped yet.
+ */
+export function mayBeTypedDecimal(
+  raw: string,
+  groupSep: string | undefined,
+  decimalSep: string | undefined
+): boolean {
+  if (!interchangeable(groupSep, decimalSep)) return false;
+  const text = raw.trim();
+  if (text.includes(decimalSep!)) return false;
+  return text.endsWith(groupSep!) || tolerateTypedDecimal(text, groupSep, decimalSep) !== text;
+}
+
 /**
  * Normalize a string for evaluation by removing locale-specific formatting
  */
@@ -109,7 +164,7 @@ export function normalizeForEval(
   groupSep: string | undefined,
   decimalSep: string | undefined
 ): string {
-  let s = raw;
+  let s = tolerateTypedDecimal(raw, groupSep, decimalSep);
   s = s.replace(/[\u202F\u00A0\s]/g, '');
   if (groupSep) {
     try {

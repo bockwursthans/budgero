@@ -10,17 +10,31 @@ import { useEffect, useState } from 'react';
 import { ArrowDownUp } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@shared/ui/tabs';
 import { useSwipeable } from 'react-swipeable';
+import { getKeyboardShortcutLabels } from '@shared/lib/keyboard-shortcuts';
+import { TYPE_SHORTCUT_DIGITS } from '@features/transactions/lib/quick-entry-shortcuts';
 
 export type TransactionType = 'inflow' | 'outflow' | 'transfer';
 
 interface TransactionTypeSelectorProps {
   value: TransactionType;
   onChange: (value: TransactionType) => void;
+  /**
+   * Picked with Alt + 1/2/3 (and the amount's sign) instead of Tab: the tabs
+   * leave the tab order and show their key.
+   */
+  keyboardShortcuts?: boolean;
 }
 
 const TAB_ORDER: TransactionType[] = ['inflow', 'outflow', 'transfer'];
 
-export function TransactionTypeSelector({ value, onChange }: TransactionTypeSelectorProps) {
+export function TransactionTypeSelector({
+  value,
+  onChange,
+  keyboardShortcuts = false,
+}: TransactionTypeSelectorProps) {
+  const { alt } = getKeyboardShortcutLabels();
+  const shortcutProps = (type: TransactionType) =>
+    keyboardShortcuts ? { tabIndex: -1, title: alt(TYPE_SHORTCUT_DIGITS[type]) } : {};
   const [enableSwipe, setEnableSwipe] = useState(false);
 
   useEffect(() => {
@@ -73,10 +87,15 @@ export function TransactionTypeSelector({ value, onChange }: TransactionTypeSele
         onValueChange={(v: string) => onChange(v as TransactionType)}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-3 gap-1 bg-transparent h-auto p-1">
+        <TabsList
+          className="grid w-full grid-cols-3 gap-1 bg-transparent h-auto p-1"
+          // Radix makes the list itself a tab stop that hands focus to the active tab.
+          {...(keyboardShortcuts ? { tabIndex: -1 } : {})}
+        >
           <TabsTrigger
             value="inflow"
             data-testid="transaction-type-inflow"
+            {...shortcutProps('inflow')}
             className="data-[state=active]:bg-success/10 data-[state=active]:text-success data-[state=active]:border-success/20 data-[state=active]:shadow-sm rounded-md border border-transparent py-1.5 px-2 sm:py-2 sm:px-3 text-xs sm:text-sm transition-all duration-200 hover:bg-muted"
           >
             <span className="mr-1 sm:mr-2 font-semibold text-base leading-none">+</span>
@@ -87,6 +106,7 @@ export function TransactionTypeSelector({ value, onChange }: TransactionTypeSele
           <TabsTrigger
             value="outflow"
             data-testid="transaction-type-outflow"
+            {...shortcutProps('outflow')}
             className="data-[state=active]:bg-destructive/10 data-[state=active]:text-destructive data-[state=active]:border-destructive/20 data-[state=active]:shadow-sm rounded-md border border-transparent py-1.5 px-2 sm:py-2 sm:px-3 text-xs sm:text-sm transition-all duration-200 hover:bg-muted"
           >
             <span className="mr-1 sm:mr-2 font-semibold text-base leading-none">−</span>
@@ -97,6 +117,7 @@ export function TransactionTypeSelector({ value, onChange }: TransactionTypeSele
           <TabsTrigger
             value="transfer"
             data-testid="transaction-type-transfer"
+            {...shortcutProps('transfer')}
             className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/20 data-[state=active]:shadow-sm rounded-md border border-transparent py-1.5 px-2 sm:py-2 sm:px-3 text-xs sm:text-sm transition-all duration-200 hover:bg-muted"
           >
             <ArrowDownUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />

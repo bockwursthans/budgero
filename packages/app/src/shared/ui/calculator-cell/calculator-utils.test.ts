@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { withEditPrecision } from '@shared/lib/number-format';
 import {
+  evaluateTextToNumber,
   getSeparators,
   formatNumberForInput,
+  mayBeTypedDecimal,
   parseLocalizedNumericString,
+  tolerateTypedDecimal,
 } from './calculator-utils';
 
 const usdNoDecimals = new Intl.NumberFormat('en-US', {
@@ -85,5 +88,39 @@ describe('withEditPrecision', () => {
 
   it('returns a cached instance for the same formatter', () => {
     expect(withEditPrecision(usdNoDecimals)).toBe(withEditPrecision(usdNoDecimals));
+  });
+});
+
+describe('decimals typed with the group separator', () => {
+  const GERMAN = { group: '.', decimal: ',' };
+  const ENGLISH = { group: ',', decimal: '.' };
+
+  it.each([
+    ['3.5', '3,5'],
+    ['12.99', '12,99'],
+    ['1.234', '1.234'],
+    ['1.234,5', '1.234,5'],
+    ['1.234.567', '1.234.567'],
+    ['2.5+3', '2,5+3'],
+  ])('reads %s as %s in a decimal-comma format', (input, expected) => {
+    expect(tolerateTypedDecimal(input, GERMAN.group, GERMAN.decimal)).toBe(expected);
+  });
+
+  it('works the other way round, and only for dot and comma', () => {
+    expect(tolerateTypedDecimal('3,5', ENGLISH.group, ENGLISH.decimal)).toBe('3.5');
+    expect(tolerateTypedDecimal('3 5', '\u00a0', ',')).toBe('3 5');
+  });
+
+  it('evaluates them as decimals and keeps thousands', () => {
+    expect(evaluateTextToNumber('3.5', GERMAN.group, GERMAN.decimal)).toBe(3.5);
+    expect(evaluateTextToNumber('1.234', GERMAN.group, GERMAN.decimal)).toBe(1234);
+    expect(evaluateTextToNumber('2.5*2', GERMAN.group, GERMAN.decimal)).toBe(5);
+  });
+
+  it('holds off regrouping while the text may still become decimals', () => {
+    expect(mayBeTypedDecimal('3.', GERMAN.group, GERMAN.decimal)).toBe(true);
+    expect(mayBeTypedDecimal('3.5', GERMAN.group, GERMAN.decimal)).toBe(true);
+    expect(mayBeTypedDecimal('1.000', GERMAN.group, GERMAN.decimal)).toBe(false);
+    expect(mayBeTypedDecimal('3,5', GERMAN.group, GERMAN.decimal)).toBe(false);
   });
 });

@@ -222,22 +222,18 @@ export function useCalculatorState({
 
     isSavingRef.current = true;
 
-    if (hasError) {
+    // Read the text as it is now: the live preview above runs a frame behind,
+    // so an Enter right after the last key would otherwise save the value
+    // before it (12 instead of 12.5).
+    const current = inputText.trim() ? evaluateText(inputText) : 0;
+    if (current === null) {
       setIsEditing(false);
       setInputText(value.toString());
       isSavingRef.current = false;
       return;
     }
 
-    let finalValue: number;
-    if (evaluatedValue !== null) {
-      finalValue = evaluatedValue;
-    } else {
-      const parsed = parseLocalizedValue(inputText);
-      finalValue = isNaN(parsed) ? 0 : parsed;
-    }
-
-    finalValue = roundForCommit(finalValue);
+    const finalValue = roundForCommit(current);
 
     // Skipping no-op commits avoids redundant updates for cells bound to
     // stored values, but parents that seed the cell with a fallback (e.g. 0)
@@ -249,17 +245,7 @@ export function useCalculatorState({
     setIsEditing(false);
     onEditingChange?.(false);
     isSavingRef.current = false;
-  }, [
-    hasError,
-    evaluatedValue,
-    inputText,
-    value,
-    onCommit,
-    onEditingChange,
-    parseLocalizedValue,
-    roundForCommit,
-    commitUnchanged,
-  ]);
+  }, [inputText, value, onCommit, onEditingChange, evaluateText, roundForCommit, commitUnchanged]);
 
   const startEditing = useCallback(() => {
     isSavingRef.current = false;

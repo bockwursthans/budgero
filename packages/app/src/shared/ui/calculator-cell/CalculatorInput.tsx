@@ -2,7 +2,7 @@ import { Trans } from '@lingui/react/macro';
 import { useRef } from 'react';
 import { Input } from '@shared/ui/input';
 import { cn } from '@shared/lib/utils';
-import { applyShortcut, isExpression } from './calculator-utils';
+import { applyShortcut, isExpression, mayBeTypedDecimal } from './calculator-utils';
 
 export interface CalculatorInputProps {
   inputRef: React.RefObject<HTMLInputElement | null>;
@@ -25,6 +25,8 @@ export interface CalculatorInputProps {
   normalizeForEvalWithLocalizer: (raw: string) => string;
   onSave: () => void;
   onCancel: () => void;
+  /** After Enter saved the value (a form can move on to its next field). */
+  onEnter?: () => void;
 }
 
 export function CalculatorInput({
@@ -48,13 +50,21 @@ export function CalculatorInput({
   normalizeForEvalWithLocalizer,
   onSave,
   onCancel,
+  onEnter,
 }: CalculatorInputProps) {
   // Tabbing out saves only after focus has landed on the next field. Saving
   // synchronously re-renders the form mid-transition, and a Radix tab list as
   // the next stop then drops focus (the dialog's trap sends it back to the top).
   const tabbingOutRef = useRef(false);
+  // The caret is put back a frame after reformatting; a key typed in between
+  // must cancel it, or the caret jumps back in front of that key.
+  const caretFrameRef = useRef<number | null>(null);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    if (caretFrameRef.current !== null) {
+      cancelAnimationFrame(caretFrameRef.current);
+      caretFrameRef.current = null;
+    }
     const raw = e.target.value;
     if (!localizer || !raw) {
       setInputText(raw);
@@ -62,8 +72,8 @@ export function CalculatorInput({
     }
 
     const normalized = normalizeForEvalWithLocalizer(raw);
-    // If expression, don't reformat live
-    if (isExpression(normalized)) {
+    // If expression, or decimals typed with the group separator, don't reformat live
+    if (isExpression(normalized) || mayBeTypedDecimal(raw, groupSep, decimalSep)) {
       setInputText(raw);
       return;
     }
@@ -153,7 +163,8 @@ export function CalculatorInput({
 
     setInputText(formatted);
     // Restore caret after render
-    requestAnimationFrame(() => {
+    caretFrameRef.current = requestAnimationFrame(() => {
+      caretFrameRef.current = null;
       try {
         inputEl.setSelectionRange(newCaret, newCaret);
       } catch {
@@ -176,6 +187,7 @@ export function CalculatorInput({
     if (e.key === 'Enter') {
       e.preventDefault();
       onSave();
+      onEnter?.();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();

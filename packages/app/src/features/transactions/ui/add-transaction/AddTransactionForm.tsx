@@ -25,7 +25,14 @@ import type { AddTransferRequest } from '@features/transactions/api/useAddTransa
 import type { AddTransferResult } from '@entities/transaction/api/useTransactions';
 import { useCreateRecurringTransaction } from '@entities/recurring/api/useRecurringTransactions';
 import { resolveCategoryId } from '@features/transactions/lib/category-selection';
-import { getCurrentDate } from './add-transaction.utils';
+import {
+  AMOUNT_SIGN_TYPES,
+  typeForShortcutCode,
+} from '@features/transactions/lib/quick-entry-shortcuts';
+import { ENTER_COMMITS_FIELD_SELECTOR } from '@shared/lib/focus-navigation';
+import { ConfirmDialog } from '@shared/ui/confirm-dialog';
+import type { AddTransactionEscapeHandler } from './useAddTransactionDialogEscape';
+import { getCurrentDate, TRANSACTION_FIELD, type TransactionField } from './add-transaction.utils';
 
 import { TransactionFormHeader } from './TransactionFormHeader';
 import { TransactionDetailsSection } from './TransactionDetailsSection';
@@ -33,7 +40,11 @@ import { TransactionSplitSection } from './TransactionSplitSection';
 import { TransactionFormActions } from './TransactionFormActions';
 import { DuplicateTransactionHint } from '../form/DuplicateTransactionHint';
 import { RecurringOptionsSection } from './RecurringOptionsSection';
-import { useAddTransactionForm, type UseAddTransactionFormOptions } from './useAddTransactionForm';
+import {
+  useAddTransactionForm,
+  type SavedTransactionSummary,
+  type UseAddTransactionFormOptions,
+} from './useAddTransactionForm';
 import {
   buildRecurringSchedule,
   createRecurringFormSettings,
@@ -61,7 +72,33 @@ export interface AddTransactionFormProps {
   onAddTransfer: (request: AddTransferRequest) => Promise<AddTransferResult>;
   onCancel: () => void;
   recurring?: AddTransactionRecurringOptions;
+  /**
+   * The dialog's Escape: the form fills it in so Escape first ends editing
+   * the amount, and asks before throwing a started transaction away (see
+   * useAddTransactionDialogEscape).
+   */
+  registerEscapeHandler?: (handler: AddTransactionEscapeHandler | null) => void;
 }
+
+/** Roles that act on Enter themselves (a picker opens, a tab or switch toggles). */
+const ENTER_ACTIVATED_ROLES = new Set([
+  'button',
+  'checkbox',
+  'combobox',
+  'option',
+  'radio',
+  'switch',
+  'tab',
+]);
+const ENTER_ACTIVATED_TAGS = new Set(['a', 'button', 'textarea']);
+const AMOUNT_FIELD_SELECTOR = '[data-testid="transaction-amount-input"]';
+
+/** Where focus goes when a required field is missing. */
+const FIELD_SELECTORS: Record<TransactionField, string> = {
+  [TRANSACTION_FIELD.fromAccount]: '[data-testid="transaction-from-account-select"]',
+  [TRANSACTION_FIELD.toAccount]: '[data-testid="transaction-to-account-select"]',
+  [TRANSACTION_FIELD.category]: '[data-testid="transaction-category-field"] [role="combobox"]',
+};
 
 export function AddTransactionForm(props: AddTransactionFormProps) {
   const spaceId = useActiveSpaceId();
@@ -76,8 +113,18 @@ function BudgetTransactionForm({
   onAddTransfer,
   onCancel,
   recurring,
+  registerEscapeHandler,
 }: AddTransactionFormProps) {
   const { t } = useLingui();
+  const formRef = React.useRef<HTMLFormElement | null>(null);
+  const [lastSaved, setLastSaved] = React.useState<SavedTransactionSummary | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = React.useState(false);
+  /** A save asked for while the amount was being typed: it waits for the amount (add another?). */
+  const pendingSubmit = React.useRef<boolean | null>(null);
+
+  const focusField = React.useCallback((field: TransactionField) => {
+    formRef.current?.querySelector<HTMLElement>(FIELD_SELECTORS[field])?.focus();
+  }, []);
 
   const createRecurring = useCreateRecurringTransaction();
   const [recurringEnabled, setRecurringEnabled] = React.useState(
@@ -138,6 +185,8 @@ function BudgetTransactionForm({
     disableLastUsed: recurringLocked,
     disableAutofill: recurringLocked,
     disableCurrencyConversion: recurringEnabled,
+    onInvalidField: focusField,
+    onSavedAnother: setLastSaved,
   });
 
   const recurringSubmitting = recurring?.isSubmitting ?? createRecurring.isPending;
@@ -269,30 +318,89 @@ function BudgetTransactionForm({
   }, [submitTransaction]);
 
   const handleKeyDown = React.useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: React.KeyboardEvent<HTMLFormElement>) => {
       if (e.defaultPrevented) return;
-      const target = e.target as HTMLElement | null;
-      const tag = target?.tagName?.toLowerCase();
-      const role = target?.getAttribute?.('role');
-      const inCommandLike =
-        role === 'combobox' || role === 'option' || target?.closest('[role="listbox"]');
+      const target = e.target as HTMLElement;
+      // Pickers and the calendar render outside the form: their keys are theirs.
+      if (!e.currentTarget.contains(target)) return;
+      const mod = e.metaKey || e.ctrlKey;
 
-      if (form.isAmountEditing && e.key === 'Enter') return;
-
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      // Ctrl+Enter saves, Ctrl+Shift+Enter saves and starts the next one.
+      if (e.key === 'Enter' && mod) {
         e.preventDefault();
-        submitTransaction(false);
+        if (form.isAmountEditing) {
+          // The amount input takes this Enter too; save once it is committed.
+          pendingSubmit.current = e.shiftKey;
+          return;
+        }
+        submitTransaction(e.shiftKey);
         return;
       }
 
-      if (e.key === 'Enter' && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey) {
-        if (tag === 'textarea' || inCommandLike) return;
-        e.preventDefault();
-        submitTransaction(false);
+      if (e.altKey && !mod && !e.shiftKey) {
+        const type = typeForShortcutCode(e.code);
+        if (type) {
+          e.preventDefault();
+          form.setTransactionType(type);
+        }
+        return;
       }
+
+      // A sign typed first into the empty amount picks income or expense.
+      const signType = AMOUNT_SIGN_TYPES[e.key];
+      if (
+        signType &&
+        !mod &&
+        target instanceof HTMLInputElement &&
+        target.value === '' &&
+        target.closest(AMOUNT_FIELD_SELECTOR)
+      ) {
+        e.preventDefault();
+        form.setTransactionType(signType);
+        return;
+      }
+
+      if (e.key !== 'Enter' || e.shiftKey || e.altKey || mod) return;
+      // The amount and the date take their Enter and move on to the next field.
+      if (form.isAmountEditing || target.closest(ENTER_COMMITS_FIELD_SELECTOR)) return;
+      const role = target.getAttribute('role');
+      if (
+        ENTER_ACTIVATED_TAGS.has(target.tagName.toLowerCase()) ||
+        (role !== null && ENTER_ACTIVATED_ROLES.has(role)) ||
+        target.closest('[role="listbox"]')
+      ) {
+        return;
+      }
+      e.preventDefault();
+      submitTransaction(false);
     },
-    [form.isAmountEditing, submitTransaction]
+    [form, submitTransaction]
   );
+
+  // Saves asked for while the amount was being typed, once it is committed.
+  React.useEffect(() => {
+    if (form.isAmountEditing || pendingSubmit.current === null) return;
+    const addAnother = pendingSubmit.current;
+    pendingSubmit.current = null;
+    submitTransaction(addAnother);
+  }, [form.isAmountEditing, submitTransaction]);
+
+  // Escape ends editing the amount first, and asks before dropping what was typed.
+  const started = (form.amount ?? 0) > 0 || form.memo.trim() !== '';
+  React.useEffect(() => {
+    if (!registerEscapeHandler) return;
+    registerEscapeHandler((event) => {
+      if (form.isAmountEditing) {
+        event.preventDefault();
+        return;
+      }
+      if (started) {
+        event.preventDefault();
+        setConfirmDiscard(true);
+      }
+    });
+    return () => registerEscapeHandler(null);
+  }, [registerEscapeHandler, form.isAmountEditing, started]);
 
   const handleRatePromptConfirm = React.useCallback(
     async (rate: number, base: string, quote: string) => {
@@ -365,11 +473,22 @@ function BudgetTransactionForm({
 
   return (
     <form
+      ref={formRef}
       onSubmit={onFormSubmit}
       onKeyDownCapture={handleKeyDown}
       className="min-w-0 max-w-lg w-full mx-auto px-1 sm:px-0"
       data-testid="add-transaction-form"
     >
+      <ConfirmDialog
+        open={confirmDiscard}
+        onOpenChange={setConfirmDiscard}
+        title={t`Discard this transaction?`}
+        description={t`What you typed here is not saved.`}
+        confirmText={t`Discard`}
+        cancelText={t`Keep editing`}
+        variant="destructive"
+        onConfirm={onCancel}
+      />
       {form.showRatePrompt && form.pendingRatePair && (
         <ManualRatePrompt
           from={form.pendingRatePair.from}
@@ -504,6 +623,8 @@ function BudgetTransactionForm({
         isOutflow={form.isOutflow}
         recurringMode={recurringMode}
         isSubmitting={recurringSubmitting}
+        lastSaved={recurringEnabled ? null : lastSaved}
+        currencyCode={currencyCode}
       />
     </form>
   );

@@ -18,6 +18,7 @@ import {
 } from '@features/transactions/api/useBatchEditShortcuts';
 import { ADD_TRANSACTION_SHORTCUT_KEY } from '@features/transactions/api/useRegisterActionShortcuts';
 import { DUPLICATE_SHORTCUT_KEY } from '@features/transactions/api/useDuplicateShortcut';
+import { TYPE_SHORTCUT_DIGITS } from '@features/transactions/lib/quick-entry-shortcuts';
 import {
   UNCATEGORIZED_FILTER_KEY,
   UNCLEARED_FILTER_KEY,
@@ -71,6 +72,23 @@ export function KeyboardShortcutsDialog() {
         },
         { keys: 'Enter', label: t`Save transaction` },
         { keys: shortcuts.mod('Enter'), label: t`Save transaction from any field` },
+      ],
+    },
+    {
+      title: t`Add transaction dialog`,
+      items: [
+        { keys: 'Tab', label: t`Amount, date, account, payee, category, memo` },
+        { keys: shortcuts.alt(TYPE_SHORTCUT_DIGITS.outflow), label: t`Expense` },
+        { keys: shortcuts.alt(TYPE_SHORTCUT_DIGITS.inflow), label: t`Income` },
+        { keys: shortcuts.alt(TYPE_SHORTCUT_DIGITS.transfer), label: t`Transfer` },
+        { keys: '+ / -', label: t`Income or expense, typed first into the amount` },
+        { keys: '24 · +1 · ↑ / ↓', label: t`Type or shift the date` },
+        { keys: shortcuts.alt('↓'), label: t`Open the calendar` },
+        { keys: 'a–z', label: t`Start typing on a picker to search it` },
+        { keys: 'Enter / Tab', label: t`Pick the entry and move on` },
+        { keys: shortcuts.mod('Enter'), label: t`Save and close` },
+        { keys: shortcuts.modShift('Enter'), label: t`Save and add another` },
+        { keys: 'Esc', label: t`Close a picker, then the dialog` },
       ],
     },
     {
