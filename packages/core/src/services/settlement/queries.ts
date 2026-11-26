@@ -2,13 +2,22 @@ import { DatabaseAdapter } from '../../database/interface.js';
 import { allRows } from '../../database/sql.js';
 import { asMilli } from '../../money/index.js';
 import { NO_SPLITS_FILTER } from '../transactions/queries.js';
-import type { SettlementLineTotal, SettlementPaymentTotal } from './types.js';
+import type {
+  SettlementBookingLine,
+  SettlementLineTotal,
+  SettlementMonthLineTotal,
+  SettlementPaymentTotal,
+} from './types.js';
 
 interface LineTotalRow {
   AccountID: number;
   CategoryID: number;
   Inflow: number | null;
   Outflow: number | null;
+}
+
+interface MonthLineTotalRow extends LineTotalRow {
+  Month: string;
 }
 
 /** The account ids arrive as one JSON array parameter, however many there are. */
@@ -25,26 +34,37 @@ const plainTransferLeg = (alias: string) => `
       SELECT c.ID FROM categories c JOIN category_groups g ON g.ID = c.CategoryGroupID
       WHERE g.BudgetID = ${alias}.BudgetID AND g.Name = '${TRANSFERS_GROUP_NAME}'))`;
 
-const LINE_TOTALS_SQL = `
+/** The month of a transaction, YYYY-MM. */
+const MONTH_COLUMN = 'substr(t.Date, 1, 7) AS Month, ';
+
+/** Totals per account and category, also per month when `byMonth`. */
+const lineTotalsSql = (byMonth: boolean) => {
+  const month = byMonth ? MONTH_COLUMN : '';
+  const groupMonth = byMonth ? 'Month, ' : '';
+  return `
   WITH lines AS (
-    SELECT t.AccountID AS AccountID, s.CategoryID AS CategoryID,
+    SELECT ${month}t.AccountID AS AccountID, s.CategoryID AS CategoryID,
            s.InflowConverted AS Inflow, s.OutflowConverted AS Outflow
     FROM transaction_splits s
     JOIN transactions t ON t.ID = s.TransactionID
     WHERE t.BudgetID = ? AND DATE(t.Date) >= DATE(?) AND DATE(t.Date) <= DATE(?)
       AND ${ACCOUNT_FILTER} AND s.CategoryID IS NOT NULL
     UNION ALL
-    SELECT t.AccountID AS AccountID, t.CategoryID AS CategoryID,
+    SELECT ${month}t.AccountID AS AccountID, t.CategoryID AS CategoryID,
            t.InflowConverted AS Inflow, t.OutflowConverted AS Outflow
     FROM transactions t
     WHERE t.BudgetID = ? AND DATE(t.Date) >= DATE(?) AND DATE(t.Date) <= DATE(?)
       AND ${ACCOUNT_FILTER} AND t.CategoryID IS NOT NULL
       ${NO_SPLITS_FILTER}
   )
-  SELECT AccountID, CategoryID, SUM(Inflow) AS Inflow, SUM(Outflow) AS Outflow
+  SELECT ${groupMonth}AccountID, CategoryID, SUM(Inflow) AS Inflow, SUM(Outflow) AS Outflow
   FROM lines
-  GROUP BY AccountID, CategoryID
+  GROUP BY ${groupMonth}AccountID, CategoryID
 `;
+};
+
+const LINE_TOTALS_SQL = lineTotalsSql(false);
+const MONTH_LINE_TOTALS_SQL = lineTotalsSql(true);
 
 /**
  * Transfers whose sending leg is in one of the accounts and whose receiving
@@ -77,6 +97,38 @@ interface PaymentTotalRow {
   Amount: number | null;
 }
 
+/** The booking lines of the accounts in the categories (split lines by their own category). */
+const BOOKING_LINES_SQL = `
+  SELECT t.ID AS TransactionID, DATE(t.Date) AS Date, t.AccountID AS AccountID,
+         s.CategoryID AS CategoryID, COALESCE(NULLIF(s.Payee, ''), t.Payee, '') AS Payee,
+         COALESCE(NULLIF(s.Memo, ''), t.Memo, '') AS Memo,
+         s.InflowConverted AS Inflow, s.OutflowConverted AS Outflow
+  FROM transaction_splits s
+  JOIN transactions t ON t.ID = s.TransactionID
+  WHERE t.BudgetID = ? AND DATE(t.Date) >= DATE(?) AND DATE(t.Date) <= DATE(?)
+    AND ${ACCOUNT_FILTER} AND s.CategoryID IN (SELECT value FROM json_each(?))
+  UNION ALL
+  SELECT t.ID AS TransactionID, DATE(t.Date) AS Date, t.AccountID AS AccountID,
+         t.CategoryID AS CategoryID, COALESCE(t.Payee, '') AS Payee, t.Memo AS Memo,
+         t.InflowConverted AS Inflow, t.OutflowConverted AS Outflow
+  FROM transactions t
+  WHERE t.BudgetID = ? AND DATE(t.Date) >= DATE(?) AND DATE(t.Date) <= DATE(?)
+    AND ${ACCOUNT_FILTER} AND t.CategoryID IN (SELECT value FROM json_each(?))
+    ${NO_SPLITS_FILTER}
+  ORDER BY Date, TransactionID
+`;
+
+interface BookingLineRow {
+  TransactionID: number;
+  Date: string;
+  AccountID: number;
+  CategoryID: number;
+  Payee: string;
+  Memo: string;
+  Inflow: number | null;
+  Outflow: number | null;
+}
+
 /**
  * SettlementQueries - SQL for the household settlement.
  */
@@ -100,6 +152,57 @@ export class SettlementQueries {
     return allRows<LineTotalRow>(this.db, LINE_TOTALS_SQL, ...params, ...params).map((row) => ({
       accountId: row.AccountID,
       categoryId: row.CategoryID,
+      inflow: asMilli(row.Inflow ?? 0),
+      outflow: asMilli(row.Outflow ?? 0),
+    }));
+  }
+
+  /** lineTotals per YYYY-MM month. */
+  monthLineTotals(
+    budgetId: number,
+    startDate: string,
+    endDate: string,
+    accountIds: readonly number[]
+  ): SettlementMonthLineTotal[] {
+    if (accountIds.length === 0) return [];
+    const params = [budgetId, startDate, endDate, JSON.stringify(accountIds)];
+    return allRows<MonthLineTotalRow>(this.db, MONTH_LINE_TOTALS_SQL, ...params, ...params).map(
+      (row) => ({
+        month: row.Month,
+        accountId: row.AccountID,
+        categoryId: row.CategoryID,
+        inflow: asMilli(row.Inflow ?? 0),
+        outflow: asMilli(row.Outflow ?? 0),
+      })
+    );
+  }
+
+  /**
+   * The single booking lines of the accounts in the categories, posted
+   * between both dates, in date order: split lines by their own category.
+   */
+  bookingLines(
+    budgetId: number,
+    startDate: string,
+    endDate: string,
+    accountIds: readonly number[],
+    categoryIds: readonly number[]
+  ): SettlementBookingLine[] {
+    if (accountIds.length === 0 || categoryIds.length === 0) return [];
+    const params = [
+      budgetId,
+      startDate,
+      endDate,
+      JSON.stringify(accountIds),
+      JSON.stringify(categoryIds),
+    ];
+    return allRows<BookingLineRow>(this.db, BOOKING_LINES_SQL, ...params, ...params).map((row) => ({
+      transactionId: row.TransactionID,
+      date: row.Date,
+      accountId: row.AccountID,
+      categoryId: row.CategoryID,
+      payee: row.Payee,
+      memo: row.Memo,
       inflow: asMilli(row.Inflow ?? 0),
       outflow: asMilli(row.Outflow ?? 0),
     }));

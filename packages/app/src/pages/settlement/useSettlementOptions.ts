@@ -15,6 +15,10 @@ export interface SettlementOptions {
   incomeCategoryIds: number[];
   /** Every category's name by id (for the settlement details). */
   categoryNames: ReadonlyMap<number, string>;
+  /** The budget's accounts, for recording settlement payments. */
+  accounts: readonly Account[];
+  /** The category plain transfers carry (Transfers group); null before it is loaded. */
+  transfersCategoryId: number | null;
   isLoading: boolean;
 }
 
@@ -63,6 +67,7 @@ export function useSettlementOptions(budgetId: number): SettlementOptions {
 
   return useMemo(() => {
     const incomeGroup = groups.find((group) => group.Name === INCOME_GROUP_NAME);
+    const transfersGroup = groups.find((group) => group.Name === TRANSFERS_GROUP_NAME);
     return {
       accountGroups: accountGroupsOf(accounts, {
         budget: t`Budget accounts`,
@@ -70,6 +75,9 @@ export function useSettlementOptions(budgetId: number): SettlementOptions {
       }),
       categoryGroups: categoryGroupsOf(groups, categories),
       categoryNames: new Map(categories.map((category) => [category.ID, category.Name])),
+      accounts,
+      transfersCategoryId:
+        categories.find((category) => category.CategoryGroupID === transfersGroup?.ID)?.ID ?? null,
       incomeCategoryIds: categories
         .filter((category) => category.CategoryGroupID === incomeGroup?.ID)
         .map((category) => category.ID),

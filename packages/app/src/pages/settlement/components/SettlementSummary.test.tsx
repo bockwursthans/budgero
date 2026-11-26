@@ -213,4 +213,24 @@ describe('SettlementSummary', () => {
 
     expect(screen.getByText(/so the shared expenses there are split equally/)).toBeInTheDocument();
   });
+
+  it('offers to record each suggested payment only when it can be recorded', async () => {
+    const onSettleUp = vi.fn();
+    const { rerender } = render(
+      <SettlementSummary result={result()} money={money} categoryNames={CATEGORY_NAMES} />
+    );
+    expect(screen.queryByRole('button', { name: 'Settle up' })).not.toBeInTheDocument();
+
+    rerender(
+      <SettlementSummary
+        result={result()}
+        money={money}
+        categoryNames={CATEGORY_NAMES}
+        onSettleUp={onSettleUp}
+      />
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Settle up' }));
+
+    expect(onSettleUp).toHaveBeenCalledWith(result().transfers[0]);
+  });
 });

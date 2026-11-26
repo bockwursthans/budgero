@@ -8,6 +8,7 @@ import {
   dayBefore,
   INITIAL_SETTLEMENT_TERMS_KEY,
   isSettlementApprovalKey,
+  monthKeysBetween,
   NodeSqlJsAdapter,
   readSettlementProfile,
   removeSettlementTerms,
@@ -17,10 +18,12 @@ import {
   SETTLEMENT_PROFILE_FORMAT_VERSION,
   SETTLEMENT_PROFILE_KEY,
   SETTLEMENT_PROFILE_STATUS,
+  SETTLEMENT_PROGRESS_STATUS,
   SETTLEMENT_STRATEGY,
   SETTLEMENT_TERMS_ISSUE,
   SETTLEMENT_WARNING,
   settlementProfileScope,
+  settlementMonthProgress,
   settlementReport,
   settlementSegments,
   settlementTermsConsent,
@@ -1145,6 +1148,115 @@ describe('SettlementService (Node/sql.js)', () => {
     expect(nets(result)).toEqual({ [ALEX]: 500_000, [SAM]: -500_000 });
     expect(result.segments).toHaveLength(2);
   });
+
+  describe('progress', () => {
+    const PROGRESS_END = '2026-03-31';
+    const progressOf = (profile = profileOf(householdTerms())) =>
+      services.settlement.progress(
+        budgetId,
+        profile,
+        SETTLEMENT_EARLIEST_DATE,
+        PROGRESS_END,
+        ALL_APPROVED
+      );
+    const statuses = (progress: ReturnType<typeof progressOf>) =>
+      Object.fromEntries(progress.months.map((entry) => [entry.month, entry.status]));
+    const samPays = (date: string, amount: number, id: string) =>
+      Promise.all([
+        add(samAccount, transfers, date, 0, amount, budgetId, id),
+        add(alexAccount, transfers, date, amount, 0, budgetId, id),
+      ]);
+
+    beforeEach(async () => {
+      // Equal incomes; Alex pays the rent each month: Sam owes 500 a month.
+      await add(alexAccount, salary, '2026-01-25', 1_000_000);
+      await add(samAccount, salary, '2026-01-25', 1_000_000);
+      await add(alexAccount, rent, '2026-01-03', 0, 1_000_000);
+      await add(alexAccount, rent, '2026-02-03', 0, 1_000_000);
+    });
+
+    it('leaves every month open without payments', () => {
+      expect(progressOf()).toEqual({
+        months: [
+          { month: '2026-01', status: SETTLEMENT_PROGRESS_STATUS.open },
+          { month: '2026-02', status: SETTLEMENT_PROGRESS_STATUS.open },
+          { month: '2026-03', status: SETTLEMENT_PROGRESS_STATUS.open },
+        ],
+        personalItems: [],
+      });
+    });
+
+    it('settles the months the payments cover, oldest first', async () => {
+      await samPays('2026-03-02', 500_000, 'settle-january');
+
+      const progress = progressOf();
+
+      expect(statuses(progress)).toEqual({
+        '2026-01': SETTLEMENT_PROGRESS_STATUS.settled,
+        '2026-02': SETTLEMENT_PROGRESS_STATUS.open,
+        '2026-03': SETTLEMENT_PROGRESS_STATUS.open,
+      });
+      expect(progress.settledThrough).toBe('2026-01');
+    });
+
+    it('marks the month after the settled ones partly settled', async () => {
+      await samPays('2026-03-02', 700_000, 'settle-part');
+
+      expect(statuses(progressOf())).toEqual({
+        '2026-01': SETTLEMENT_PROGRESS_STATUS.settled,
+        '2026-02': SETTLEMENT_PROGRESS_STATUS.partly,
+        '2026-03': SETTLEMENT_PROGRESS_STATUS.open,
+      });
+    });
+
+    it('settles everything once the open balance is paid', async () => {
+      await samPays('2026-03-02', 1_000_000, 'settle-all');
+
+      const progress = progressOf();
+
+      expect(new Set(Object.values(statuses(progress)))).toEqual(
+        new Set([SETTLEMENT_PROGRESS_STATUS.settled])
+      );
+      expect(progress.settledThrough).toBe('2026-03');
+    });
+
+    it('lists personal categories paid by someone else with their month', async () => {
+      await samPays('2026-03-02', 500_000, 'settle-january');
+      await add(alexAccount, hobby, '2026-02-10', 0, 50_000);
+      // Paid by its owner: no item.
+      await add(samAccount, hobby, '2026-02-11', 0, 20_000);
+      const withPersonal = profileOf({
+        ...householdTerms(),
+        participants: householdTerms().participants.map((participant) =>
+          participant.id === SAM ? { ...participant, personalCategoryIds: [hobby] } : participant
+        ),
+      });
+
+      expect(progressOf(withPersonal).personalItems).toEqual([
+        expect.objectContaining({
+          date: '2026-02-10',
+          categoryId: hobby,
+          paidById: ALEX,
+          ownerId: SAM,
+          amount: 50_000,
+          memo: 'memo',
+          status: SETTLEMENT_PROGRESS_STATUS.open,
+        }),
+      ]);
+    });
+
+    it('has no months for terms nobody agreed to', () => {
+      expect(
+        services.settlement.progress(
+          budgetId,
+          profileOf(householdTerms()),
+          SETTLEMENT_EARLIEST_DATE,
+          PROGRESS_END,
+          () => false
+        )
+      ).toEqual({ months: [], personalItems: [] });
+    });
+  });
 });
 
 describe('SettlementService without everyone’s consent (Node/sql.js)', () => {
@@ -1246,5 +1358,66 @@ describe('settlementReport', () => {
       sharedExpensesByCategory: [{ categoryId: RENT, category: 'Rent', amount: 1000.005 }],
       incomeByCategory: [{ categoryId: SALARY, category: '', amount: 3000 }],
     });
+  });
+});
+
+describe('settlementMonthProgress', () => {
+  const owed = (alex: number, sam: number) =>
+    new Map([
+      [ALEX, alex],
+      [SAM, sam],
+    ]);
+  const paid = (bySam: number) =>
+    new Map([
+      [ALEX, -bySam],
+      [SAM, bySam],
+    ]);
+  const months = [
+    { month: '2026-01', nets: owed(300_000, -300_000) },
+    { month: '2026-02', nets: owed(500_000, -500_000) },
+    { month: '2026-03', nets: owed(800_000, -800_000) },
+  ];
+  const statusesOf = (payments: Map<string, number>) =>
+    settlementMonthProgress(months, payments).months.map((entry) => entry.status);
+  const { settled, partly, open } = SETTLEMENT_PROGRESS_STATUS;
+
+  it('settles the months the payments reach, then partly the next one', () => {
+    expect(statusesOf(paid(0))).toEqual([open, open, open]);
+    expect(statusesOf(paid(100_000))).toEqual([partly, open, open]);
+    expect(statusesOf(paid(300_000))).toEqual([settled, open, open]);
+    expect(statusesOf(paid(400_000))).toEqual([settled, partly, open]);
+    expect(statusesOf(paid(800_000))).toEqual([settled, settled, settled]);
+  });
+
+  it('names the last settled month, and none before any is settled', () => {
+    expect(settlementMonthProgress(months, paid(500_000)).settledThrough).toBe('2026-02');
+    expect(settlementMonthProgress(months, paid(0))).not.toHaveProperty('settledThrough');
+  });
+
+  it('treats under half a cent as even and a month that ends even as settled', () => {
+    const even = [
+      { month: '2026-01', nets: owed(300_000, -300_000) },
+      { month: '2026-02', nets: owed(4, -4) },
+    ];
+    expect(settlementMonthProgress(even, paid(0)).months.map((m) => m.status)).toEqual([
+      settled,
+      settled,
+    ]);
+  });
+
+  it('counts overpaying as settled', () => {
+    expect(statusesOf(paid(900_000))).toEqual([settled, settled, settled]);
+  });
+});
+
+describe('monthKeysBetween', () => {
+  it('runs across the year end, both ends included', () => {
+    expect(monthKeysBetween('2025-11', '2026-02')).toEqual([
+      '2025-11',
+      '2025-12',
+      '2026-01',
+      '2026-02',
+    ]);
+    expect(monthKeysBetween('2026-02', '2026-01')).toEqual([]);
   });
 });

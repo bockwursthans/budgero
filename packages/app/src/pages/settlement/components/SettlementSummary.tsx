@@ -1,9 +1,14 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Fragment, useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronRight } from 'lucide-react';
-import type { SettlementCategoryAmount, SettlementResult } from '@budgero/core/browser';
+import type {
+  SettlementCategoryAmount,
+  SettlementResult,
+  SettlementTransfer,
+} from '@budgero/core/browser';
 import { formatPercent } from '@pages/analytics/format-percent';
 import { Alert, AlertDescription } from '@shared/ui/alert';
+import { Button } from '@shared/ui/button';
 import { Card, CardContent } from '@shared/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@shared/ui/table';
 import { cn } from '@shared/lib/utils';
@@ -16,6 +21,8 @@ interface SettlementSummaryProps {
   currentUserId?: string | null;
   /** Category names by id, for the per-category details. */
   categoryNames: ReadonlyMap<number, string>;
+  /** Records a suggested payment; without it the payments are only listed. */
+  onSettleUp?: (transfer: SettlementTransfer) => void;
 }
 
 const PERCENT_POINTS = 100;
@@ -32,6 +39,7 @@ export function SettlementSummary({
   money,
   currentUserId,
   categoryNames,
+  onSettleUp,
 }: SettlementSummaryProps) {
   const { t } = useLingui();
   const nameOf = new Map(result.participants.map((p) => [p.participantId, p.name]));
@@ -246,6 +254,11 @@ export function SettlementSummary({
                   </span>
                   <span className="font-medium">{nameOf.get(transfer.toParticipantId)}</span>
                   <span className="ml-auto font-mono tabular-nums">{money(transfer.amount)}</span>
+                  {onSettleUp ? (
+                    <Button size="sm" variant="outline" onClick={() => onSettleUp(transfer)}>
+                      <Trans>Settle up</Trans>
+                    </Button>
+                  ) : null}
                 </li>
               ))}
             </ul>

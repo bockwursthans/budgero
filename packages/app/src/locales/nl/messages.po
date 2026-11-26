@@ -478,6 +478,11 @@ msgstr "{0, plural, one {Te verdelen voor # maand komt overeen.} other {Te verde
 msgid "{0, plural, one {Processed # mutation} other {Processed # mutations}}"
 msgstr "{0, plural, one {# mutatie verwerkt} other {# mutaties verwerkt}}"
 
+#. placeholder {0}: recordable.length
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "{0, plural, one {Record # transfer} other {Record # transfers}}"
+msgstr "{0, plural, one {# overboeking vastleggen} other {# overboekingen vastleggen}}"
+
 #. placeholder {0}: items.length
 #: src/pages/settings/PayeesPage.tsx
 msgid "{0, plural, one {Remove # payee?} other {Remove # payees?}}"
@@ -500,6 +505,11 @@ msgstr "{0, plural, one {rij} other {rijen}}"
 #: src/pages/analytics/insights.ts
 msgid "{0, plural, one {Savings target of {1} was met in {hit} of # month.} other {Savings target of {2} was met in {hit} of # months.}}"
 msgstr "{0, plural, one {Het spaardoel van {1} is gehaald in {hit} van # maand.} other {Het spaardoel van {2} is gehaald in {hit} van # maanden.}}"
+
+#. placeholder {0}: request.lines.length
+#: src/pages/settlement/SettlementPage.tsx
+msgid "{0, plural, one {Settlement payment recorded.} other {# settlement payments recorded.}}"
+msgstr "{0, plural, one {Verrekenbetaling vastgelegd.} other {# verrekenbetalingen vastgelegd.}}"
 
 #. placeholder {0}: sources.length
 #: src/features/import/ui/steps/configure/AccountsInFilePanel.tsx
@@ -1237,6 +1247,10 @@ msgstr "{firstGroup} en {secondGroup}"
 #: src/features/debt/ui/PayoffSimulator.tsx
 msgid "{formattedPayment}/mo"
 msgstr "{formattedPayment}/mnd"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "{from} pays {to} {amount}. It is recorded as transfers between your personal accounts, so the open balance goes down by what you enter here."
+msgstr "{from} betaalt {to} {amount}. Dat wordt vastgelegd als overboekingen tussen jullie persoonlijke rekeningen, dus het openstaande saldo daalt met wat je hier invult."
 
 #: src/pages/analytics/components/GoalFundingList.tsx
 msgid "{funded} of {target}"
@@ -4155,6 +4169,7 @@ msgstr "Aflossingsschema"
 #: src/pages/analytics/reports/ScenarioReport.tsx
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 #: src/pages/settings/subscription/InvoicesTable.tsx
+#: src/pages/settlement/components/SettlementProgressCard.tsx
 #: src/pages/warranties/components/WarrantyFormDialog.tsx
 #: src/pages/warranties/components/WarrantyTable.tsx
 msgid "Amount"
@@ -5127,6 +5142,10 @@ msgstr "Boekhandel"
 msgid "Both accounts use the same currency, so this transfer has no conversion rate."
 msgstr "Beide rekeningen gebruiken dezelfde valuta, dus deze overboeking heeft geen wisselkoers."
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Both need a personal account in the settlement terms to record the payment."
+msgstr "Beiden hebben een persoonlijke rekening in de verrekenregels nodig om de betaling vast te leggen."
+
 #: src/pages/onboarding/onboarding-data.ts
 msgid "Brazilian Real"
 msgstr "Braziliaanse real"
@@ -5643,6 +5662,7 @@ msgstr "Canadese dollar"
 #: src/pages/settings/subscription/PlanChangeDialog.tsx
 #: src/pages/settings/WorkspaceSettingsPage.tsx
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 #: src/pages/warranties/components/WarrantyFormDialog.tsx
 msgid "Cancel"
 msgstr "Annuleren"
@@ -5798,6 +5818,7 @@ msgstr "Categorieën die deze maand meer hebben uitgegeven dan ze hebben."
 #: src/pages/analytics/components/TargetTable.tsx
 #: src/pages/analytics/reports/PlanRealityReport.tsx
 #: src/pages/analytics/reports/VsExpenseReport.tsx
+#: src/pages/settlement/components/SettlementProgressCard.tsx
 msgid "Category"
 msgstr "Categorie"
 
@@ -7875,6 +7896,8 @@ msgstr "Databasestatistieken"
 #: src/features/reports/ui/notebook/question-labels.ts
 #: src/pages/admin/admin-users/user-details/BillingTab.tsx
 #: src/pages/settings/subscription/InvoicesTable.tsx
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "Date"
 msgstr "Datum"
 
@@ -8213,6 +8236,7 @@ msgid "Deleted \"{name}\""
 msgstr "\"{name}\" verwijderd"
 
 #: src/pages/settlement/components/SettlementSummary.tsx
+#: src/pages/settlement/SettlementPage.tsx
 msgid "Deleted category"
 msgstr "Verwijderde categorie"
 
@@ -9371,6 +9395,10 @@ msgstr "Iedereen in deze werkruimte doet mee. Nodig iemand eerst uit voor de wer
 msgid "Everyone taking part needs their own Budgero login in this workspace, so they can enter and manage their own transactions. Invite the others first."
 msgstr "Iedere deelnemer heeft een eigen Budgero-login in deze werkruimte nodig om zijn eigen transacties in te voeren en te beheren. Nodig de anderen eerst uit."
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Everything is settled."
+msgstr "Alles is verrekend."
+
 #: src/pages/settings/components/DuplicateHintSettingsCard.tsx
 msgid "Exact (±0.01)"
 msgstr "Exact (±0,01)"
@@ -10193,6 +10221,11 @@ msgstr "Stroom (Sankey)"
 msgid "Flow chart"
 msgstr "Stroomdiagram"
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgctxt "settlement-paid-for"
+msgid "for"
+msgstr "voor"
+
 #: src/features/bank-sync/ui/EnableBankingSetupCard.tsx
 msgid "For a Production app, use \"Activate by linking accounts\" and link every account you want to sync. Accounts you don't link there come back empty."
 msgstr "Gebruik bij een Production-app ‘Activate by linking accounts’ en koppel elke rekening die je wilt synchroniseren. Rekeningen die je daar niet koppelt, blijven leeg."
@@ -10317,6 +10350,7 @@ msgstr "Vriend of collega"
 #: src/pages/admin/StickinessAnalyticsSection.tsx
 #: src/pages/custom-dashboards/components/DashboardFilterBar.tsx
 #: src/pages/settings/CurrencySettingsPage.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "From"
 msgstr "Van"
 
@@ -10908,7 +10942,9 @@ msgstr "Horizon"
 msgid "Household"
 msgstr "Huishouden"
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
 #: src/pages/settlement/SettlementPage.tsx
+#: src/pages/settlement/useSettleUp.ts
 #: src/shared/model/nav-registry.ts
 msgid "Household settlement"
 msgstr "Huishoudverrekening"
@@ -12685,6 +12721,10 @@ msgstr "Klaar markeren"
 msgid "Mark ready posts it on its due date, Post now posts it today, and Skip leaves this one out. You find them on each upcoming one here and in the register."
 msgstr "‘Klaar markeren’ boekt hem op de vervaldatum, ‘Nu boeken’ boekt hem vandaag, en ‘Overslaan’ slaat deze ene over. Je vindt ze bij elke aankomende hier en in het register."
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Mark the transfers with the label \"Household settlement\""
+msgstr "De overboekingen markeren met het label 'Huishoudverrekening'"
+
 #: src/features/transactions/ui/TransactionsBatchToolbar.tsx
 msgid "Mark uncleared"
 msgstr "Markeren als niet bevestigd"
@@ -12839,6 +12879,7 @@ msgstr "Lidmaatschapsgegevens"
 #: src/features/transactions/ui/desktop-table/SplitDetailsDialog.tsx
 #: src/features/transactions/ui/form/SplitEditor.tsx
 #: src/features/transactions/ui/mobile-transaction-card/TransactionCardDetails.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "Memo"
 msgstr "Memo"
 
@@ -13117,6 +13158,10 @@ msgstr "Maandelijkse trend"
 msgid "months"
 msgstr "maanden"
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Months"
+msgstr "Maanden"
+
 #. placeholder {0}: goalMonthLabel(currentMonth)
 #: src/features/goal-management/ui/GoalSection.tsx
 msgid "Months before {0} keep their goal."
@@ -13169,6 +13214,10 @@ msgstr "Meer acties voor {0}"
 #: src/features/reports/ui/notebook/viz/ChartTypePicker.tsx
 msgid "More chart types"
 msgstr "Meer grafiektypen"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "More than the open balance by {difference}"
+msgstr "{difference} meer dan het openstaande saldo"
 
 #: src/entities/account/model/accountTypes.ts
 #: src/features/page-guides/ui/guide-visuals.tsx
@@ -14568,6 +14617,10 @@ msgstr "Niets meer na te kijken."
 msgid "Nothing new to import."
 msgstr "Niets nieuws om te importeren."
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Nothing settled yet."
+msgstr "Nog niets verrekend."
+
 #: src/features/budgeting/ui/BudgetContextPanel.tsx
 msgid "Nothing to apply — no assignments last month."
 msgstr "Niets toe te passen — geen toewijzingen vorige maand."
@@ -14819,6 +14872,10 @@ msgstr "Eén kleine letter"
 msgid "One number"
 msgstr "Eén cijfer"
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "One of the accounts is in another currency. Record this payment in the transaction dialog, where the exchange rate can be set."
+msgstr "Een van de rekeningen heeft een andere valuta. Leg deze betaling vast in het transactievenster, waar de wisselkoers kan worden ingesteld."
+
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "One row per payee: how often and how much, transfers left out."
 msgstr "Eén rij per begunstigde: hoe vaak en hoeveel, zonder overboekingen."
@@ -14836,6 +14893,14 @@ msgstr "Eén abonnement, tot 5 personen"
 #: src/pages/settings/automation-rules/RuleRow.tsx
 msgid "One time"
 msgstr "Eenmalig"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "One transfer for everything"
+msgstr "Eén overboeking voor alles"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "One transfer per item paid for {from}, then one for the rest"
+msgstr "Eén overboeking per post die voor {from} is betaald, daarna één voor de rest"
 
 #: src/app/startup/screens.tsx
 msgid "One uppercase letter"
@@ -14921,6 +14986,11 @@ msgstr "Alleen jij kunt je budget lezen"
 #: src/pages/admin/admin-users/user-details/BillingTab.tsx
 msgid "Open"
 msgstr "Openen"
+
+#: src/pages/settlement/settlement-messages.ts
+msgctxt "settlement-status"
+msgid "Open"
+msgstr "Open"
 
 #: src/features/subscription/ui/SharedWorkspaceAccessRequired.tsx
 msgid "Open <0>account settings</0> and download your exports from <1>data management</1>."
@@ -15369,10 +15439,15 @@ msgstr "Betaald"
 msgid "Paid {0} more than set aside"
 msgstr "{0}meer betaald dan gereserveerd"
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Paid by"
+msgstr "Betaald door"
+
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Paid by others (owed in full)"
 msgstr "Door anderen betaald (volledig verschuldigd)"
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
 #: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Paid for each other"
 msgstr "Voor elkaar betaald"
@@ -15424,6 +15499,14 @@ msgstr "Deelnemer"
 #: src/pages/settlement/components/SettlementTermsDialog.tsx
 msgid "Participants"
 msgstr "Deelnemers"
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Partly settled"
+msgstr "Deels verrekend"
+
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Partly settled in {partly}; nothing settled in full yet."
+msgstr "{partly} deels verrekend; nog niets volledig verrekend."
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "Parts of this settlement could not be read, so it can't be changed here. Update Budgero on all devices."
@@ -15516,6 +15599,10 @@ msgstr "Begunstigde"
 #: src/features/rules/ui/rule-editor/RuleActionRow.tsx
 msgid "Payee (blank clears it)"
 msgstr "Begunstigde (leeg wist deze)"
+
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Payee / memo"
+msgstr "Begunstigde / memo"
 
 #: src/pages/settings/PayeesPage.tsx
 msgid "Payee added"
@@ -15798,6 +15885,7 @@ msgid "Pick a way to start"
 msgstr "Kies hoe je begint"
 
 #: src/features/import/ui/steps/configure/AccountsInFilePanel.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "Pick an account"
 msgstr "Kies een rekening"
 
@@ -17264,6 +17352,10 @@ msgstr "Dit label verwijderen?"
 #: src/pages/settings/PayeesPage.tsx
 msgid "Remove this payee?"
 msgstr "Deze begunstigde verwijderen?"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Remove transfer"
+msgstr "Overboeking verwijderen"
 
 #. placeholder {0}: result.transactionsRemoved
 #. placeholder {1}: result.accountsRemoved ? plural(result.accountsRemoved, { one: `, # account`, other: `, # accounts`, }) : ''
@@ -18947,8 +19039,29 @@ msgid "Settings → Workspaces"
 msgstr "Instellingen → Werkruimtes"
 
 #: src/pages/settlement/components/SettlementSummary.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Settle up"
+msgstr "Verrekenen"
+
+#: src/pages/settlement/settlement-messages.ts
+msgid "Settled"
+msgstr "Verrekend"
+
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Settled through {settledThrough}; {partly} partly."
+msgstr "Verrekend tot en met {settledThrough}; {partly} deels."
+
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Settled through {settledThrough}."
+msgstr "Verrekend tot en met {settledThrough}."
+
+#: src/pages/settlement/components/SettlementSummary.tsx
 msgid "Settlement payments"
 msgstr "Verrekenbetalingen"
+
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "Settlement progress"
+msgstr "Stand van de verrekening"
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "Settlement saved. It takes effect once everyone has agreed."
@@ -18957,6 +19070,14 @@ msgstr "Verrekening opgeslagen. Ze geldt zodra iedereen heeft ingestemd."
 #: src/pages/settlement/components/SettlementTermsList.tsx
 msgid "Settlement terms"
 msgstr "Verrekenafspraken"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Settles {category} of {date}"
+msgstr "Verrekent {category} van {date}"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Settles the open balance"
+msgstr "Verrekent het openstaande saldo"
 
 #: src/pages/onboarding/apply-onboarding.ts
 #: src/pages/onboarding/steps/DoneStep.tsx
@@ -19009,6 +19130,7 @@ msgid "Shared expense categories"
 msgstr "Categorieën gedeelde uitgaven"
 
 #: src/pages/settlement/components/SettlementSummary.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "Shared expenses"
 msgstr "Gedeelde uitgaven"
 
@@ -19935,6 +20057,7 @@ msgstr "Statistiek"
 #: src/pages/settings/ImportsPage.tsx
 #: src/pages/settings/push-api/TokenStatusCard.tsx
 #: src/pages/settings/subscription/InvoicesTable.tsx
+#: src/pages/settlement/components/SettlementProgressCard.tsx
 #: src/pages/warranties/components/WarrantyTable.tsx
 msgid "Status"
 msgstr "Status"
@@ -19973,6 +20096,10 @@ msgstr "Deze rekening wordt nog gecontroleerd"
 #: src/features/goal-management/lib/core-goal-text.ts
 msgid "Still Needed"
 msgstr "Nog nodig"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Still open afterwards: {difference}"
+msgstr "Daarna nog open: {difference}"
 
 #: src/features/budget-planning/ui/category-row/CCUnderfundedDetails.tsx
 msgid "Still underfunded"
@@ -20524,6 +20651,10 @@ msgstr "Het beschikbare saldo dat je elke maand in deze categorie wilt hebben."
 msgid "The balance is off by a fraction of a cent (rounding from a currency conversion). Reconciling clears it so the account matches your bank exactly."
 msgstr "Het saldo wijkt een fractie van een cent af (afronding door een valutaomrekening). Afstemmen werkt dit weg zodat de rekening precies overeenkomt met je bank."
 
+#: src/pages/settlement/components/SettlementProgressCard.tsx
+msgid "The balance is settled as a whole: a month counts as settled once the payments made so far cover everything owed up to its end."
+msgstr "Het saldo wordt als geheel verrekend: een maand telt als verrekend zodra de betalingen tot nu toe alles dekken wat tot het einde ervan verschuldigd was."
+
 #: src/features/reports/ui/notebook/question-labels.ts
 msgid "The balance of accounts that aren't debts."
 msgstr "Het saldo van rekeningen die geen schulden zijn."
@@ -20687,6 +20818,10 @@ msgstr "De groep Inkomsten kan niet worden verwijderd."
 msgid "The invite has been revoked."
 msgstr "De uitnodiging is ingetrokken."
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "The items add up to more than the payment, because other amounts offset them. Record one transfer."
+msgstr "De posten zijn samen meer dan de betaling, omdat andere bedragen ze compenseren. Leg één overboeking vast."
+
 #: src/features/bank-sync/ui/EnableBankingSetupCard.tsx
 msgid "The key is stored encrypted inside this budget and is never sent anywhere else. Requests are encrypted from this browser all the way to Enable Banking; Budgero's relay only forwards traffic it can't read. Anyone you share this budget with can sync it too."
 msgstr "De sleutel wordt versleuteld in dit budget opgeslagen en nergens anders naartoe gestuurd. Verzoeken zijn versleuteld van deze browser tot aan Enable Banking; de Budgero-relay stuurt alleen verkeer door dat hij niet kan lezen. Iedereen met wie je dit budget deelt, kan het ook synchroniseren."
@@ -20738,6 +20873,10 @@ msgstr "De eigenaar maakt uitnodigingen, hernoemt of verwijdert de werkruimte en
 #: src/pages/accounts/hooks/useRecurringEditorFromTransaction.ts
 msgid "The paired transfer transaction could not be loaded."
 msgstr "De gekoppelde overboekingstransactie kon niet worden geladen."
+
+#: src/pages/settlement/SettlementPage.tsx
+msgid "The payment could not be recorded. Check your connection and try again."
+msgstr "De betaling kon niet worden vastgelegd. Controleer je verbinding en probeer het opnieuw."
 
 #: src/pages/settlement/SettlementPage.tsx
 msgid "The period it covered is then settled with the terms before it. Transactions are not touched."
@@ -21445,6 +21584,7 @@ msgstr "Titel op het dashboard (optioneel)"
 #: src/pages/admin/StickinessAnalyticsSection.tsx
 #: src/pages/custom-dashboards/components/DashboardFilterBar.tsx
 #: src/pages/settings/CurrencySettingsPage.tsx
+#: src/pages/settlement/components/SettleUpDialog.tsx
 msgid "To"
 msgstr "Naar"
 
@@ -21678,6 +21818,10 @@ msgstr "Totaal aantal gebruikers"
 msgid "Total: {0}"
 msgstr "Totaal: {0}"
 
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Total: <0>{totalText}</0>"
+msgstr "Totaal: <0>{totalText}</0>"
+
 #: src/pages/onboarding/onboarding-data.ts
 msgid "Totally optional — it just helps us know where to find more people like you."
 msgstr "Helemaal optioneel — het helpt ons alleen om te weten waar we meer mensen zoals jij kunnen vinden."
@@ -21879,6 +22023,10 @@ msgstr "Overboekingen buiten budget"
 #: src/features/budgeting/ui/ReadyToAssignHelpPopover.tsx
 msgid "Transfers onto budget"
 msgstr "Overboekingen in budget"
+
+#: src/pages/settlement/components/SettleUpDialog.tsx
+msgid "Transfers to record"
+msgstr "Vast te leggen overboekingen"
 
 #: src/features/demo-budget/lib/seed-demo-budget.ts
 msgid "Transit pass"
